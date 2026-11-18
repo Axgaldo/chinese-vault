@@ -14,8 +14,12 @@ import { m3 } from './hsk1/m3'
 import { m4 } from './hsk1/m4'
 import { m5 } from './hsk1/m5'
 import { m6 } from './hsk1/m6'
+import { m7 } from './hsk1/m7'
+import { m8 } from './hsk1/m8'
+import { m9 } from './hsk1/m9'
+import { m10 } from './hsk1/m10'
 
-export const modules: VaultModule[] = [hsk0, m1, m2, m3, m4, m5, m6]
+export const modules: VaultModule[] = [hsk0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10]
 
 export const moduleById = new Map(modules.map((m) => [m.id, m]))
 
@@ -44,6 +48,7 @@ export function entryIdsInStep(step: Step): string[] {
     case 'choose-hanzi':
     case 'listen':
     case 'type-pinyin':
+    case 'dictate':
       return [step.entry]
     case 'tone':
       return [step.entry]
