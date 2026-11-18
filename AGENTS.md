@@ -65,7 +65,7 @@ src/
 │   ├── builders.ts      # helpers: e(), grammar(), lesson(), drill(), build(), match()…
 │   ├── hsk0.ts          # SECTOR 0: tonos y fonética
 │   ├── index.ts         # registro: modules, lessonById, entriesById, seenEntries…
-│   └── hsk1/m1…m6.ts    # SECTORES 1-6 (saludos→identidad→números→familia→lugares→comida)
+│   └── hsk1/m1…m10.ts  # SECTORES 1-10 (saludos→identidad→números→familia→lugares→comida→tiempo→rutina→cualidades→auditoría final)
 ├── types/               # content.ts (curso) y progress.ts (progreso/SRS/rangos)
 ├── lib/
 │   ├── audio.ts         # speakEntry/speakSentence: MP3 → fallback TTS
@@ -81,8 +81,9 @@ src/
 │   ├── useAuth.ts       # modo local/anon/account (no persistido)
 │   └── useToasts.ts     # avisos flotantes (logros/chapas) con autodesaparición
 ├── components/
-│   ├── challenges.tsx   # LOS 9 RETOS (intro, note, choose-es, choose-hanzi, listen,
-│   │                    #   tone, type-pinyin, build, match) + ChallengeView dispatcher
+│   ├── challenges.tsx   # LOS 10 RETOS (intro, note, choose-es, choose-hanzi, listen,
+│   │                    #   tone, type-pinyin, dictate=quiz de escucha, build, match)
+│   │                    #   + ChallengeView dispatcher
 │   ├── LessonRunner.tsx # cola de pasos, reintentos (pos+4), XP, estrellas, completado
 │   ├── Pinyin.tsx       # pinyin coloreado por tono
 │   ├── BootScreen.tsx   # arranque VAULT-OS (una vez, localStorage 'cv-boot-v1')
@@ -178,13 +179,16 @@ service cloud.firestore {
 
 ## Modo de escritura (pinyin-first)
 
-- `settings.showHanzi` (default **false** = pinyin): los retos muestran pinyin (coloreado por tono)
-  o hanzi. El botón 拼/漢 de la cabecera de lección lo alterna al vuelo.
-- `PromptWord` (challenges.tsx): la palabra del enunciado suena al tocarla y revela el otro
-  sistema. `reveal={false}` solo para retos de transcripción (type-pinyin SIEMPRE muestra hanzi).
-- Match/Build/options muestran el script activo y anotan el otro tras responder.
-- persist version 2 migra showHanzi a false. Cualquier campo nuevo de settings/ProgressState
-  necesita: tipo + INITIAL_PROGRESS + `progressData()` + migrate con defaults.
+- `settings.scriptMode` ('pinyin' | 'both' | 'hanzi', default **pinyin**): el botón 拼/拼+漢/漢 de la
+  cabecera de lección ROTA los tres modos (también desde Perfil → Ajustes).
+  - 拼: pinyin grande; tocar la palabra = audio + revela el hanzi.
+  - 拼+漢: hanzi con el pinyin apilado debajo (estilo HelloChinese).
+  - 漢: hanzi; tocar = audio + revela el pinyin.
+- `PromptWord` (challenges.tsx) es el enunciado; `reveal={false}` solo para retos de transcripción
+  (type-pinyin SIEMPRE muestra hanzi). `WordInMode` es la versión para opciones/chips.
+- Tras responder, las opciones anotan el script que falta según el modo.
+- persist version 3 migra showHanzi(boolean)→scriptMode. Campo nuevo en settings/ProgressState:
+  tipo + INITIAL_PROGRESS + migrate con defaults.
 
 ## Diseño (identidad visual)
 
@@ -200,6 +204,12 @@ service cloud.firestore {
   claro, `text-lg`); al final, `<Cursor />` (barrita parpadeante de consola). Los retos con
   opciones grandes y botones de audio son el look de referencia ("escucha y elige").
 - Componentes de UI en `components/ui.tsx`: NO inventar botones nuevos, usar `Btn`/`Panel`/etc.
+  Para ajustes on/off usa SIEMPRE `Toggle` (botón `[ ■ ACTIVADO ]`) — los checkboxes nativos se
+  renderizan invisibles en algunos navegadores oscuros (bug real reportado).
+- **Apariencia (Perfil):** `settings.contrast` (ultra-oscuro: clase `cv-contrast` en `<html>`,
+  redefine los tokens vault a negro puro/verde fósforo), `settings.crt` (scanlines/viñeta/barrido/
+  parpadeo on-off, condicional en App.tsx) y `settings.bodyFont` ('mono'|'pixel'|'sans' vía
+  `html[data-font]`). Los TRES se aplican con un useEffect en App.tsx.
 - Textos de UI en español con sabor Fallout pero sin ser insoportables: "REGISTRAR ENTRADA",
   "ACCESO CONCEDIDO", "ERROR DE PROTOCOLO", "ENTRADAS REGISTRADAS", "ZONA PELIGROSA"…
 
@@ -214,19 +224,17 @@ service cloud.firestore {
 
 ## Roadmap (siguientes sesiones)
 
-Contenido (sectores 7-10 de HSK 1, ~150 palabras completas):
+**HSK 1 está COMPLETO** (S-00 → S-10, ~150 palabras, 32 lecciones, 10 retos incluido el
+dictado de oído puro del Overseer).
 
-- **S-07 Tiempo:** 今天/明天/昨天, 星期, 年/月/日, 现在, 时候, 上午/下午, 分钟…
-- **S-08 Rutina (verbos):** 去/来/看/想/会/能/做/写/读/听/说, 学习, 工作, 睡觉…
-- **S-09 Cualidades (adjetivos):** 大/小/多/少, 高兴, 漂亮, 热/冷, 累, 忙, 知道…
-- **S-10 Auditoría final del Vault:** repaso integral + mini-conversaciones con todo lo visto.
+Hecho en v0.2/v0.3: PWA offline, chapas + bono diario, 10 logros, modo supervisor,
+rotación de script 拼/拼漢/漢 con toque-revelar, apariencia (ultra-oscuro, CRT on/off,
+letra), legibilidad + cursor de consola, sectores 7-10 y auditoría final con dictado.
 
-Hecho en v0.2: PWA offline, chapas + bono diario, 10 logros, modo supervisor,
-modo pinyin⇄hanzi con toque-revelar, legibilidad de paneles largos + cursor de consola.
-
-Features candidatas: misión diaria (quest con recompensa en chapas), quiz de escucha pura,
-exportar/importar progreso (JSON), HSK 2+ (nuevos módulos), modo caracteres (escribir hanzi
-con trazos), estadísticas con gráficas, tienda de chapas (temas de color del terminal).
+Features candidatas: misión diaria (quest con recompensa en chapas), tienda de chapas
+(temas de color del terminal), exportar/importar progreso (JSON), HSK 2+ (nuevos módulos),
+modo caracteres (escribir hanzi con trazos), estadísticas con gráficas, quiz de escucha
+con frases completas.
 
 ## Notas de entorno conocidas
 

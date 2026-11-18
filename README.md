@@ -14,18 +14,22 @@ CALIBRANDO TONOS (4/4).............. OK
 ABRIENDO LA PUERTA DEL REFUGIO 101..
 ```
 
-## Qué tiene hoy (v0.2)
+## Qué tiene hoy (v0.3) — HSK 1 COMPLETO
 
 - **Sector 0 (HSK 0):** tonos, fonética y pinyin antes de hablar.
-- **Sectores 1–6 (HSK 1):** saludos, identidad, números, familia, lugares, comida — 24 lecciones,
-  ~100 palabras y 17 apuntes de gramática, con **audio en todas las palabras y frases**.
-- **9 tipos de reto:** tarjetas de vocabulario, traducción, dictado por oído, entrenador de tonos,
-  escribir pinyin, construir frases, emparejar, apuntes de gramática y auditorías de repaso.
+- **Sectores 1–10 (HSK 1 completo):** saludos, identidad, números, familia, lugares, comida,
+  tiempo, rutina, cualidades y la Auditoría Final — **32 lecciones, ~150 palabras y 25 apuntes
+  de gramática**, con **audio en todas las palabras y frases**.
+- **10 tipos de reto:** tarjetas de vocabulario, traducción, dictado por oído, entrenador de tonos,
+  escribir pinyin, **dictado de oído puro** (quiz de escucha sin texto), construir frases,
+  emparejar, apuntes de gramática y auditorías de repaso.
 - **Repetición espaciada (SRS):** cada palabra vista entra en tu cola de repaso con intervalos
   crecientes (SM-2 simplificado).
-- **Modo pinyin ⇄ hanzi (estilo HelloChinese):** botón 拼/漢 en plena lección; toca cualquier
-  palabra del enunciado para oírla y ver su versión en el otro sistema. El pinyin es el modo
-  principal, coloreado por tono (1 rojo, 2 ámbar, 3 turquesa, 4 violeta).
+- **3 modos de escritura (estilo HelloChinese):** botón 拼 → 拼+漢 → 漢 en plena lección —
+  pinyin puro (con toque-revelado del hanzi), hanzi con pinyin apilado, o hanzi. El pinyin va
+  coloreado por tono (1 rojo, 2 ámbar, 3 turquesa, 4 violeta).
+- **Apariencia configurable:** ultra-oscuro (negro puro + verde fósforo), efecto CRT on/off y
+  selector de letra (mono/pixel/sans) desde el Perfil.
 - **Chapas ⛓ y logros:** la moneda del refugio — bono diario +5, chapas por lecciones y repasos;
   10 logros con sus toasts ("Puerta 101", "El Rey de las Chapas"…).
 - **👁 Modo Supervisor (libre):** en Ajustes del Perfil, desbloquea todas las lecciones para
@@ -95,6 +99,10 @@ S-03 Números                  ── contar, precios, teléfono y edad
 S-04 Familia                  ── los tuyos, tener (有)， plurales con 们
 S-05 Lugares                  ── estar en (在)， este/ese, ¿dónde?
 S-06 Comida y bebida          ── 我想喝茶 y el comedor del refugio
+S-07 Tiempo                   ── hoy/mañana, fechas, horas y 两点半
+S-08 Rutina                   ── verbos sin conjugación, 会/能， 我在学习
+S-09 Cualidades               ── adjetivos-como-verbo, estados y gustos
+S-10 Auditoría Final          ── el dictado del Overseer + certificado HSK 1
 ```
 
 Cada sector termina con una **Auditoría** que consolida todo antes de abrir la siguiente puerta.
