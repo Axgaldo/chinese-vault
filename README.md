@@ -65,14 +65,15 @@ npm run dev       # http://localhost:5173
 
 ## Cuenta en la nube (opcional y gratis)
 
-Por defecto tu progreso vive en tu navegador. Para tenerlo en la nube y seguir en otro dispositivo:
+Por defecto tu progreso vive en tu navegador. Para tenerlo en la nube y seguir en otro dispositivo,
+la app usa **inicio de sesión con Google** (seguridad de Google, sin contraseñas que cuidar):
 
-1. Crea un proyecto en [console.firebase.google.com](https://console.firebase.google.com)
-   (**plan Spark**: gratuito, sin tarjeta).
-2. Añade una app web (`</>`) y copia su configuración.
-3. Activa **Authentication → Sign-in method → Anónimo** y **Correo electrónico/contraseña**.
-4. Crea **Firestore Database** (da igual el modo; luego pega estas reglas para que nadie más que
-   tú lea tu progreso):
+1. En tu proyecto de [console.firebase.google.com](https://console.firebase.google.com):
+   **Authentication → Sign-in method** → activa **Google** (elige tu email de soporte)
+   y también **Anónimo** (lo usa el modo local inicial).
+2. **Project settings → Your apps → Web (</>)** y copia la configuración que te da.
+3. Crea **Firestore Database** (production mode vale) y pega estas reglas para que nadie
+   más que tú lea tu progreso:
 
 ```
 rules_version = '2';
@@ -85,9 +86,9 @@ service cloud.firestore {
 }
 ```
 
-5. Copia `.env.example` a `.env` y pega tus claves. Reinicia `npm run dev`.
-6. En la app: **Perfil → vincula tu email**. Tu habitante anónimo se convierte en cuenta sin
-   perder nada.
+4. Copia `.env.example` a `.env` y pega tus claves. Reinicia `npm run dev`.
+5. En la app: **Perfil → 🔴 ENTRAR CON GOOGLE**. Tu habitante anónimo se convierte en tu
+   cuenta de Google conservando todo el progreso.
 
 ## Estructura del aprendizaje
 

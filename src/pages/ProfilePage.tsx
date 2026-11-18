@@ -4,7 +4,6 @@
 
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import type { Auth } from 'firebase/auth'
 import { allLessons, seenEntries } from '../content'
 import { ACHIEVEMENTS } from '../lib/achievements'
 import { speakHanzi } from '../lib/audio'
@@ -29,8 +28,6 @@ export function ProfilePage() {
   const reset = useProgress((s) => s.reset)
   const { mode, email, uid } = useAuth()
 
-  const [mailInput, setMailInput] = useState('')
-  const [passInput, setPassInput] = useState('')
   const [authMsg, setAuthMsg] = useState<string | null>(null)
   const [confirmReset, setConfirmReset] = useState(false)
 
@@ -39,57 +36,46 @@ export function ProfilePage() {
   const achievements = useProgress((s) => s.achievements)
   const unlockedCount = Object.keys(achievements).length
 
-  const authError = (code: string): string => {
+  /** Errores de Google Sign-In traducidos al idioma del refugio */
+  const googleError = (code: string): string => {
     switch (code) {
-      case 'auth/email-already-in-use':
-        return 'Ese email ya tiene cuenta: usa ENTRAR con tus datos.'
-      case 'auth/invalid-credential':
-      case 'auth/wrong-password':
-      case 'auth/user-not-found':
-        return 'Email o contraseña incorrectos.'
-      case 'auth/invalid-email':
-        return 'Ese email no parece válido.'
-      case 'auth/weak-password':
-        return 'La contraseña debe tener al menos 6 caracteres.'
+      case 'auth/popup-closed-by-user':
+      case 'auth/cancelled-popup-request':
+        return 'Ventana cerrada antes de terminar. Inténtalo otra vez.'
+      case 'auth/popup-blocked':
+        return 'El navegador bloqueó la ventana emergente: permite pop-ups para esta web.'
+      case 'auth/operation-not-allowed':
+        return 'Proveedor no activado: enciende Google en Authentication → Sign-in method (consola de Firebase).'
+      case 'auth/unauthorized-domain':
+        return 'Dominio no autorizado: añádelo en Authentication → Settings → Authorized domains.'
+      case 'auth/network-request-failed':
+        return 'Problema de red al hablar con Google. Revisa tu conexión.'
       default:
         return 'No se pudo completar la operación. Inténtalo de nuevo.'
     }
   }
 
-  const linkAccount = async () => {
+  /**
+   * ENTRAR CON GOOGLE:
+   * • si la sesión es anónima → linkWithPopup (mismo uid: el progreso local sube sin perder nada)
+   * • si no hay sesión → signInWithPopup (recupera el progreso de la nube en este dispositivo)
+   */
+  const googleSignIn = async () => {
     const fb = await loadFirebase()
     if (!fb) return
-    const a = fb.auth
-    const { EmailAuthProvider, linkWithCredential, signInWithEmailAndPassword } = await import('firebase/auth')
+    const { GoogleAuthProvider, linkWithPopup, signInWithPopup } = await import('firebase/auth')
+    const provider = new GoogleAuthProvider()
     try {
-      const cred = EmailAuthProvider.credential(mailInput, passInput)
-      const user = a.currentUser
+      const user = fb.auth.currentUser
       if (user?.isAnonymous) {
-        await linkWithCredential(user, cred)
-        setAuthMsg('Progreso vinculado a tu cuenta ✓ ya puedes entrar desde otro dispositivo')
-      } else if (!user) {
-        await signInWithEmailAndPassword(a, mailInput, passInput)
-        setAuthMsg('Sesión iniciada ✓')
+        await linkWithPopup(user, provider)
+        setAuthMsg('Progreso vinculado a tu cuenta de Google ✓ te sigue en cualquier dispositivo')
       } else {
-        setAuthMsg('Ya tienes cuenta guardada en la nube.')
+        await signInWithPopup(fb.auth, provider)
+        setAuthMsg('Sesión iniciada con Google ✓')
       }
-      setPassInput('')
     } catch (err) {
-      setAuthMsg(authError((err as { code?: string })?.code ?? ''))
-    }
-  }
-
-  const login = async () => {
-    const fb = await loadFirebase()
-    if (!fb) return
-    const a: Auth = fb.auth
-    const { signInWithEmailAndPassword } = await import('firebase/auth')
-    try {
-      await signInWithEmailAndPassword(a, mailInput, passInput)
-      setAuthMsg('Sesión iniciada ✓')
-      setPassInput('')
-    } catch (err) {
-      setAuthMsg(authError((err as { code?: string })?.code ?? ''))
+      setAuthMsg(googleError((err as { code?: string })?.code ?? ''))
     }
   }
 
@@ -154,7 +140,7 @@ export function ProfilePage() {
         {firebaseEnabled && mode === 'account' && (
           <div className="space-y-2">
             <p className="text-sm">
-              CUENTA EN LA NUBE: <span className="text-vault-300">{email}</span>
+              CUENTA DE GOOGLE: <span className="text-vault-300">{email}</span>
             </p>
             <Btn variant="amber" className="w-full" onClick={() => void logout()}>
               CERRAR SESIÓN
@@ -165,33 +151,12 @@ export function ProfilePage() {
         {firebaseEnabled && mode === 'anon' && (
           <div className="space-y-2">
             <p className="text-sm text-vault-500">
-              HABITANTE ANÓNIMO ({uid?.slice(0, 8)}) — el progreso se guarda en la nube con ese id. Vincula
-              un email para recuperarlo en otro dispositivo:
+              HABITANTE ANÓNIMO ({uid?.slice(0, 8)}) — el progreso se guarda en la nube con ese id.
+              Entra con Google para llevarlo a cualquier dispositivo (sin perder nada):
             </p>
-            <input
-              type="email"
-              className="choice choice-selected w-full rounded px-3 py-2 text-vault-100 outline-none"
-              placeholder="tu@email.com"
-              value={mailInput}
-              onChange={(e) => setMailInput(e.target.value)}
-              autoComplete="email"
-            />
-            <input
-              type="password"
-              className="choice choice-selected w-full rounded px-3 py-2 text-vault-100 outline-none"
-              placeholder="contraseña (mín. 6)"
-              value={passInput}
-              onChange={(e) => setPassInput(e.target.value)}
-              autoComplete="new-password"
-            />
-            <div className="flex gap-2">
-              <Btn className="flex-1" onClick={() => void linkAccount()} disabled={!mailInput || !passInput}>
-                VINCULAR ✓
-              </Btn>
-              <Btn variant="amber" className="flex-1" onClick={() => void login()} disabled={!mailInput || !passInput}>
-                ENTRAR
-              </Btn>
-            </div>
+            <Btn className="w-full" onClick={() => void googleSignIn()}>
+              <span className="mr-2">🔴</span> ENTRAR CON GOOGLE ▸
+            </Btn>
           </div>
         )}
 

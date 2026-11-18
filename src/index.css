@@ -166,9 +166,14 @@ html.cv-contrast .meter {
 
 /* ── Letra del texto general (Ajustes → Apariencia) ──────────────────────── */
 
+/* Pixel (VT323) es ópticamente más pequeña: escala el raíz para agrandar
+   todo el texto rem-basado de la UI en ~25% (equivalente a +2-3 pts) */
+html[data-font='pixel'] {
+  font-size: 125%;
+}
+
 html[data-font='pixel'] body {
   font-family: var(--font-display);
-  font-size: 1.15em;
 }
 
 html[data-font='sans'] body {

@@ -136,11 +136,14 @@ Todo el curso son datos TS. Mirar `src/content/hsk1/m1.ts` como ejemplo canónic
 
 Sin `.env` la app es 100% local. Con `.env` (ver `.env.example`):
 
-- **Auth anónima automática** → cada dispositivo = un uid; su Firestore doc guarda el progreso.
+- **Auth anónima automática** → cada dispositivo = un uid anónimo; su Firestore doc guarda el progreso.
+  En la consola hay que activar los DOS proveedores: **Google** y **Anónimo**.
+- **ENTRAR CON GOOGLE** (Perfil): si la sesión es anónima hace `linkWithPopup` (mismo uid → el
+  progreso local sube sin perder nada); si no hay sesión, `signInWithPopup` recupera la nube.
+  Errores típicos traducidos: `operation-not-allowed` (proveedor sin activar) y
+  `unauthorized-domain` (dominio no añadido en Authentication → Settings).
 - Sincronización **local-first**: debounce 3s tras cada cambio; si el remoto tiene `updatedAt` mayor,
-  se adopta el remoto.
-- **Vincular email** (Perfil) hace `linkWithCredential` sobre el usuario anónimo → mismo uid en otros
-  dispositivos, sin perder progreso.
+  se adopta el remoto (gana el más reciente).
 - Documento: `users/{uid} = { progress: <ProgressState>, updatedAt }`.
 - **Reglas de seguridad** a poner en la consola (la modalidad "prueba" caduca en 30 días):
 
