@@ -34,6 +34,8 @@ export function LessonRunner({
 }) {
   const completeLesson = useProgress((s) => s.completeLesson)
   const addXp = useProgress((s) => s.addXp)
+  const showHanzi = useProgress((s) => s.settings.showHanzi)
+  const setSettings = useProgress((s) => s.setSettings)
 
   const [queue, setQueue] = useState<number[]>(() => lesson.steps.map((_, i) => i))
   const [pos, setPos] = useState(0)
@@ -159,6 +161,18 @@ export function LessonRunner({
           <div className="flex-1">
             <Meter value={progress} />
           </div>
+          <button
+            type="button"
+            aria-label={showHanzi ? 'cambiar a pinyin' : 'cambiar a caracteres chinos'}
+            title={showHanzi ? 'modo pinyin' : 'modo hanzi'}
+            className={`btn-vault px-2.5 py-0.5 ${showHanzi ? '' : 'text-vault-amber'}`}
+            onClick={() => {
+              sfx.tap()
+              setSettings({ showHanzi: !showHanzi })
+            }}
+          >
+            {showHanzi ? '拼' : '漢'}
+          </button>
           <span className="font-display text-xl text-vault-300">+{xpGain} XP</span>
         </div>
         <p className="mt-1 text-center font-display text-lg text-vault-500">{lesson.title}</p>
@@ -179,7 +193,7 @@ export function LessonRunner({
         </div>
       ) : step && current !== undefined ? (
         <div className="flex flex-1 flex-col justify-center p-4">
-          <ChallengeView step={step} awardXp={awardXp} onResult={handleResult} />
+          <ChallengeView key={pos} step={step} awardXp={awardXp} onResult={handleResult} />
         </div>
       ) : null}
     </div>

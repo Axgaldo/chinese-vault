@@ -10,10 +10,10 @@ import { entriesById, notesById } from '../content'
 import { speakEntry, speakSentence } from '../lib/audio'
 import { sfx } from '../lib/sfx'
 import { optionsFor, shuffle } from '../lib/questions'
-import { pinyinMatches, toneColor, toneLabel } from '../lib/pinyin'
+import { pinyinMatches, syllabify, toneColor, toneLabel } from '../lib/pinyin'
 import { useProgress } from '../stores/useProgress'
 import { Pinyin } from './Pinyin'
-import { Btn, Panel, Prompt, SpeakerBtn } from './ui'
+import { Btn, Cursor, Panel, Prompt, SpeakerBtn } from './ui'
 import type { Step, VocabEntry } from '../types/content'
 
 export interface ChallengeProps {
@@ -84,6 +84,58 @@ function Feedback({
   )
 }
 
+/** Modo de escritura del habitante: pinyin-first (showHanzi=false) */
+function useShowHanzi(): boolean {
+  return useProgress((s) => s.settings.showHanzi)
+}
+
+/**
+ * Palabra grande del enunciado, estilo HelloChinese:
+ * pinyin o hanzi según el modo; al tocarla suena y se revela el otro sistema.
+ */
+function PromptWord({
+  entry,
+  reveal = true,
+  className = '',
+}: {
+  entry: VocabEntry
+  /** false para retos de transcripción: siempre hanzi, sin revelado */
+  reveal?: boolean
+  className?: string
+}) {
+  const showHanzi = useShowHanzi()
+  const [peeked, setPeeked] = useState(false)
+  const showOther = reveal && peeked
+
+  return (
+    <button
+      type="button"
+      className={`flex flex-col items-center ${className}`}
+      onClick={() => {
+        speakEntry(entry)
+        if (reveal) setPeeked((p) => !p)
+      }}
+      title="toca: audio + versión en el otro sistema"
+    >
+      {showHanzi ? (
+        <span className="font-hanzi text-6xl leading-tight text-vault-100 glow sm:text-7xl">{entry.hanzi}</span>
+      ) : (
+        <Pinyin text={entry.pinyin} className="text-5xl glow sm:text-6xl" />
+      )}
+      {showOther && (
+        <span className="pop-in mt-1">
+          {showHanzi ? (
+            <Pinyin text={entry.pinyin} className="text-xl" />
+          ) : (
+            <span className="font-hanzi text-2xl text-vault-300">{entry.hanzi}</span>
+          )}
+        </span>
+      )}
+    </button>
+  )
+}
+
+/** Hanzi grande siempre visible (para retos de transcripción de pinyin) */
 function EntryHanzi({ entry, className = '' }: { entry: VocabEntry; className?: string }) {
   return (
     <button
@@ -137,9 +189,9 @@ function NoteView({ step, onResult }: CProps<'note'>) {
   return (
     <div className="flex flex-col gap-3">
       <Prompt>▓ APUNTE DEL REFUGIO ▓</Prompt>
-      <Panel solid className="p-4">
-        <h3 className="font-display text-2xl text-vault-300 glow">{note.title}</h3>
-        <div className="mt-2 space-y-2 text-base leading-relaxed">
+      <Panel solid className="panel-read p-4">
+        <h3 className="font-display text-2xl text-vault-200 glow">{note.title}</h3>
+        <div className="mt-2 space-y-2 text-lg leading-relaxed">
           {note.body.split('\n').map((p, i) => (
             <p key={i}>{p}</p>
           ))}
@@ -157,6 +209,7 @@ function NoteView({ step, onResult }: CProps<'note'>) {
               <Pinyin text={ex.pinyin} className="text-sm" /> <span className="text-sm text-vault-500">— {ex.es}</span>
             </button>
           ))}
+          <Cursor />
         </div>
       </Panel>
       <Btn className="w-full" onClick={() => onResult(true, 0)}>
@@ -185,7 +238,7 @@ function ChooseEs({ step, awardXp, onResult }: CProps<'choose-es'>) {
     <div className="flex flex-col items-center gap-4">
       <Prompt>¿QUÉ SIGNIFICA?</Prompt>
       <div className="flex items-center gap-3">
-        <EntryHanzi entry={entry} className="text-7xl" />
+        <PromptWord entry={entry} />
         <SpeakerBtn onClick={() => speakEntry(entry)} />
       </div>
       <div className={`grid w-full gap-2 ${answered ? (correct ? 'flash-correct' : 'shake flash-wrong') : ''}`}>
@@ -262,7 +315,11 @@ function ChooseHanzi({ step, awardXp, onResult }: CProps<'choose-hanzi'>) {
               ) : (
                 <Pinyin text={opt.pinyin} className="text-2xl" />
               )}
-              {answered && <Pinyin text={opt.pinyin} className="mt-1 text-xs text-vault-500" />}
+              {answered && (
+                <span className="mt-1 text-xs text-vault-500">
+                  {showHanzi ? <Pinyin text={opt.pinyin} /> : opt.hanzi}
+                </span>
+              )}
             </button>
           )
         })}
@@ -326,6 +383,11 @@ function ListenView({ step, awardXp, onResult }: CProps<'listen'>) {
                 <span className="font-hanzi text-3xl text-vault-100">{opt.hanzi}</span>
               ) : (
                 <Pinyin text={opt.pinyin} className="text-2xl" />
+              )}
+              {answered && (
+                <span className="mt-1 text-xs text-vault-500">
+                  {showHanzi ? <Pinyin text={opt.pinyin} /> : opt.hanzi}
+                </span>
               )}
             </button>
           )
@@ -481,13 +543,27 @@ function TypePinyin({ step, awardXp, onResult }: CProps<'type-pinyin'>) {
 
 function BuildView({ step, awardXp, onResult }: CProps<'build'>) {
   const { sentence } = step
+  const showHanzi = useShowHanzi()
   const target = useMemo(() => sentence.hanzi.replace(/[。，？！、]/g, ''), [sentence])
   const bank = useMemo(() => shuffle(Array.from(target)), [target])
+  /** Sílabas alineadas con los caracteres (para el modo pinyin) */
+  const sylls = useMemo(() => {
+    const syl = syllabify(sentence.pinyin)
+    return syl.length === target.length ? syl : null
+  }, [sentence, target])
   const [placed, setPlaced] = useState<number[]>([])
   const [state, setState] = useState<'building' | 'ok' | 'ko'>('building')
 
   const answer = placed.map((i) => bank[i]).join('')
   const ready = answer.length === target.length
+
+  /** Contenido de la pieza i según el modo de escritura */
+  const chip = (i: number) =>
+    showHanzi ? (
+      <span className="font-hanzi text-2xl text-vault-200">{bank[i]}</span>
+    ) : (
+      <Pinyin text={sylls?.[i]?.text ?? bank[i]} className="text-xl text-vault-200" />
+    )
 
   const check = () => {
     if (!ready || state !== 'building') return
@@ -520,11 +596,11 @@ function BuildView({ step, awardXp, onResult }: CProps<'build'>) {
           <button
             key={pos}
             type="button"
-            className="chip px-2 py-1 font-hanzi text-2xl text-vault-200"
+            className="chip px-2 py-1"
             onClick={() => state === 'building' && setPlaced(placed.slice(0, pos))}
             title="quitar pieza"
           >
-            {bank[bankIdx]}
+            {chip(bankIdx)}
           </button>
         ))}
       </div>
@@ -532,17 +608,15 @@ function BuildView({ step, awardXp, onResult }: CProps<'build'>) {
       {state === 'building' && (
         <>
           <div className="flex flex-wrap justify-center gap-1">
-            {bank.map((ch, i) => (
+            {bank.map((_, i) => (
               <button
                 key={i}
                 type="button"
                 disabled={placed.includes(i)}
-                className={`choice rounded px-3 py-2 font-hanzi text-2xl text-vault-100 ${
-                  placed.includes(i) ? 'opacity-20' : 'hover:border-vault-400'
-                }`}
+                className={`choice rounded px-3 py-2 ${placed.includes(i) ? 'opacity-20' : 'hover:border-vault-400'}`}
                 onClick={() => setPlaced([...placed, i])}
               >
-                {ch}
+                {chip(i)}
               </button>
             ))}
           </div>
@@ -574,6 +648,7 @@ function BuildView({ step, awardXp, onResult }: CProps<'build'>) {
 
 function MatchView({ step, awardXp, onResult }: CProps<'match'>) {
   const ids = step.entries
+  const showHanzi = useShowHanzi()
   const left = useMemo(() => shuffle(ids), [ids])
   const right = useMemo(() => shuffle(ids), [ids])
   const [selected, setSelected] = useState<string | null>(null)
@@ -610,7 +685,7 @@ function MatchView({ step, awardXp, onResult }: CProps<'match'>) {
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <Prompt>EMPAREJA HANZI ↔ SIGNIFICADO</Prompt>
+      <Prompt>{showHanzi ? 'EMPAREJA HANZI ↔ SIGNIFICADO' : 'EMPAREJA PINYIN ↔ SIGNIFICADO'}</Prompt>
       <div className="grid w-full grid-cols-2 gap-2">
         <div className="space-y-2">
           {left.map((id) => {
@@ -621,12 +696,21 @@ function MatchView({ step, awardXp, onResult }: CProps<'match'>) {
               <button
                 key={id}
                 type="button"
-                className={`choice w-full rounded px-3 py-3 font-hanzi text-2xl text-vault-100 ${
-                  isMatched ? 'choice-correct opacity-40' : selected === id ? 'choice-selected' : ''
+                className={`choice flex w-full flex-col items-center rounded px-3 py-3 ${
+                  isMatched ? 'choice-correct opacity-50' : selected === id ? 'choice-selected' : ''
                 } ${wrongPair === id ? 'shake' : ''}`}
                 onClick={() => tapLeft(id)}
               >
-                {opt.hanzi}
+                {showHanzi ? (
+                  <span className="font-hanzi text-2xl text-vault-100">{opt.hanzi}</span>
+                ) : (
+                  <Pinyin text={opt.pinyin} className="text-xl" />
+                )}
+                {isMatched && (
+                  <span className="mt-0.5 text-xs text-vault-300">
+                    {showHanzi ? <Pinyin text={opt.pinyin} /> : opt.hanzi}
+                  </span>
+                )}
               </button>
             )
           })}
