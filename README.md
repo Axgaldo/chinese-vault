@@ -14,7 +14,7 @@ CALIBRANDO TONOS (4/4).............. OK
 ABRIENDO LA PUERTA DEL REFUGIO 101..
 ```
 
-## Qué tiene hoy (v0.1)
+## Qué tiene hoy (v0.2)
 
 - **Sector 0 (HSK 0):** tonos, fonética y pinyin antes de hablar.
 - **Sectores 1–6 (HSK 1):** saludos, identidad, números, familia, lugares, comida — 24 lecciones,
@@ -23,9 +23,15 @@ ABRIENDO LA PUERTA DEL REFUGIO 101..
   escribir pinyin, construir frases, emparejar, apuntes de gramática y auditorías de repaso.
 - **Repetición espaciada (SRS):** cada palabra vista entra en tu cola de repaso con intervalos
   crecientes (SM-2 simplificado).
-- **Pinyin coloreado por tono** (1 rojo, 2 ámbar, 3 turquesa, 4 violeta) — el truco que usan las
-  mejores apps.
-- **Puro pinyin si quieres:** en Ajustes puedes ocultar el hanzi por completo.
+- **Modo pinyin ⇄ hanzi (estilo HelloChinese):** botón 拼/漢 en plena lección; toca cualquier
+  palabra del enunciado para oírla y ver su versión en el otro sistema. El pinyin es el modo
+  principal, coloreado por tono (1 rojo, 2 ámbar, 3 turquesa, 4 violeta).
+- **Chapas ⛓ y logros:** la moneda del refugio — bono diario +5, chapas por lecciones y repasos;
+  10 logros con sus toasts ("Puerta 101", "El Rey de las Chapas"…).
+- **👁 Modo Supervisor (libre):** en Ajustes del Perfil, desbloquea todas las lecciones para
+  explorar el contenido sin orden.
+- **PWA offline:** `npm run build` genera un service worker que precachea la app completa,
+  audio incluido. Instálala en el móvil/escritorio y funciona sin conexión.
 - **Progreso 100% local** (localStorage) y **sincronización opcional con Firebase** gratuito para
   tener cuenta y multi-dispositivo.
 - Cero backend, cero binarios en el repo, licencia **MIT**.
@@ -48,6 +54,10 @@ npm run dev       # http://localhost:5173
 | `npm run preview` | Sirve el build de producción                    |
 | `npm run lint`    | ESLint                                          |
 | `npm run audio`   | Genera los MP3 que falten (`audio:force` = todo)|
+
+> **PWA offline:** el service worker se genera al hacer `npm run build` (en `dev` no hace falta).
+> Sirve `dist/` con cualquier hosting estático y la app instalará como app con su icono,
+> funcionando sin conexión. Con Firebase Hosting: `npm i -g firebase-tools && firebase init hosting && firebase deploy`.
 
 ## Cuenta en la nube (opcional y gratis)
 
@@ -97,7 +107,8 @@ apps como HelloChinese.
 - Cómo se añade contenido (palabras, lecciones, módulos nuevos): ver **AGENTS.md**.
 - Próximos sectores: **S-07 Tiempo**, **S-08 Rutina (verbos)**, **S-09 Cualidades** y
   **S-10 Auditoría final** — con eso se completa el HSK 1 (~150 palabras).
-- Ideas en la nevera: misión diaria, logros, PWA offline, HSK 2, modo escritura de caracteres.
+- Ideas en la nevera: misión diaria, tienda de chapas (temas de color), quiz de escucha pura,
+  HSK 2, modo escritura de caracteres.
 
 ## Créditos
 

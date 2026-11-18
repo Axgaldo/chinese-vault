@@ -36,6 +36,7 @@ Antonio vibecodea y hace push desde GitHub Desktop; los agentes hacen commits en
 | Router          | react-router-dom 7          | **HashRouter** (deploy estático sin rewrites) |
 | Nube (opcional) | Firebase 13 (JS SDK)       | Auth anónima+email, Firestore; **chunk perezoso** (solo carga si hay `.env`) |
 | Audio           | msedge-tts + Web Speech API | MP3 pre-generados en `public/audio` (gitignored) con fallback TTS navegador |
+| PWA             | vite-plugin-pwa 2 (workbox)| Service worker + manifest; precachea TODO incluido el audio → offline total |
 | Lint            | ESLint 10 flat config       | `npm run lint`                              |
 | SFX             | WebAudio procedural         | pitidos retro, sin archivos de sonido       |
 
@@ -71,12 +72,14 @@ src/
 │   ├── pinyin.ts        # sílabas, tonos, colores, normalización (ü/v/u:, sin tonos)
 │   ├── srs.ts           # SM-2 simplificado (again/hard/good/easy)
 │   ├── questions.ts     # distractores en runtime + reviewStepFor
+│   ├── achievements.ts  # catálogo de logros + newlyUnlocked (se sellan en el store)
 │   ├── sfx.ts           # WebAudio bleeps retro
 │   ├── firebase.ts      # loadFirebase() perezoso (chunk aparte)
 │   └── sync.ts          # local-first → Firestore (debounce 3s, updatedAt manda)
 ├── stores/
-│   ├── useProgress.ts   # zustand persist: xp, racha, completadas, srs, ajustes
-│   └── useAuth.ts       # modo local/anon/account (no persistido)
+│   ├── useProgress.ts   # zustand persist: xp, chapas, racha, completadas, srs, logros, ajustes
+│   ├── useAuth.ts       # modo local/anon/account (no persistido)
+│   └── useToasts.ts     # avisos flotantes (logros/chapas) con autodesaparición
 ├── components/
 │   ├── challenges.tsx   # LOS 9 RETOS (intro, note, choose-es, choose-hanzi, listen,
 │   │                    #   tone, type-pinyin, build, match) + ChallengeView dispatcher
@@ -160,10 +163,28 @@ service cloud.firestore {
 - Estrellas: ≥90% primera intención → 3★, ≥65% → 2★, resto 1★. Precisión = aciertos a la primera /
   pasos que puntúan (intro y apuntes no puntúan).
 - Fallo → el paso se reencola 4 posiciones más adelante y no da XP al repetirse.
+  IMPORTANTE: `LessonRunner` monta cada paso con `key={pos}` — sin la key, el estado interno
+  de un reto se filtra al siguiente paso del mismo tipo (bug histórico de los "escucha" seguidos).
 - SRS: nueva palabra → due mañana. again (due ~10 min, lapses++), hard (intervalo×1.2),
   good (×ease), easy (×ease×1.3), ease 2.5→mín 1.3.
 - Racha: cuenta al completar lección o repaso (día local, no UTC).
 - Rangos en `types/progress.ts` (Habitante Errante → Leyenda del Vault).
+- **Chapas ⛓ (moneda):** bono diario +5 con la primera actividad de cada día, lección nueva +3,
+  repetida +1, sesión de repaso +2. Constantes en `stores/useProgress.ts`.
+- **Logros:** catálogo en `lib/achievements.ts` (se sellan tras cada actividad con toast +
+  sfx.log; `main.tsx` hace un `checkAchievements()` de arranque para migraciones).
+- **Modo Supervisor:** `settings.adminMode` (libre, no es secreto) — desbloquea todas las
+  lecciones (Home + LessonPage consultan el flag).
+
+## Modo de escritura (pinyin-first)
+
+- `settings.showHanzi` (default **false** = pinyin): los retos muestran pinyin (coloreado por tono)
+  o hanzi. El botón 拼/漢 de la cabecera de lección lo alterna al vuelo.
+- `PromptWord` (challenges.tsx): la palabra del enunciado suena al tocarla y revela el otro
+  sistema. `reveal={false}` solo para retos de transcripción (type-pinyin SIEMPRE muestra hanzi).
+- Match/Build/options muestran el script activo y anotan el otro tras responder.
+- persist version 2 migra showHanzi a false. Cualquier campo nuevo de settings/ProgressState
+  necesita: tipo + INITIAL_PROGRESS + `progressData()` + migrate con defaults.
 
 ## Diseño (identidad visual)
 
@@ -172,8 +193,12 @@ service cloud.firestore {
   `font-hanzi` (Noto Sans SC) para caracteres chinos, `font-pinyin` para pinyin (con diacríticos).
 - **Colores de tono** (pedagógicos, en pinyin): 1 rojo `tone-1`, 2 ámbar `tone-2`, 3 turquesa
   `tone-3`, 4 violeta `tone-4`, 5 gris `tone-5`. El componente `<Pinyin>` los aplica solo.
-- Clases CRT en `index.css`: `.crt-overlay` (scanlines), `.crt-vignette`, `.crt-sweep`, `.crt-flicker`,
-  `.panel` (esquinas biseladas), `.btn-vault`, `.choice`, `.meter` (barra segmentada), `.glow`.
+- Clases CRT en `index.css`: `.crt-overlay` (scanlines suaves, alpha 0.12), `.crt-vignette`,
+  `.crt-sweep`, `.crt-flicker`, `.panel` (esquinas biseladas), `.btn-vault`, `.choice`,
+  `.meter` (barra segmentada), `.glow`.
+- **Legibilidad:** los párrafos largos van en `.panel` + `.panel-read` (fondo casi negro, texto
+  claro, `text-lg`); al final, `<Cursor />` (barrita parpadeante de consola). Los retos con
+  opciones grandes y botones de audio son el look de referencia ("escucha y elige").
 - Componentes de UI en `components/ui.tsx`: NO inventar botones nuevos, usar `Btn`/`Panel`/etc.
 - Textos de UI en español con sabor Fallout pero sin ser insoportables: "REGISTRAR ENTRADA",
   "ACCESO CONCEDIDO", "ERROR DE PROTOCOLO", "ENTRADAS REGISTRADAS", "ZONA PELIGROSA"…
@@ -196,9 +221,12 @@ Contenido (sectores 7-10 de HSK 1, ~150 palabras completas):
 - **S-09 Cualidades (adjetivos):** 大/小/多/少, 高兴, 漂亮, 热/冷, 累, 忙, 知道…
 - **S-10 Auditoría final del Vault:** repaso integral + mini-conversaciones con todo lo visto.
 
-Features candidatas: misión diaria (quest), logros/cintas, quiz de escucha pura, logros de racha,
-exportar/importar progreso (JSON), PWA offline, HSK 2+ (nuevos módulos), modo caracteres
-(escribir hanzi con trazos), estadísticas con gráficas.
+Hecho en v0.2: PWA offline, chapas + bono diario, 10 logros, modo supervisor,
+modo pinyin⇄hanzi con toque-revelar, legibilidad de paneles largos + cursor de consola.
+
+Features candidatas: misión diaria (quest con recompensa en chapas), quiz de escucha pura,
+exportar/importar progreso (JSON), HSK 2+ (nuevos módulos), modo caracteres (escribir hanzi
+con trazos), estadísticas con gráficas, tienda de chapas (temas de color del terminal).
 
 ## Notas de entorno conocidas
 
