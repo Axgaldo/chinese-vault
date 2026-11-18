@@ -24,15 +24,39 @@ export interface SrsCard {
   lapses: number
 }
 
+/** Modo de escritura: pinyin puro · pinyin+hanzi apilados · hanzi puro */
+export type ScriptMode = 'pinyin' | 'both' | 'hanzi'
+
+export const SCRIPT_MODES: { mode: ScriptMode; label: string; icon: string }[] = [
+  { mode: 'pinyin', label: 'pinyin', icon: '拼' },
+  { mode: 'both', label: 'pinyin + hanzi', icon: '拼漢' },
+  { mode: 'hanzi', label: 'hanzi', icon: '漢' },
+]
+
+/** Letra del texto general */
+export type BodyFont = 'mono' | 'pixel' | 'sans'
+
+export const BODY_FONTS: { font: BodyFont; label: string }[] = [
+  { font: 'mono', label: 'MONO' },
+  { font: 'pixel', label: 'PIXEL' },
+  { font: 'sans', label: 'SANS' },
+]
+
 export interface Settings {
   /** Velocidad del audio (0.6 - 1.2) */
   audioRate: number
-  /** false = pinyin-first puro: los retos muestran pinyin (el hanzi es el añadido) */
-  showHanzi: boolean
+  /** Qué sistema de escritura muestran los retos (botón 拼/漢 de la lección) */
+  scriptMode: ScriptMode
   /** Efectos de sonido retro */
   sfxOn: boolean
   /** MODO SUPERVISOR: desbloquea todas las lecciones (libre, para explorar) */
   adminMode: boolean
+  /** Ultra-oscuro: negro puro + verde fósforo (máximo contraste) */
+  contrast: boolean
+  /** Efecto CRT (scanlines, viñeta, barrido y parpadeo) */
+  crt: boolean
+  /** Letra del texto general */
+  bodyFont: BodyFont
 }
 
 export interface ProgressState {
@@ -63,7 +87,15 @@ export const INITIAL_PROGRESS: ProgressState = {
   srs: {},
   reviewsDone: 0,
   achievements: {},
-  settings: { audioRate: 0.9, showHanzi: false, sfxOn: true, adminMode: false },
+  settings: {
+    audioRate: 0.9,
+    scriptMode: 'pinyin',
+    sfxOn: true,
+    adminMode: false,
+    contrast: false,
+    crt: true,
+    bodyFont: 'mono',
+  },
   updatedAt: 0,
 }
 

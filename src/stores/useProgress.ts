@@ -12,6 +12,7 @@ import { toastAchievement, toastCaps } from './useToasts'
 import {
   INITIAL_PROGRESS,
   type ProgressState,
+  type ScriptMode,
   type Settings,
 } from '../types/progress'
 
@@ -157,18 +158,20 @@ export const useProgress = create<ProgressStore>()(
     }),
     {
       name: 'chinese-vault-progress',
-      version: 2,
-      migrate: (persisted, version) => {
+      version: 3,
+      migrate: (persisted) => {
+        const raw = persisted as Partial<ProgressState> & {
+          settings?: Partial<Settings> & { showHanzi?: boolean }
+        }
+        const rawSettings = (raw.settings ?? {}) as Partial<Settings> & { showHanzi?: boolean }
         const p = {
           ...structuredClone(INITIAL_PROGRESS),
-          ...(persisted as Partial<ProgressState>),
+          ...raw,
         } as ProgressState
-        p.settings = { ...INITIAL_PROGRESS.settings, ...(p.settings ?? {}) }
-        // v2: el pinyin pasa a ser el modo por defecto (el hanzi es el añadido)
-        if (version < 2) p.settings.showHanzi = false
-        p.caps ??= 0
-        p.reviewsDone ??= 0
-        p.achievements ??= {}
+        // v2→v3: showHanzi (boolean) → scriptMode ('pinyin' | 'both' | 'hanzi')
+        const scriptMode: ScriptMode =
+          rawSettings.scriptMode ?? (rawSettings.showHanzi ? 'hanzi' : 'pinyin')
+        p.settings = { ...INITIAL_PROGRESS.settings, ...rawSettings, scriptMode } as Settings
         return p
       },
     },

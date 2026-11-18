@@ -3,6 +3,7 @@
    ───────────────────────────────────────────────────────────────────────────── */
 
 import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from 'react'
+import { sfx } from '../lib/sfx'
 
 export function Btn({
   variant = 'primary',
@@ -71,6 +72,43 @@ export function Cursor({ className = '' }: { className?: string }) {
     <span className={`blink ml-1 text-vault-400 ${className}`} aria-hidden>
       █
     </span>
+  )
+}
+
+/** Botón interruptor estilo terminal (sustituye a los checkboxes nativos,
+ *  que se renderizan invisibles en algunos navegadores oscuros) */
+export function Toggle({
+  on,
+  onToggle,
+  label,
+  hint,
+  teal = false,
+}: {
+  on: boolean
+  onToggle(): void
+  label: string
+  hint?: string
+  teal?: boolean
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={on}
+      className="flex w-full items-center justify-between py-1 text-left"
+      onClick={() => {
+        sfx.tap()
+        onToggle()
+      }}
+    >
+      <span className="text-sm">
+        {label}
+        {hint && <span className="block text-xs text-vault-600">{hint}</span>}
+      </span>
+      <span className={`font-display text-lg tracking-wider ${on ? (teal ? 'text-vault-teal glow' : 'text-vault-400 glow') : 'text-vault-600'}`}>
+        {on ? '[ ■ ACTIVADO ]' : '[ □ DESACTIVADO ]'}
+      </span>
+    </button>
   )
 }
 

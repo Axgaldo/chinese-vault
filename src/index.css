@@ -135,6 +135,46 @@ body {
   animation: crt-sweep 9s linear infinite;
 }
 
+/* ── Ultra-oscuro (máximo contraste): negro puro + verde fósforo ────────────── */html.cv-contrast {
+  --color-vault-950: #000000;
+  --color-vault-900: #000000;
+  --color-vault-850: #000000;
+  --color-vault-800: #00180b;
+  --color-vault-700: #00552b;
+  --color-vault-600: #00cc55;
+  --color-vault-500: #22ff77;
+  --color-vault-400: #3dff70;
+  --color-vault-300: #5cff8f;
+  --color-vault-200: #9cffc0;
+  --color-vault-100: #d9ffe8;
+}
+
+html.cv-contrast body {
+  background: #000;
+}
+
+html.cv-contrast .panel,
+html.cv-contrast .panel-solid,
+html.cv-contrast .panel-read,
+html.cv-contrast .chip {
+  background: #000;
+}
+
+html.cv-contrast .meter {
+  background: #000;
+}
+
+/* ── Letra del texto general (Ajustes → Apariencia) ──────────────────────── */
+
+html[data-font='pixel'] body {
+  font-family: var(--font-display);
+  font-size: 1.15em;
+}
+
+html[data-font='sans'] body {
+  font-family: system-ui, 'Segoe UI', sans-serif;
+}
+
 /* ── Componentes del refugio ──────────────────────────────────────────────── */
 
 /* Panel con esquinas biseladas estilo Pip-Boy */

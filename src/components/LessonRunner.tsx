@@ -10,6 +10,8 @@ import { sfx } from '../lib/sfx'
 import { isGraded } from '../lib/questions'
 import { useProgress } from '../stores/useProgress'
 import type { Lesson } from '../types/content'
+import type { ScriptMode } from '../types/progress'
+import { SCRIPT_MODES } from '../types/progress'
 import { ChallengeView } from './challenges'
 import { Btn, Chip, Meter, Panel } from './ui'
 import { Pinyin } from './Pinyin'
@@ -34,7 +36,7 @@ export function LessonRunner({
 }) {
   const completeLesson = useProgress((s) => s.completeLesson)
   const addXp = useProgress((s) => s.addXp)
-  const showHanzi = useProgress((s) => s.settings.showHanzi)
+  const scriptMode = useProgress((s) => s.settings.scriptMode)
   const setSettings = useProgress((s) => s.setSettings)
 
   const [queue, setQueue] = useState<number[]>(() => lesson.steps.map((_, i) => i))
@@ -163,15 +165,17 @@ export function LessonRunner({
           </div>
           <button
             type="button"
-            aria-label={showHanzi ? 'cambiar a pinyin' : 'cambiar a caracteres chinos'}
-            title={showHanzi ? 'modo pinyin' : 'modo hanzi'}
-            className={`btn-vault px-2.5 py-0.5 ${showHanzi ? '' : 'text-vault-amber'}`}
+            aria-label="rotar modo de escritura"
+            title={`modo: ${SCRIPT_MODES.find((m) => m.mode === scriptMode)?.label} — toca para rotar`}
+            className={`btn-vault px-2.5 py-0.5 ${scriptMode === 'pinyin' ? '' : 'text-vault-amber'}`}
             onClick={() => {
               sfx.tap()
-              setSettings({ showHanzi: !showHanzi })
+              const order: ScriptMode[] = ['pinyin', 'both', 'hanzi']
+              const next = order[(order.indexOf(scriptMode) + 1) % order.length]
+              setSettings({ scriptMode: next })
             }}
           >
-            {showHanzi ? '拼' : '漢'}
+            {SCRIPT_MODES.find((m) => m.mode === scriptMode)?.icon}
           </button>
           <span className="font-display text-xl text-vault-300">+{xpGain} XP</span>
         </div>

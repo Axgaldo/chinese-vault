@@ -8,11 +8,13 @@ import type { Auth } from 'firebase/auth'
 import { allLessons, seenEntries } from '../content'
 import { ACHIEVEMENTS } from '../lib/achievements'
 import { speakHanzi } from '../lib/audio'
+import { sfx } from '../lib/sfx'
 import { firebaseEnabled, loadFirebase } from '../lib/firebase'
 import { useProgress } from '../stores/useProgress'
 import { useAuth } from '../stores/useAuth'
-import { rankFor } from '../types/progress'
-import { Btn, Chip, Meter, Panel, Prompt, SectionTitle } from '../components/ui'
+import { rankFor, type ScriptMode } from '../types/progress'
+import { BODY_FONTS, SCRIPT_MODES } from '../types/progress'
+import { Btn, Chip, Meter, Panel, Prompt, SectionTitle, Toggle } from '../components/ui'
 
 export function ProfilePage() {
   const navigate = useNavigate()
@@ -197,7 +199,7 @@ export function ProfilePage() {
       </Panel>
 
       <SectionTitle>AJUSTES DEL TERMINAL</SectionTitle>
-      <Panel className="space-y-4 p-4">
+      <Panel className="space-y-3 p-4">
         <div>
           <div className="flex items-center justify-between">
             <span className="text-sm">Velocidad del audio</span>
@@ -219,43 +221,82 @@ export function ProfilePage() {
           </div>
         </div>
 
-        <label className="flex items-center justify-between">
+        <div className="flex items-center justify-between border-t border-vault-700 pt-3">
           <span className="text-sm">
-            Modo hanzi en los retos
-            <span className="block text-xs text-vault-600">desactivado = pinyin puro (también cambia con 拼/漢 arriba)</span>
+            Modo de escritura
+            <span className="block text-xs text-vault-600">
+              rota también con el botón 拼/漢 de la cabecera de cada lección
+            </span>
           </span>
-          <input
-            type="checkbox"
-            checked={settings.showHanzi}
-            className="h-5 w-5 accent-vault-400"
-            onChange={(e) => setSettings({ showHanzi: e.target.checked })}
-          />
-        </label>
+          <Btn
+            className="px-3 py-1 text-xl"
+            onClick={() => {
+              const order: ScriptMode[] = ['pinyin', 'both', 'hanzi']
+              setSettings({ scriptMode: order[(order.indexOf(settings.scriptMode) + 1) % order.length] })
+            }}
+            title="rotar modo"
+          >
+            {SCRIPT_MODES.find((m) => m.mode === settings.scriptMode)?.icon}
+          </Btn>
+        </div>
 
-        <label className="flex items-center justify-between">
-          <span className="text-sm">
-            Efectos de sonido retro
-          </span>
-          <input
-            type="checkbox"
-            checked={settings.sfxOn}
-            className="h-5 w-5 accent-vault-400"
-            onChange={(e) => setSettings({ sfxOn: e.target.checked })}
+        <div className="border-t border-vault-700 pt-3">
+          <Toggle
+            label="Efectos de sonido retro"
+            on={settings.sfxOn}
+            onToggle={() => setSettings({ sfxOn: !settings.sfxOn })}
           />
-        </label>
+        </div>
 
-        <label className="flex items-center justify-between border-t border-vault-700 pt-3">
-          <span className="text-sm">
-            👁 Modo Supervisor
-            <span className="block text-xs text-vault-600">libre: desbloquea todas las lecciones y sectores</span>
-          </span>
-          <input
-            type="checkbox"
-            checked={settings.adminMode}
-            className="h-5 w-5 accent-vault-teal"
-            onChange={(e) => setSettings({ adminMode: e.target.checked })}
+        <div className="border-t border-vault-700 pt-3">
+          <Toggle
+            label="👁 Modo Supervisor"
+            hint="libre: desbloquea todas las lecciones y sectores"
+            teal={true}
+            on={settings.adminMode}
+            onToggle={() => setSettings({ adminMode: !settings.adminMode })}
           />
-        </label>
+        </div>
+      </Panel>
+
+      <SectionTitle>APARIENCIA DEL TERMINAL</SectionTitle>
+      <Panel className="space-y-3 p-4">
+        <Toggle
+          label="Ultra-oscuro"
+          hint="negro puro y verde fósforo: contraste máximo"
+          on={settings.contrast}
+          onToggle={() => setSettings({ contrast: !settings.contrast })}
+        />
+        <div className="border-t border-vault-700 pt-3">
+          <Toggle
+            label="Efecto CRT"
+            hint="scanlines, viñeta, barrido y parpadeo"
+            on={settings.crt}
+            onToggle={() => setSettings({ crt: !settings.crt })}
+          />
+        </div>
+        <div className="flex items-center justify-between border-t border-vault-700 pt-3">
+          <span className="text-sm">
+            Letra del texto general
+          </span>
+          <div className="flex gap-1">
+            {BODY_FONTS.map((f) => (
+              <button
+                key={f.font}
+                type="button"
+                className={`choice rounded px-2.5 py-1 font-display text-sm ${
+                  settings.bodyFont === f.font ? 'choice-selected text-vault-300' : 'text-vault-600'
+                }`}
+                onClick={() => {
+                  sfx.tap()
+                  setSettings({ bodyFont: f.font })
+                }}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
       </Panel>
 
       <SectionTitle>ZONA PELIGROSA</SectionTitle>

@@ -10,11 +10,12 @@ import { entriesById, notesById } from '../content'
 import { speakEntry, speakSentence } from '../lib/audio'
 import { sfx } from '../lib/sfx'
 import { optionsFor, shuffle } from '../lib/questions'
-import { pinyinMatches, syllabify, toneColor, toneLabel } from '../lib/pinyin'
+import { pinyinMatches, stripTones, syllabify, toneColor, toneLabel } from '../lib/pinyin'
 import { useProgress } from '../stores/useProgress'
 import { Pinyin } from './Pinyin'
 import { Btn, Cursor, Panel, Prompt, SpeakerBtn } from './ui'
 import type { Step, VocabEntry } from '../types/content'
+import type { ScriptMode } from '../types/progress'
 
 export interface ChallengeProps {
   step: Step
@@ -47,6 +48,8 @@ export function ChallengeView({ step, ...rest }: ChallengeProps) {
       return <TonePick step={step} {...rest} />
     case 'type-pinyin':
       return <TypePinyin step={step} {...rest} />
+    case 'dictate':
+      return <Dictation step={step} {...rest} />
     case 'build':
       return <BuildView step={step} {...rest} />
     case 'match':
@@ -84,14 +87,16 @@ function Feedback({
   )
 }
 
-/** Modo de escritura del habitante: pinyin-first (showHanzi=false) */
-function useShowHanzi(): boolean {
-  return useProgress((s) => s.settings.showHanzi)
+/** Modo de escritura del habitante: 拼 (pinyin) → 拼+漢 (ambos) → 漢 (hanzi) */
+function useScriptMode(): ScriptMode {
+  return useProgress((s) => s.settings.scriptMode)
 }
 
 /**
- * Palabra grande del enunciado, estilo HelloChinese:
- * pinyin o hanzi según el modo; al tocarla suena y se revela el otro sistema.
+ * Palabra del enunciado, estilo HelloChinese:
+ * 拼: pinyin grande (toca = audio + revela el hanzi)
+ * 拼+漢: hanzi con pinyin apilado debajo
+ * 漢: hanzi grande (toca = audio + revela el pinyin)
  */
 function PromptWord({
   entry,
@@ -103,9 +108,9 @@ function PromptWord({
   reveal?: boolean
   className?: string
 }) {
-  const showHanzi = useShowHanzi()
+  const mode = useScriptMode()
   const [peeked, setPeeked] = useState(false)
-  const showOther = reveal && peeked
+  const canPeek = reveal && mode !== 'both'
 
   return (
     <button
@@ -113,25 +118,40 @@ function PromptWord({
       className={`flex flex-col items-center ${className}`}
       onClick={() => {
         speakEntry(entry)
-        if (reveal) setPeeked((p) => !p)
+        if (canPeek) setPeeked((p) => !p)
       }}
-      title="toca: audio + versión en el otro sistema"
+      title={canPeek ? 'toca: audio + versión en el otro sistema' : 'toca: audio'}
     >
-      {showHanzi ? (
-        <span className="font-hanzi text-6xl leading-tight text-vault-100 glow sm:text-7xl">{entry.hanzi}</span>
-      ) : (
+      {mode === 'pinyin' ? (
         <Pinyin text={entry.pinyin} className="text-5xl glow sm:text-6xl" />
+      ) : (
+        <span className="font-hanzi text-6xl leading-tight text-vault-100 glow sm:text-7xl">{entry.hanzi}</span>
       )}
-      {showOther && (
+      {mode === 'both' && <Pinyin text={entry.pinyin} className="mt-0.5 text-xl text-vault-300" />}
+      {canPeek && peeked && (
         <span className="pop-in mt-1">
-          {showHanzi ? (
-            <Pinyin text={entry.pinyin} className="text-xl" />
-          ) : (
+          {mode === 'pinyin' ? (
             <span className="font-hanzi text-2xl text-vault-300">{entry.hanzi}</span>
+          ) : (
+            <Pinyin text={entry.pinyin} className="text-xl" />
           )}
         </span>
       )}
     </button>
+  )
+}
+
+/** Palabra dentro de opciones/chips: muestra el script del modo activo */
+function WordInMode({ entry }: { entry: VocabEntry }) {
+  const mode = useScriptMode()
+  if (mode === 'pinyin') {
+    return <Pinyin text={entry.pinyin} className="text-2xl" />
+  }
+  return (
+    <span className="flex flex-col items-center">
+      <span className="font-hanzi text-3xl text-vault-100">{entry.hanzi}</span>
+      {mode === 'both' && <Pinyin text={entry.pinyin} className="mt-0.5 text-xs text-vault-400" />}
+    </span>
   )
 }
 
@@ -274,7 +294,7 @@ function ChooseEs({ step, awardXp, onResult }: CProps<'choose-es'>) {
 
 function ChooseHanzi({ step, awardXp, onResult }: CProps<'choose-hanzi'>) {
   const entry = entriesById.get(step.entry)
-  const showHanzi = useProgress((s) => s.settings.showHanzi)
+  const mode = useScriptMode()
   const completedKey = useCompletedKey()
   const options = useMemo(
     () => optionsFor(step.entry, completedKey ? completedKey.split(',') : []),
@@ -310,14 +330,10 @@ function ChooseHanzi({ step, awardXp, onResult }: CProps<'choose-hanzi'>) {
                 else sfx.wrong()
               }}
             >
-              {showHanzi ? (
-                <span className="font-hanzi text-3xl text-vault-100">{opt.hanzi}</span>
-              ) : (
-                <Pinyin text={opt.pinyin} className="text-2xl" />
-              )}
-              {answered && (
+              <WordInMode entry={opt} />
+              {answered && mode !== 'both' && (
                 <span className="mt-1 text-xs text-vault-500">
-                  {showHanzi ? <Pinyin text={opt.pinyin} /> : opt.hanzi}
+                  {mode === 'pinyin' ? opt.hanzi : <Pinyin text={opt.pinyin} />}
                 </span>
               )}
             </button>
@@ -339,7 +355,7 @@ function ChooseHanzi({ step, awardXp, onResult }: CProps<'choose-hanzi'>) {
 
 function ListenView({ step, awardXp, onResult }: CProps<'listen'>) {
   const entry = entriesById.get(step.entry)
-  const showHanzi = useProgress((s) => s.settings.showHanzi)
+  const mode = useScriptMode()
   const completedKey = useCompletedKey()
   const options = useMemo(
     () => optionsFor(step.entry, completedKey ? completedKey.split(',') : []),
@@ -379,14 +395,10 @@ function ListenView({ step, awardXp, onResult }: CProps<'listen'>) {
                 else sfx.wrong()
               }}
             >
-              {showHanzi ? (
-                <span className="font-hanzi text-3xl text-vault-100">{opt.hanzi}</span>
-              ) : (
-                <Pinyin text={opt.pinyin} className="text-2xl" />
-              )}
-              {answered && (
+              <WordInMode entry={opt} />
+              {answered && mode !== 'both' && (
                 <span className="mt-1 text-xs text-vault-500">
-                  {showHanzi ? <Pinyin text={opt.pinyin} /> : opt.hanzi}
+                  {mode === 'pinyin' ? opt.hanzi : <Pinyin text={opt.pinyin} />}
                 </span>
               )}
             </button>
@@ -539,11 +551,83 @@ function TypePinyin({ step, awardXp, onResult }: CProps<'type-pinyin'>) {
   )
 }
 
+/* ── Dictado de oído puro (quiz de escucha) ───────────────────────────────── */
+
+function Dictation({ step, awardXp, onResult }: CProps<'dictate'>) {
+  const entry = entriesById.get(step.entry)
+  const [value, setValue] = useState('')
+  const [state, setState] = useState<'typing' | 'ok' | 'ko'>('typing')
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    inputRef.current?.focus()
+    if (entry) {
+      const t = setTimeout(() => speakEntry(entry), 400)
+      return () => clearTimeout(t)
+    }
+  }, [entry])
+
+  if (!entry) return null
+
+  const submit = () => {
+    if (!value.trim() || state !== 'typing') return
+    if (pinyinMatches(value, entry.pinyin)) {
+      setState('ok')
+      sfx.correct()
+    } else {
+      setState('ko')
+      sfx.wrong()
+    }
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-4">
+      <Prompt>▓ DICTADO DEL REFUGIO ▓</Prompt>
+      <p className="text-sm text-vault-500">solo con el oído: escribe el pinyin (sin tonos)</p>
+      <SpeakerBtn big onClick={() => speakEntry(entry)} />
+      <form
+        className={`w-full space-y-3 ${state === 'ok' ? 'flash-correct' : state === 'ko' ? 'shake flash-wrong' : ''}`}
+        onSubmit={(ev) => {
+          ev.preventDefault()
+          submit()
+        }}
+      >
+        <input
+          ref={inputRef}
+          value={value}
+          onChange={(ev) => setValue(ev.target.value)}
+          disabled={state !== 'typing'}
+          className="choice choice-selected w-full rounded px-4 py-3 text-center text-2xl text-vault-100 outline-none"
+          placeholder="lo que oigas…"
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
+          inputMode="text"
+        />
+        {state === 'typing' && (
+          <Btn type="submit" className="w-full" disabled={!value.trim()}>
+            COMPROBAR ▸
+          </Btn>
+        )}
+      </form>
+      {state !== 'typing' && (
+        <Feedback correct={state === 'ok'} onContinue={() => onResult(state === 'ok', awardXp && state === 'ok' ? 10 : 0)}>
+          <p className="text-center">
+            <span className="font-hanzi text-xl text-vault-200">{entry.hanzi} </span>
+            <Pinyin text={entry.pinyin} className="text-lg" />
+            <span className="block text-sm text-vault-500">— {entry.es}</span>
+          </p>
+        </Feedback>
+      )}
+    </div>
+  )
+}
+
 /* ── Construir frase ──────────────────────────────────────────────────────── */
 
 function BuildView({ step, awardXp, onResult }: CProps<'build'>) {
   const { sentence } = step
-  const showHanzi = useShowHanzi()
+  const mode = useScriptMode()
   const target = useMemo(() => sentence.hanzi.replace(/[。，？！、]/g, ''), [sentence])
   const bank = useMemo(() => shuffle(Array.from(target)), [target])
   /** Sílabas alineadas con los caracteres (para el modo pinyin) */
@@ -558,12 +642,16 @@ function BuildView({ step, awardXp, onResult }: CProps<'build'>) {
   const ready = answer.length === target.length
 
   /** Contenido de la pieza i según el modo de escritura */
-  const chip = (i: number) =>
-    showHanzi ? (
-      <span className="font-hanzi text-2xl text-vault-200">{bank[i]}</span>
-    ) : (
-      <Pinyin text={sylls?.[i]?.text ?? bank[i]} className="text-xl text-vault-200" />
+  const chip = (i: number) => {
+    const syl = sylls?.[i]?.text ?? bank[i]
+    if (mode === 'pinyin') return <Pinyin text={syl} className="text-xl text-vault-200" />
+    return (
+      <span className="flex flex-col items-center leading-none">
+        <span className="font-hanzi text-2xl text-vault-200">{bank[i]}</span>
+        {mode === 'both' && <span className="text-[10px] text-vault-500">{stripTones(syl)}</span>}
+      </span>
     )
+  }
 
   const check = () => {
     if (!ready || state !== 'building') return
@@ -648,7 +736,7 @@ function BuildView({ step, awardXp, onResult }: CProps<'build'>) {
 
 function MatchView({ step, awardXp, onResult }: CProps<'match'>) {
   const ids = step.entries
-  const showHanzi = useShowHanzi()
+  const mode = useScriptMode()
   const left = useMemo(() => shuffle(ids), [ids])
   const right = useMemo(() => shuffle(ids), [ids])
   const [selected, setSelected] = useState<string | null>(null)
@@ -685,7 +773,7 @@ function MatchView({ step, awardXp, onResult }: CProps<'match'>) {
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <Prompt>{showHanzi ? 'EMPAREJA HANZI ↔ SIGNIFICADO' : 'EMPAREJA PINYIN ↔ SIGNIFICADO'}</Prompt>
+      <Prompt>{mode === 'pinyin' ? 'EMPAREJA PINYIN ↔ SIGNIFICADO' : 'EMPAREJA HANZI ↔ SIGNIFICADO'}</Prompt>
       <div className="grid w-full grid-cols-2 gap-2">
         <div className="space-y-2">
           {left.map((id) => {
@@ -701,14 +789,15 @@ function MatchView({ step, awardXp, onResult }: CProps<'match'>) {
                 } ${wrongPair === id ? 'shake' : ''}`}
                 onClick={() => tapLeft(id)}
               >
-                {showHanzi ? (
-                  <span className="font-hanzi text-2xl text-vault-100">{opt.hanzi}</span>
-                ) : (
+                {mode === 'pinyin' ? (
                   <Pinyin text={opt.pinyin} className="text-xl" />
+                ) : (
+                  <span className="font-hanzi text-2xl text-vault-100">{opt.hanzi}</span>
                 )}
-                {isMatched && (
+                {mode === 'both' && <Pinyin text={opt.pinyin} className="mt-0.5 text-xs text-vault-400" />}
+                {isMatched && mode !== 'both' && (
                   <span className="mt-0.5 text-xs text-vault-300">
-                    {showHanzi ? <Pinyin text={opt.pinyin} /> : opt.hanzi}
+                    {mode === 'pinyin' ? opt.hanzi : <Pinyin text={opt.pinyin} />}
                   </span>
                 )}
               </button>

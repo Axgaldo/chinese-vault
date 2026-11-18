@@ -44,7 +44,7 @@ export type Step =
   | { type: 'intro'; entry: string }
   /** Apunte de gramática */
   | { type: 'note'; note: string }
-  /** Dado el hanzi, elegir la traducción española */
+  /** Dado el hanzi/pinyin, elegir la traducción española */
   | { type: 'choose-es'; entry: string }
   /** Dada la traducción, elegir el hanzi (o pinyin si el usuario lo prefiere) */
   | { type: 'choose-hanzi'; entry: string }
@@ -54,6 +54,8 @@ export type Step =
   | { type: 'tone'; entry: string; syllable: string; tone: Tone }
   /** Escribir el pinyin (sin tonos, sin mayúsculas) */
   | { type: 'type-pinyin'; entry: string }
+  /** Dictado de oído puro: solo audio, escribir el pinyin que se oye */
+  | { type: 'dictate'; entry: string }
   /** Construir una frase ordenando sus piezas */
   | { type: 'build'; sentence: Sentence }
   /** Emparejar hanzi ↔ español */

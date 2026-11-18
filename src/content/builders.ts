@@ -89,6 +89,9 @@ export const toneDrill = (entry: string, syllable: string, tone: Tone): Step => 
 /** Escribir el pinyin */
 export const typeP = (id: string): Step => ({ type: 'type-pinyin', entry: id })
 
+/** Dictado de oído puro (quiz de escucha) */
+export const dictate = (id: string): Step => ({ type: 'dictate', entry: id })
+
 /** Construir una frase ordenando sus caracteres */
 export const build = (hanzi: string, pinyin: string, es: string): Step => ({
   type: 'build',

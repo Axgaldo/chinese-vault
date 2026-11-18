@@ -40,8 +40,11 @@ export function isGraded(step: Step): boolean {
  */
 export function reviewStepFor(entryId: string, reps: number): Step {
   const entry = entriesById.get(entryId)
-  // Palabras largas: escribirlas es el repaso más exigente
+  // Palabras largas: dictado de oído puro (type-pinyin si es muy corta)
   if (entry && entry.hanzi.length >= 3 && reps % 4 === 3) {
+    return { type: 'dictate', entry: entryId }
+  }
+  if (entry && entry.hanzi.length < 3 && reps % 4 === 3) {
     return { type: 'type-pinyin', entry: entryId }
   }
   switch (reps % 3) {

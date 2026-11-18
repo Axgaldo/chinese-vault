@@ -4,11 +4,12 @@
    La barra de navegación se oculta durante las lecciones (modo inmersivo).
    ───────────────────────────────────────────────────────────────────────────── */
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { BootScreen } from './components/BootScreen'
 import { NavBar } from './components/NavBar'
 import { useToasts } from './stores/useToasts'
+import { useProgress } from './stores/useProgress'
 import { ArchivePage } from './pages/ArchivePage'
 import { HomePage } from './pages/HomePage'
 import { LessonPage } from './pages/LessonPage'
@@ -39,15 +40,34 @@ export default function App() {
   const [booted, setBooted] = useState(() => Boolean(localStorage.getItem(BOOT_KEY)))
   const inLesson = location.pathname.startsWith('/lesson')
 
+  // Apariencia del terminal (ajustes del perfil)
+  const crt = useProgress((s) => s.settings.crt)
+  const contrast = useProgress((s) => s.settings.contrast)
+  const bodyFont = useProgress((s) => s.settings.bodyFont)
+
+  useEffect(() => {
+    const el = document.documentElement
+    el.classList.toggle('cv-contrast', contrast)
+    el.dataset.font = bodyFont
+  }, [contrast, bodyFont])
+
   return (
     <>
       {/* capa CRT global */}
-      <div className="crt-overlay" aria-hidden />
-      <div className="crt-vignette" aria-hidden />
-      <div className="crt-sweep" aria-hidden />
+      {crt && (
+        <>
+          <div className="crt-overlay" aria-hidden />
+          <div className="crt-vignette" aria-hidden />
+          <div className="crt-sweep" aria-hidden />
+        </>
+      )}
 
       {/* carcasa del dispositivo */}
-      <div className="crt-flicker relative mx-auto flex min-h-dvh w-full max-w-[460px] flex-col md:my-4 md:min-h-[calc(100dvh-2rem)] md:border-x md:border-vault-800">
+      <div
+        className={`relative mx-auto flex min-h-dvh w-full max-w-[460px] flex-col md:my-4 md:min-h-[calc(100dvh-2rem)] md:border-x md:border-vault-800 ${
+          crt ? 'crt-flicker' : ''
+        }`}
+      >
         <main className="flex-1">
           <Routes>
             <Route path="/" element={<HomePage />} />
