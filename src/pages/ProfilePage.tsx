@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Auth } from 'firebase/auth'
 import { allLessons, seenEntries } from '../content'
+import { ACHIEVEMENTS } from '../lib/achievements'
 import { speakHanzi } from '../lib/audio'
 import { firebaseEnabled, loadFirebase } from '../lib/firebase'
 import { useProgress } from '../stores/useProgress'
@@ -18,7 +19,9 @@ export function ProfilePage() {
   const records = useProgress((s) => s.completed)
   const completed = Object.keys(records)
   const xp = useProgress((s) => s.xp)
+  const caps = useProgress((s) => s.caps)
   const streak = useProgress((s) => s.streakDays)
+  const reviewsDone = useProgress((s) => s.reviewsDone)
   const settings = useProgress((s) => s.settings)
   const setSettings = useProgress((s) => s.setSettings)
   const reset = useProgress((s) => s.reset)
@@ -31,6 +34,8 @@ export function ProfilePage() {
 
   const { current: rank, next: nextRank, progress: rankProgress } = rankFor(xp)
   const seenCount = seenEntries(completed).length
+  const achievements = useProgress((s) => s.achievements)
+  const unlockedCount = Object.keys(achievements).length
 
   const authError = (code: string): string => {
     switch (code) {
@@ -108,10 +113,31 @@ export function ProfilePage() {
           {xp} XP{nextRank ? ` · siguiente: ${nextRank.name} (${nextRank.xp - xp} XP)` : ' · rango máximo'}
         </p>
         <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
+          <div className="chip px-2 py-1">⛓ CHAPAS {caps}</div>
           <div className="chip px-2 py-1">LECCIONES {completed.length}/{allLessons.length}</div>
           <div className="chip px-2 py-1">PALABRAS {seenCount}</div>
+          <div className="chip px-2 py-1">REPASOS {reviewsDone}</div>
         </div>
       </Panel>
+
+      <SectionTitle>LOGROS ({unlockedCount}/{ACHIEVEMENTS.length})</SectionTitle>
+      <div className="grid grid-cols-2 gap-2">
+        {ACHIEVEMENTS.map((a) => {
+          const unlockedAt = achievements[a.id]
+          const isUnlocked = Boolean(unlockedAt)
+          return (
+            <div
+              key={a.id}
+              className={`panel p-3 ${isUnlocked ? 'border-vault-400' : 'opacity-45'}`}
+              title={isUnlocked ? `desbloqueado ${new Date(unlockedAt).toLocaleDateString('es')}` : a.desc}
+            >
+              <div className={`text-2xl ${isUnlocked ? '' : 'grayscale'}`}>{isUnlocked ? a.emoji : '🔒'}</div>
+              <p className={`font-display text-lg ${isUnlocked ? 'text-vault-200 glow' : 'text-vault-500'}`}>{a.title}</p>
+              <p className="text-xs text-vault-600">{a.desc}</p>
+            </div>
+          )
+        })}
+      </div>
 
       <SectionTitle>CUENTA Y NUBE</SectionTitle>
       <Panel className="p-4">
@@ -195,8 +221,8 @@ export function ProfilePage() {
 
         <label className="flex items-center justify-between">
           <span className="text-sm">
-            Mostrar hanzi en los retos
-            <span className="block text-xs text-vault-600">desactivado = modo pinyin puro</span>
+            Modo hanzi en los retos
+            <span className="block text-xs text-vault-600">desactivado = pinyin puro (también cambia con 拼/漢 arriba)</span>
           </span>
           <input
             type="checkbox"
@@ -207,12 +233,27 @@ export function ProfilePage() {
         </label>
 
         <label className="flex items-center justify-between">
-          <span className="text-sm">Efectos de sonido retro</span>
+          <span className="text-sm">
+            Efectos de sonido retro
+          </span>
           <input
             type="checkbox"
             checked={settings.sfxOn}
             className="h-5 w-5 accent-vault-400"
             onChange={(e) => setSettings({ sfxOn: e.target.checked })}
+          />
+        </label>
+
+        <label className="flex items-center justify-between border-t border-vault-700 pt-3">
+          <span className="text-sm">
+            👁 Modo Supervisor
+            <span className="block text-xs text-vault-600">libre: desbloquea todas las lecciones y sectores</span>
+          </span>
+          <input
+            type="checkbox"
+            checked={settings.adminMode}
+            className="h-5 w-5 accent-vault-teal"
+            onChange={(e) => setSettings({ adminMode: e.target.checked })}
           />
         </label>
       </Panel>

@@ -24,6 +24,7 @@ export function ReviewPage() {
   const navigate = useNavigate()
   const addXp = useProgress((s) => s.addXp)
   const gradeEntry = useProgress((s) => s.gradeEntry)
+  const finishReviewSession = useProgress((s) => s.finishReviewSession)
   const srs = useProgress((s) => s.srs)
 
   const [queue, setQueue] = useState<ReviewItem[]>(() => {
@@ -58,6 +59,7 @@ export function ReviewPage() {
       addXp(XP_REVIEW)
       setXp((x) => x + XP_REVIEW)
       if (pos + 1 >= queue.length) {
+        finishReviewSession()
         setDone(true)
         sfx.complete()
       } else setPos(pos + 1)

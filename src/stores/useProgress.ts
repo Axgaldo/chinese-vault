@@ -6,21 +6,31 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { lessonEntryIds } from '../content'
+import { newlyUnlocked } from '../lib/achievements'
 import { gradeCard, newCard, type Grade } from '../lib/srs'
+import { toastAchievement, toastCaps } from './useToasts'
 import {
   INITIAL_PROGRESS,
   type ProgressState,
   type Settings,
 } from '../types/progress'
 
+/* Chapas: la moneda del refugio ⛓ */
+const CAPS_DAILY_BONUS = 5
+const CAPS_LESSON_NEW = 3
+const CAPS_LESSON_REPEAT = 1
+const CAPS_REVIEW = 2
+
 interface ProgressActions {
   addXp(n: number): void
-  /** Marca lección completada e inscribe sus palabras en el pool SRS */
+  /** Marca lección completada: chapas + racha + palabras al pool SRS + logros */
   completeLesson(lessonId: string, stars: number, accuracy: number): void
-  /** Registra el resultado de un repaso */
+  /** Registra el resultado de un repaso individual */
   gradeEntry(entryId: string, g: Grade): void
-  /** Cuenta un día de estudio (racha) */
-  touchDay(): void
+  /** Cierra una sesión de repaso: chapas + logros */
+  finishReviewSession(): void
+  /** Sella logros pendientes de estados migrados (se llama al arrancar) */
+  checkAchievements(): void
   setSettings(patch: Partial<Settings>): void
   /** Adopta un progreso remoto (Firebase) más reciente */
   hydrate(p: ProgressState): void
@@ -37,18 +47,42 @@ function localISO(offsetDays = 0): string {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
 }
 
+/** Aplica el día de estudio y devuelve [nuevoEstado, sumóDía] */
+function applyDay(state: ProgressState): { s: ProgressState; newDay: boolean } {
+  const today = localISO()
+  if (state.lastStudyDay === today) return { s: state, newDay: false }
+  const streakDays =
+    state.lastStudyDay === localISO(-1) ? state.streakDays + 1 : Math.max(1, state.streakDays)
+  return { s: { ...state, streakDays, lastStudyDay: today }, newDay: true }
+}
+
+/** Comprueba logros sobre un estado candidato, los sella y avisa */
+function sealAchievements(state: ProgressState): ProgressState {
+  const fresh = newlyUnlocked(state)
+  if (!fresh.length) return state
+  const achievements = { ...state.achievements }
+  const now = Date.now()
+  for (const a of fresh) {
+    achievements[a.id] = now
+    toastAchievement(a.emoji, a.title)
+  }
+  return { ...state, achievements }
+}
+
 export const useProgress = create<ProgressStore>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       ...structuredClone(INITIAL_PROGRESS),
 
       addXp(n) {
-        set((s) => ({ xp: s.xp + n, updatedAt: Date.now() }))
+        set((s) => sealAchievements({ ...s, xp: s.xp + n, updatedAt: Date.now() }))
       },
 
       completeLesson(lessonId, stars, accuracy) {
         set((s) => {
           const prev = s.completed[lessonId]
+          const firstTime = !prev
+
           const completed = {
             ...s.completed,
             [lessonId]: {
@@ -57,25 +91,27 @@ export const useProgress = create<ProgressStore>()(
               playedAt: Date.now(),
             },
           }
+
           // Las palabras de la lección entran al pool de repaso (due mañana)
           const srs = { ...s.srs }
           for (const id of lessonEntryIds(lessonId)) {
             if (!srs[id]) srs[id] = newCard(1)
           }
-          const today = localISO()
-          const streak =
-            s.lastStudyDay === today
-              ? s.streakDays
-              : s.lastStudyDay === localISO(-1)
-                ? s.streakDays + 1
-                : 1
-          return {
+
+          // racha + chapas
+          const day = applyDay(s)
+          const capsGain =
+            (day.newDay ? CAPS_DAILY_BONUS : 0) + (firstTime ? CAPS_LESSON_NEW : CAPS_LESSON_REPEAT)
+          if (capsGain > 0) toastCaps(capsGain, day.newDay ? 'bono diario' : 'lección completada')
+
+          const next = sealAchievements({
+            ...day.s,
             completed,
             srs,
-            streakDays: streak,
-            lastStudyDay: today,
+            caps: s.caps + capsGain,
             updatedAt: Date.now(),
-          }
+          })
+          return next
         })
       },
 
@@ -86,15 +122,22 @@ export const useProgress = create<ProgressStore>()(
         }))
       },
 
-      touchDay() {
-        const s = get()
-        const today = localISO()
-        if (s.lastStudyDay === today) return
-        set({
-          lastStudyDay: today,
-          streakDays: s.lastStudyDay === localISO(-1) ? s.streakDays + 1 : 1,
-          updatedAt: Date.now(),
+      finishReviewSession() {
+        set((s) => {
+          const day = applyDay(s)
+          const capsGain = (day.newDay ? CAPS_DAILY_BONUS : 0) + CAPS_REVIEW
+          toastCaps(capsGain, day.newDay ? 'bono diario' : 'repaso completado')
+          return sealAchievements({
+            ...day.s,
+            reviewsDone: s.reviewsDone + 1,
+            caps: s.caps + capsGain,
+            updatedAt: Date.now(),
+          })
         })
+      },
+
+      checkAchievements() {
+        set((s) => sealAchievements({ ...s }))
       },
 
       setSettings(patch) {
@@ -114,13 +157,26 @@ export const useProgress = create<ProgressStore>()(
     }),
     {
       name: 'chinese-vault-progress',
-      version: 1,
+      version: 2,
+      migrate: (persisted, version) => {
+        const p = {
+          ...structuredClone(INITIAL_PROGRESS),
+          ...(persisted as Partial<ProgressState>),
+        } as ProgressState
+        p.settings = { ...INITIAL_PROGRESS.settings, ...(p.settings ?? {}) }
+        // v2: el pinyin pasa a ser el modo por defecto (el hanzi es el añadido)
+        if (version < 2) p.settings.showHanzi = false
+        p.caps ??= 0
+        p.reviewsDone ??= 0
+        p.achievements ??= {}
+        return p
+      },
     },
   ),
 )
 
 /** Selecciona solo la parte de datos (para subir a Firestore) */
 export function progressData(s: ProgressStore): ProgressState {
-  const { xp, streakDays, lastStudyDay, completed, srs, settings, updatedAt } = s
-  return { xp, streakDays, lastStudyDay, completed, srs, settings, updatedAt }
+  const { xp, caps, streakDays, lastStudyDay, completed, srs, reviewsDone, achievements, settings, updatedAt } = s
+  return { xp, caps, streakDays, lastStudyDay, completed, srs, reviewsDone, achievements, settings, updatedAt }
 }

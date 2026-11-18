@@ -11,11 +11,12 @@ export function LessonPage() {
   const { lessonId } = useParams()
   const navigate = useNavigate()
   const completedKey = useProgress((s) => Object.keys(s.completed).join(','))
+  const adminMode = useProgress((s) => s.settings.adminMode)
   const completed = completedKey ? completedKey.split(',') : []
 
   const lesson = lessonId ? lessonById.get(lessonId) : undefined
   if (!lesson) return <Navigate to="/" replace />
-  if (!isLessonUnlocked(lesson.id, completed)) return <Navigate to="/" replace />
+  if (!isLessonUnlocked(lesson.id, completed) && !adminMode) return <Navigate to="/" replace />
 
   return (
     <LessonRunner

@@ -22,6 +22,9 @@ useProgress.subscribe((s, prev) => {
   if (s.settings.sfxOn !== prev.settings.sfxOn) setSfxEnabled(s.settings.sfxOn)
 })
 
+// Sella logros merecidos por estados previos (migraciones) sin toasts múltiples
+useProgress.getState().checkAchievements()
+
 // Desbloqueo del audio del navegador al primer gesto
 window.addEventListener('pointerdown', () => initSfx(), { once: true, capture: true })
 

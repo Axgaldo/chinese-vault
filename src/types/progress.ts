@@ -27,14 +27,18 @@ export interface SrsCard {
 export interface Settings {
   /** Velocidad del audio (0.6 - 1.2) */
   audioRate: number
-  /** false = pinyin-first puro: los retres muestran pinyin en lugar de hanzi */
+  /** false = pinyin-first puro: los retos muestran pinyin (el hanzi es el añadido) */
   showHanzi: boolean
   /** Efectos de sonido retro */
   sfxOn: boolean
+  /** MODO SUPERVISOR: desbloquea todas las lecciones (libre, para explorar) */
+  adminMode: boolean
 }
 
 export interface ProgressState {
   xp: number
+  /** Chapas: la moneda del refugio (bono diario + actividades) */
+  caps: number
   streakDays: number
   /** Último día de estudio (ISO yyyy-mm-dd) */
   lastStudyDay: string
@@ -42,17 +46,24 @@ export interface ProgressState {
   completed: Record<string, LessonRecord>
   /** Tarjetas SRS: entryId → card */
   srs: Record<string, SrsCard>
+  /** Sesiones de repaso completadas */
+  reviewsDone: number
+  /** Logros desbloqueados: achievementId → timestamp */
+  achievements: Record<string, number>
   settings: Settings
   updatedAt: number
 }
 
 export const INITIAL_PROGRESS: ProgressState = {
   xp: 0,
+  caps: 0,
   streakDays: 0,
   lastStudyDay: '',
   completed: {},
   srs: {},
-  settings: { audioRate: 0.9, showHanzi: true, sfxOn: true },
+  reviewsDone: 0,
+  achievements: {},
+  settings: { audioRate: 0.9, showHanzi: false, sfxOn: true, adminMode: false },
   updatedAt: 0,
 }
 

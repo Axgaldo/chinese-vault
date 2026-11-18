@@ -15,7 +15,9 @@ export function HomePage() {
   const records = useProgress((s) => s.completed)
   const completed = Object.keys(records)
   const xp = useProgress((s) => s.xp)
+  const caps = useProgress((s) => s.caps)
   const streak = useProgress((s) => s.streakDays)
+  const adminMode = useProgress((s) => s.settings.adminMode)
   const due = useProgress((s) => Object.values(s.srs).filter((c) => c.due <= Date.now()).length)
   const { current: rank, next: nextRank, progress: rankProgress } = rankFor(xp)
 
@@ -30,7 +32,11 @@ export function HomePage() {
           <h1 className="font-display text-4xl tracking-widest text-vault-400 glow">CHINESE VAULT</h1>
           <p className="text-xs text-vault-600">SISTEMA DE ENTRENAMIENTO LINGÜÍSTICO · v1.0</p>
         </div>
-        <Chip className="text-vault-amber">🔥 {streak}</Chip>
+        <div className="flex items-center gap-1.5">
+          {adminMode && <Chip className="text-vault-teal">👁 SUPERVISOR</Chip>}
+          <Chip className="text-vault-amber">⛓ {caps}</Chip>
+          <Chip className="text-vault-amber">🔥 {streak}</Chip>
+        </div>
       </header>
 
       <Panel className="p-3">
@@ -79,7 +85,7 @@ export function HomePage() {
       <SectionTitle>SECTORES DEL REFUGIO</SectionTitle>
       <div className="flex flex-col gap-3">
         {modules.map((m) => (
-          <ModuleCard key={m.id} m={m} records={records} onPlay={(lessonId) => navigate(`/lesson/${lessonId}`)} />
+          <ModuleCard key={m.id} m={m} records={records} adminMode={adminMode} onPlay={(lessonId) => navigate(`/lesson/${lessonId}`)} />
         ))}
       </div>
 
@@ -91,10 +97,12 @@ export function HomePage() {
 function ModuleCard({
   m,
   records,
+  adminMode,
   onPlay,
 }: {
   m: VaultModule
   records: Record<string, LessonRecord>
+  adminMode: boolean
   onPlay(lessonId: string): void
 }) {
   const doneCount = m.lessons.filter((l) => l.id in records).length
@@ -115,7 +123,7 @@ function ModuleCard({
       <div className="mt-3 flex flex-wrap gap-2">
         {m.lessons.map((l, i) => {
           const isDone = l.id in records
-          const unlocked = i === 0 || m.lessons[i - 1].id in records
+          const unlocked = adminMode || i === 0 || m.lessons[i - 1].id in records
           const isNext = !isDone && unlocked
           return (
             <button

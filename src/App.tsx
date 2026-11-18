@@ -8,6 +8,7 @@ import { useState } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { BootScreen } from './components/BootScreen'
 import { NavBar } from './components/NavBar'
+import { useToasts } from './stores/useToasts'
 import { ArchivePage } from './pages/ArchivePage'
 import { HomePage } from './pages/HomePage'
 import { LessonPage } from './pages/LessonPage'
@@ -16,6 +17,22 @@ import { ReviewPage } from './pages/ReviewPage'
 
 /** Clave compartida con BootScreen (primera visita) */
 const BOOT_KEY = 'cv-boot-v1'
+
+/** Avisos flotantes: logros, chapas… */
+function ToastStack() {
+  const toasts = useToasts((s) => s.toasts)
+  if (!toasts.length) return null
+  return (
+    <div className="pointer-events-none fixed inset-x-0 top-3 z-[95] mx-auto flex max-w-[460px] flex-col items-center gap-2 px-4">
+      {toasts.map((t) => (
+        <div key={t.id} className="panel panel-solid pop-in px-4 py-2 text-center">
+          <span className="mr-2 text-xl">{t.emoji}</span>
+          <span className="font-display text-lg tracking-wider text-vault-200 glow">{t.text}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
 
 export default function App() {
   const location = useLocation()
@@ -44,6 +61,7 @@ export default function App() {
         {!inLesson && <NavBar />}
       </div>
 
+      <ToastStack />
       {!booted && <BootScreen onHide={() => setBooted(true)} />}
     </>
   )
