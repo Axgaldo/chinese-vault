@@ -1,0 +1,289 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   CHINESE VAULT · tema Pip-Boy / CRT
+   Tokens de diseño (Tailwind v4 los expone como utilidades):
+   bg-vault-950, text-vault-300, border-vault-600, font-display, font-hanzi…
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@theme {
+  /* Fósforo verde */
+  --color-vault-950: #030804;
+  --color-vault-900: #071309;
+  --color-vault-850: #0a1a0d;
+  --color-vault-800: #0c2410;
+  --color-vault-700: #123017;
+  --color-vault-600: #1d7a38;
+  --color-vault-500: #2fae52;
+  --color-vault-400: #3dff70;
+  --color-vault-300: #6bffa0;
+  --color-vault-200: #9cffc0;
+  --color-vault-100: #c8ffdb;
+
+  /* Acentos del sistema */
+  --color-vault-amber: #ffb000;
+  --color-vault-red: #ff4b4b;
+  --color-vault-teal: #38d9c9;
+  --color-vault-purple: #b78bff;
+
+  /* Tonos del mandarín (1-5) */
+  --color-tone-1: #ff5c5c;
+  --color-tone-2: #ffb000;
+  --color-tone-3: #38d9c9;
+  --color-tone-4: #b78bff;
+  --color-tone-5: #7d8f83;
+
+  /* Tipografía */
+  --font-display: "VT323", "Share Tech Mono", monospace;
+  --font-mono: "Share Tech Mono", ui-monospace, monospace;
+  --font-pinyin: "Share Tech Mono", "Noto Sans SC", ui-monospace, monospace;
+  --font-hanzi: "Noto Sans SC", "Microsoft YaHei", sans-serif;
+}
+
+/* ── Base ─────────────────────────────────────────────────────────────────── */
+
+html {
+  background: var(--color-vault-950);
+}
+
+body {
+  font-family: var(--font-mono);
+  color: var(--color-vault-300);
+  background:
+    radial-gradient(ellipse 120% 80% at 50% -10%, #0a2412 0%, transparent 60%),
+    var(--color-vault-950);
+  min-height: 100dvh;
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: var(--color-vault-400);
+  color: var(--color-vault-950);
+}
+
+/* Scrollbar retro */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-vault-950);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-vault-700);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-vault-600);
+}
+
+/* ── Efectos CRT ──────────────────────────────────────────────────────────── */
+
+/* Capa global de scanlines sobre toda la app */
+.crt-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.22) 3px,
+    rgba(0, 0, 0, 0.22) 4px
+  );
+  mix-blend-mode: multiply;
+}
+
+/* Viñeta suave en los bordes de la pantalla */
+.crt-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 91;
+  pointer-events: none;
+  background: radial-gradient(ellipse 140% 140% at 50% 50%, transparent 62%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+/* Parpadeo sutil del fósforo */
+@keyframes crt-flicker {
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.96; }
+  94% { opacity: 1; }
+  97% { opacity: 0.98; }
+  98% { opacity: 1; }
+}
+.crt-flicker {
+  animation: crt-flicker 6s infinite;
+}
+
+/* Línea de refresco que barre la pantalla de vez en cuando */
+@keyframes crt-sweep {
+  0% { transform: translateY(-12vh); opacity: 0; }
+  8% { opacity: 0.6; }
+  45% { opacity: 0.12; }
+  100% { transform: translateY(112vh); opacity: 0; }
+}
+.crt-sweep {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 10vh;
+  z-index: 92;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, rgba(107, 255, 160, 0.05), transparent);
+  animation: crt-sweep 9s linear infinite;
+}
+
+/* ── Componentes del refugio ──────────────────────────────────────────────── */
+
+/* Panel con esquinas biseladas estilo Pip-Boy */
+.panel {
+  position: relative;
+  background: color-mix(in srgb, var(--color-vault-900) 92%, transparent);
+  border: 1px solid var(--color-vault-700);
+  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px);
+}
+.panel-solid {
+  background: var(--color-vault-900);
+}
+
+/* Encabezados con brillo fosforescente */
+.glow {
+  text-shadow: 0 0 8px color-mix(in srgb, currentColor 55%, transparent);
+}
+.glow-soft {
+  text-shadow: 0 0 5px color-mix(in srgb, currentColor 35%, transparent);
+}
+
+/* Botón de acción principal */
+.btn-vault {
+  font-family: var(--font-display);
+  letter-spacing: 0.05em;
+  border: 1px solid var(--color-vault-500);
+  color: var(--color-vault-400);
+  background: color-mix(in srgb, var(--color-vault-800) 80%, transparent);
+  transition: background 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
+  user-select: none;
+}
+.btn-vault:hover:not(:disabled) {
+  background: var(--color-vault-400);
+  color: var(--color-vault-950);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--color-vault-400) 45%, transparent);
+}
+.btn-vault:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.btn-vault:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.btn-vault-amber {
+  border-color: var(--color-vault-amber);
+  color: var(--color-vault-amber);
+}
+.btn-vault-amber:hover:not(:disabled) {
+  background: var(--color-vault-amber);
+  color: var(--color-vault-950);
+  box-shadow: 0 0 18px rgba(255, 176, 0, 0.4);
+}
+
+/* Opciones de reto: tarjetas seleccionables */
+.choice {
+  font-family: var(--font-mono);
+  border: 1px solid var(--color-vault-700);
+  background: color-mix(in srgb, var(--color-vault-850) 90%, transparent);
+  transition: border-color 0.1s ease, background 0.1s ease;
+}
+.choice:hover:not(:disabled) {
+  border-color: var(--color-vault-500);
+}
+.choice-selected {
+  border-color: var(--color-vault-400);
+  background: color-mix(in srgb, var(--color-vault-700) 70%, transparent);
+}
+.choice-correct {
+  border-color: var(--color-vault-400) !important;
+  background: color-mix(in srgb, var(--color-vault-600) 45%, transparent) !important;
+  box-shadow: 0 0 14px color-mix(in srgb, var(--color-vault-400) 30%, transparent);
+}
+.choice-wrong {
+  border-color: var(--color-vault-red) !important;
+  background: rgba(120, 20, 20, 0.35) !important;
+}
+
+/* Shake al fallar */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-7px); }
+  40%, 80% { transform: translateX(7px); }
+}
+.shake {
+  animation: shake 0.35s ease;
+}
+
+/* Flash verde/rodo al acertar/fallar */
+@keyframes flash-correct { 0% { background: rgba(61, 255, 112, 0.16); } 100% { background: transparent; } }
+@keyframes flash-wrong { 0% { background: rgba(255, 75, 75, 0.14); } 100% { background: transparent; } }
+.flash-correct { animation: flash-correct 0.7s ease-out; }
+.flash-wrong { animation: flash-wrong 0.7s ease-out; }
+
+/* Barra de progreso segmentada (retro) */
+.meter {
+  background: var(--color-vault-850);
+  border: 1px solid var(--color-vault-700);
+}
+.meter-fill {
+  background: repeating-linear-gradient(
+    to right,
+    var(--color-vault-400) 0px,
+    var(--color-vault-400) 6px,
+    var(--color-vault-600) 6px,
+    var(--color-vault-600) 8px
+  );
+  box-shadow: 0 0 10px color-mix(in srgb, var(--color-vault-400) 40%, transparent);
+}
+
+/* Chip de estado / etiqueta */
+.chip {
+  font-family: var(--font-display);
+  border: 1px solid var(--color-vault-700);
+  background: var(--color-vault-900);
+}
+
+/* Núcleo de lección (nodo del mapa) */
+.node-locked { opacity: 0.35; filter: grayscale(0.6); }
+@keyframes node-pulse {
+  0%, 100% { box-shadow: 0 0 8px color-mix(in srgb, var(--color-vault-400) 50%, transparent); }
+  50% { box-shadow: 0 0 20px color-mix(in srgb, var(--color-vault-400) 90%, transparent); }
+}
+.node-current {
+  border-color: var(--color-vault-400) !important;
+  animation: node-pulse 1.6s ease-in-out infinite;
+}
+
+/* Cursor de texto parpadeante para el arranque */
+@keyframes blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+.blink { animation: blink 1s step-end infinite; }
+
+/* Aparición escalonada de líneas del boot */
+@keyframes boot-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.boot-line { animation: boot-in 0.25s ease-out both; }
+
+/* Animación de "registro" en el archivo */
+@keyframes pop-in {
+  0% { transform: scale(0.6); opacity: 0; }
+  70% { transform: scale(1.08); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.pop-in { animation: pop-in 0.35s cubic-bezier(0.2, 1.4, 0.4, 1) both; }
+
+/* XP flotante */
+@keyframes xp-float {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-46px); opacity: 0; }
+}
+.xp-float { animation: xp-float 0.9s ease-out both; }
