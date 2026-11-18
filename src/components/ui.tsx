@@ -65,6 +65,15 @@ export function Prompt({ children, className = '' }: { children: ReactNode; clas
   )
 }
 
+/** Cursor de consola antigua, para finales de texto largo */
+export function Cursor({ className = '' }: { className?: string }) {
+  return (
+    <span className={`blink ml-1 text-vault-400 ${className}`} aria-hidden>
+      █
+    </span>
+  )
+}
+
 /** Botón redondo de audio */
 export function SpeakerBtn({
   onClick,

@@ -48,7 +48,7 @@ html {
 
 body {
   font-family: var(--font-mono);
-  color: var(--color-vault-300);
+  color: var(--color-vault-200);
   background:
     radial-gradient(ellipse 120% 80% at 50% -10%, #0a2412 0%, transparent 60%),
     var(--color-vault-950);
@@ -88,8 +88,8 @@ body {
     to bottom,
     transparent 0px,
     transparent 2px,
-    rgba(0, 0, 0, 0.22) 3px,
-    rgba(0, 0, 0, 0.22) 4px
+    rgba(0, 0, 0, 0.12) 3px,
+    rgba(0, 0, 0, 0.12) 4px
   );
   mix-blend-mode: multiply;
 }
@@ -100,7 +100,7 @@ body {
   inset: 0;
   z-index: 91;
   pointer-events: none;
-  background: radial-gradient(ellipse 140% 140% at 50% 50%, transparent 62%, rgba(0, 0, 0, 0.55) 100%);
+  background: radial-gradient(ellipse 145% 145% at 50% 50%, transparent 66%, rgba(0, 0, 0, 0.4) 100%);
 }
 
 /* Parpadeo sutil del fósforo */
@@ -146,6 +146,15 @@ body {
 }
 .panel-solid {
   background: var(--color-vault-900);
+}
+
+/* Panel de lectura: fondo casi negro y texto claro para párrafos largos */
+.panel-read {
+  background: #020604;
+  border-color: var(--color-vault-600);
+}
+.panel-read p {
+  color: var(--color-vault-100);
 }
 
 /* Encabezados con brillo fosforescente */
