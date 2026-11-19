@@ -86,7 +86,8 @@ src/
 │   ├── builders.ts      # helpers: e(), grammar(), lesson(), drill(), build(), match()…
 │   ├── hsk0.ts          # SECTOR 0: tonos y fonética
 │   ├── index.ts         # registro: modules, lessonById, entriesById, seenEntries…
-│   └── hsk1/m1…m10.ts  # SECTORES 1-10 (saludos→identidad→números→familia→lugares→comida→tiempo→rutina→cualidades→auditoría final)
+│   ├── hsk1/m1…m10.ts  # SECTORES 1-10 (HSK 1: saludos→…→auditoría final)
+│   └── hsk2/m11…m20.ts # SECTORES 11-20 (HSK 2: 了→posiciones→comida→gente→比→dar/tomar→tecnología→movimiento→conectores→idioma+final)
 ├── types/               # content.ts (curso) y progress.ts (progreso/SRS/rangos)
 ├── lib/
 │   ├── audio.ts         # speakEntry/speakSentence: MP3 → fallback TTS
@@ -266,19 +267,33 @@ service cloud.firestore {
   `lib/questions.ts`, `lib/achievements.ts` o el contenido, corre `npm run test`. El test de
   integridad del curso (`content/index.test.ts`) valida TODAS las referencias de ids.
 
+## Radio del Refugio 📻 y HSK 2 (v2.0.0)
+
+- **Radio** (`lib/radio.ts` + `pages/RadioPage.tsx`, ruta `/radio`, NavBar 6 pestañas):
+  programas generados desde el contenido COMPLETADO (nunca suena algo no visto):
+  "BOLETÍN · sector X" (frases: ¿qué oyes? → elegir traducción / transcripción → escribir
+  pinyin completo sin tonos) y "TONOS & MÚSICA" (identificar tono al oído). Items fallados
+  se reencolan con `retry: true` (sin XP doble). XP +5 por acierto, alimenta `steps` diario.
+- **HSK 2** (`content/hsk2/m11..m20.ts`, sectores S-11 a S-20, ~130 palabras nuevas):
+  la gramática va EXPLICADA con profundidad ("el error número uno…", contrastes ✗/✓,
+  "Tip del Overseer"): 了 como CAMBIO (no "pasado"), 正在, V+到 (resultado logrado),
+  V+来/V+去 (deixis), 比, 有点儿, 因为...所以, 还是, 太...了, 越来越, V+过 (experiencia).
+  El sector m20 cierra con la "auditoría final HSK 2" y el certificado del Overseer.
+- `VaultModule.hsk` ahora es `0 | 1 | 2`: para HSK 3 ampliar el union y el test de integridad.
+
 ## Roadmap (siguientes sesiones)
 
-**HSK 1 está COMPLETO** (S-00 → S-10, ~150 palabras, 32 lecciones, 10 retos incluido el
-dictado de oído puro del Overseer).
+**HSK 1 COMPLETO** (S-00 → S-10, ~150 palabras, 32 lecciones).
+**HSK 2 COMPLETO** (S-11 → S-20, ~130 palabras nuevas, 46 lecciones HSK2, radio del refugio,
+caravana, tienda y estadísticas — todo verificado con 50 tests + integridad del curso).
 
-Hecho en v0.2/v0.3: PWA offline, chapas + bono diario, 10 logros, modo supervisor,
-rotación de script 拼/拼漢/漢 con toque-revelar, apariencia (ultra-oscuro, CRT on/off,
-letra), legibilidad + cursor de consola, sectores 7-10 y auditoría final con dictado.
+Hecho en v2.0.0: Radio del Refugio (escucha pura por programas), HSK 2 completo con
+gramática explicada a fondo (了 cambio, 正在, V+到, V+来/V+去, 比, 有点儿,
+因为...所以, 还是, 太...了, 越来越, V+过), certificado final del Overseer.
 
-Features candidatas: misión diaria (quest con recompensa en chapas), tienda de chapas
-(temas de color del terminal), exportar/importar progreso (JSON), HSK 2+ (nuevos módulos),
-modo caracteres (escribir hanzi con trazos), estadísticas con gráficas, quiz de escucha
-con frases completas.
+Features candidatas: misión diaria de caravana mejorada, tienda con más temas,
+exportar/importar progreso (JSON), HSK 3 (ampliar `hsk` union + tests), modo
+escritura de caracteres (trazos), estadísticas con gráficas, PWA iOS pulida.
 
 ## Notas de entorno conocidas
 

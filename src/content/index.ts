@@ -18,8 +18,21 @@ import { m7 } from './hsk1/m7'
 import { m8 } from './hsk1/m8'
 import { m9 } from './hsk1/m9'
 import { m10 } from './hsk1/m10'
+import { m11 } from './hsk2/m11'
+import { m12 } from './hsk2/m12'
+import { m13 } from './hsk2/m13'
+import { m14 } from './hsk2/m14'
+import { m15 } from './hsk2/m15'
+import { m16 } from './hsk2/m16'
+import { m17 } from './hsk2/m17'
+import { m18 } from './hsk2/m18'
+import { m19 } from './hsk2/m19'
+import { m20 } from './hsk2/m20'
 
-export const modules: VaultModule[] = [hsk0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10]
+export const modules: VaultModule[] = [
+  hsk0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10,
+  m11, m12, m13, m14, m15, m16, m17, m18, m19, m20,
+]
 
 export const moduleById = new Map(modules.map((m) => [m.id, m]))
 

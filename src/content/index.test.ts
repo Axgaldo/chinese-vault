@@ -37,7 +37,7 @@ describe('integridad del curso', () => {
     const problems: string[] = []
     for (const m of modules) {
       if (!m.id || !m.code || !m.title || !m.subtitle) problems.push(`módulo incompleto: ${m.id}`)
-      if (m.hsk !== 0 && m.hsk !== 1) problems.push(`hsk inválido: ${m.id}`)
+      if (m.hsk !== 0 && m.hsk !== 1 && m.hsk !== 2) problems.push(`hsk inválido: ${m.id}`)
       if (m.lessons.length < 1) problems.push(`${m.id}: sin lecciones`)
       for (const l of m.lessons) {
         if (!l.id || !l.title) problems.push(`lección sin id/título en ${m.id}`)

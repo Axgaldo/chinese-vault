@@ -22,8 +22,13 @@ ABRIENDO LA PUERTA DEL REFUGIO 101..
 
 - **Sector 0 (HSK 0):** tonos, fonética y pinyin antes de hablar.
 - **Sectores 1–10 (HSK 1 completo):** saludos, identidad, números, familia, lugares, comida,
-  tiempo, rutina, cualidades y la Auditoría Final — **32 lecciones, ~150 palabras y 25 apuntes
-  de gramática**, con **audio en todas las palabras y frases**.
+  tiempo, rutina, cualidades y la Auditoría Final — **~150 palabras y 25 apuntes de gramática**.
+- **Sectores 11–20 (HSK 2 completo):** la gran partícula **了** (explicada como cambio de estado,
+  no como "pasado"), posiciones, comida, gente, comparaciones con **比**, dar/tomar con **V+到**,
+  tecnología, direcciones con deixis **V+来/V+去**, conectores **因为...所以** y la experiencia
+  con **V+过** — ~130 palabras nuevas y 16 apunes con profundidad de profesor (contrastes bien/mal).
+- **📻 Radio del Refugio:** escucha pura con las frases que ya has aprendido — boletines por
+  sector, transcripción de emisiones (dictado de frase completa) y el programa de tonos.
 - **10 tipos de reto:** tarjetas de vocabulario, traducción, dictado por oído, entrenador de tonos,
   escribir pinyin, **dictado de oído puro** (quiz de escucha sin texto), construir frases,
   emparejar, apuntes de gramática y auditorías de repaso.
@@ -133,6 +138,16 @@ S-07 Tiempo                   ── hoy/mañana, fechas, horas y 两点半
 S-08 Rutina                   ── verbos sin conjugación, 会/能， 我在学习
 S-09 Cualidades               ── adjetivos-como-verbo, estados y gustos
 S-10 Auditoría Final          ── el dictado del Overseer + certificado HSK 1
+S-11 El Tiempo y 了           ── 了 como CAMBIO, 正在, planes y antes/después
+S-12 Casa y Posiciones        ── habitaciones, 旁边/前面/后面
+S-13 Mesa del Comedor         ── comidas del día, sabores 甜/酸
+S-14 Gente del Refugio        ── 男/女， oficios y las palabras del idioma
+S-15 Comparar y Describir     ── opuestos en pareja, colores y la báscula 比
+S-16 Dar y Tomar              ── 给 (persona primero), V+到 = misión cumplida
+S-17 Mundo y Tecnología       ── 用手机发短信 y la vida digital
+S-18 Rutas y Movimiento      ── V+来/V+去 (aquí/allá), 一直走，然后左拐
+S-19 Opiniones del Overseer   ── 因为...所以， 还是, 太...了， 越来越
+S-20 El Idioma + Final        ── 声调/拼音/汉字/语法 y el certificado HSK 2
 ```
 
 Cada sector termina con una **Auditoría** que consolida todo antes de abrir la siguiente puerta.
