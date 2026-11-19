@@ -56,6 +56,10 @@ export type Step =
   | { type: 'type-pinyin'; entry: string }
   /** Dictado de oído puro: solo audio, escribir el pinyin que se oye */
   | { type: 'dictate'; entry: string }
+  /** Desafío oral: pronunciar la palabra (SpeechRecognition, puntúa por sílabas) */
+  | { type: 'speak'; entry: string }
+  /** Desafío de escritura: trazar el hanzi en la cuadrícula 田字格 (puntúa el trazo) */
+  | { type: 'write'; entry: string }
   /** Construir una frase ordenando sus piezas */
   | { type: 'build'; sentence: Sentence }
   /** Emparejar hanzi ↔ español */

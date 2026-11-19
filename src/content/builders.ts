@@ -92,6 +92,12 @@ export const typeP = (id: string): Step => ({ type: 'type-pinyin', entry: id })
 /** Dictado de oído puro (quiz de escucha) */
 export const dictate = (id: string): Step => ({ type: 'dictate', entry: id })
 
+/** Desafío oral: pronunciar la palabra */
+export const speak = (id: string): Step => ({ type: 'speak', entry: id })
+
+/** Desafío de escritura: trazar el hanzi */
+export const write = (id: string): Step => ({ type: 'write', entry: id })
+
 /** Construir una frase ordenando sus caracteres */
 export const build = (hanzi: string, pinyin: string, es: string): Step => ({
   type: 'build',

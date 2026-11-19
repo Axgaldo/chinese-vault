@@ -1,7 +1,7 @@
 {
   "name": "chinese-vault",
   "private": true,
-  "version": "2.2.1",
+  "version": "2.3.0",
   "type": "module",
   "description": "Aprende chino mandarín desde 0 — refugio post-apocalíptico estilo Pip-Boy. Pinyin primero, hanzi de propina, UI en español. HSK 0-1.",
   "license": "MIT",

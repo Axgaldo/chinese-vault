@@ -288,6 +288,20 @@ service cloud.firestore {
   `lib/questions.ts`, `lib/achievements.ts` o el contenido, corre `npm run test`. El test de
   integridad del curso (`content/index.test.ts`) valida TODAS las referencias de ids.
 
+- **Desafío oral (`speak`)**: SpeechRecognition (Chrome/Edge; en Firefox se omite sin
+  penalización): micrófono → oye en zh-CN → cada carácter del objetivo (≈ sílaba) se marca
+  verde/rojo según si aparece en lo oído (hasta 3 alternativas). Verde total = +10 XP,
+  parcial (≥50%) = +5.
+- **Desafío de escritura (`write`)**: canvas 田字格 (cuadrícula china con guías) — trazas
+  el hanzi sobre la guía tenue y se puntúa por IoU de píxeles contra el carácter renderizado:
+  ≥50% verde +10, ≥32% ámbar +5. PointerEvents (funciona con ratón y dedo).
+- **Inyección automática**: `lessonSteps()` (LessonRunner) añade un `speak` + un `write`
+  (elegidos por hash estable de la lección) a toda lección kind 'review' (auditorías).
+  El SRS también rota un `speak` cada 5 repeticiones (reviewStepFor).
+- **Práctica libre**: ruta `/practice/:mode/:entryId` (PracticePage) — en el Archivo el
+  selector 🔊 ESCUCHAR / 🎤 PRONUNCIAR / ✍️ ESCRIBIR decide si tocar la palabra la
+  reproduce o abre su desafío. +10/+5 XP por acierto.
+
 ## Radio del Refugio 📻 y HSK 2 (v2.0.0)
 
 - **Radio** (`lib/radio.ts` + `pages/RadioPage.tsx`, ruta `/radio`, NavBar 6 pestañas):

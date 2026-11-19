@@ -56,9 +56,9 @@ describe('reviewStepFor', () => {
     expect(reviewStepFor('w-dui-bu-qi', 3).type).toBe('dictate')
   })
 
-  it('reps 4: el ciclo mod 3 continúa (listen, tanto corta como larga)', () => {
-    expect(reviewStepFor('w-ni-hao', 4).type).toBe('listen')
-    expect(reviewStepFor('w-dui-bu-qi', 4).type).toBe('listen')
+  it('reps 4: desafío oral (el bucle oído-boca cada 5 repeticiones)', () => {
+    expect(reviewStepFor('w-ni-hao', 4).type).toBe('speak')
+    expect(reviewStepFor('w-dui-bu-qi', 4).type).toBe('speak')
   })
 })
 

@@ -41,11 +41,15 @@ export function isGraded(step: Step): boolean {
 export function reviewStepFor(entryId: string, reps: number): Step {
   const entry = entriesById.get(entryId)
   // Palabras largas: dictado de oído puro (type-pinyin si es muy corta)
-  if (entry && entry.hanzi.length >= 3 && reps % 4 === 3) {
+  if (entry && entry.hanzi.length >= 3 && reps % 5 === 3) {
     return { type: 'dictate', entry: entryId }
   }
-  if (entry && entry.hanzi.length < 3 && reps % 4 === 3) {
+  if (entry && entry.hanzi.length < 3 && reps % 5 === 3) {
     return { type: 'type-pinyin', entry: entryId }
+  }
+  // cada 5ª repetición: desafío oral (el bucle oído-boca)
+  if (reps % 5 === 4) {
+    return { type: 'speak', entry: entryId }
   }
   switch (reps % 3) {
     case 0:

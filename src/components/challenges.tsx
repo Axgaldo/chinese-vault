@@ -50,11 +50,41 @@ export function ChallengeView({ step, ...rest }: ChallengeProps) {
       return <TypePinyin step={step} {...rest} />
     case 'dictate':
       return <Dictation step={step} {...rest} />
+    case 'speak':
+      return <SpeakView step={step} {...rest} />
+    case 'write':
+      return <WriteView step={step} {...rest} />
     case 'build':
       return <BuildView step={step} {...rest} />
     case 'match':
       return <MatchView step={step} {...rest} />
   }
+}
+
+/* ── Reconocimiento de voz (Web Speech API) ───────────────────────────────── */
+
+interface SpeechRecognitionEventLike {
+  results: ArrayLike<ArrayLike<{ transcript: string }>>
+}
+interface SpeechRecognitionInstance {
+  lang: string
+  interimResults: boolean
+  maxAlternatives: number
+  start(): void
+  abort(): void
+  onresult: ((e: SpeechRecognitionEventLike) => void) | null
+  onerror: ((e: { error?: string }) => void) | null
+  onend: (() => void) | null
+}
+type SpeechRecognitionCtor = new () => SpeechRecognitionInstance
+
+/** ¿El navegador trae reconocimiento de voz? (Chrome/Edge sí; Firefox no) */
+function getSpeechRecognition(): SpeechRecognitionCtor | null {
+  const w = window as unknown as {
+    SpeechRecognition?: SpeechRecognitionCtor
+    webkitSpeechRecognition?: SpeechRecognitionCtor
+  }
+  return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null
 }
 
 /* ── Utilidades compartidas ───────────────────────────────────────────────── */
@@ -728,6 +758,360 @@ function BuildView({ step, awardXp, onResult }: CProps<'build'>) {
           </p>
         </Feedback>
       )}
+    </div>
+  )
+}
+
+/* ── Desafío oral (pronunciación) ─────────────────────────────────────────── */
+
+function SpeakView({ step, awardXp, onResult }: CProps<'speak'>) {
+  const entry = entriesById.get(step.entry)
+  const [state, setState] = useState<'idle' | 'listening' | 'done'>('idle')
+  const [alts, setAlts] = useState<string[]>([])
+  const [errMsg, setErrMsg] = useState<string | null>(null)
+  const recRef = useRef<SpeechRecognitionInstance | null>(null)
+  const hasSR = Boolean(getSpeechRecognition())
+
+  useEffect(() => {
+    if (entry) {
+      const t = setTimeout(() => speakEntry(entry), 350)
+      return () => clearTimeout(t)
+    }
+  }, [entry])
+
+  if (!entry) return null
+
+  const start = () => {
+    const SR = getSpeechRecognition()
+    if (!SR || !entry) return
+    sfx.tap()
+    try {
+      recRef.current?.abort()
+    } catch {
+      /* rec ya muerto */
+    }
+    const rec = new SR()
+    recRef.current = rec
+    rec.lang = 'zh-CN'
+    rec.interimResults = false
+    rec.maxAlternatives = 3
+    rec.onresult = (e) => {
+      const list = e.results[0]
+      const found: string[] = []
+      for (let i = 0; i < list.length; i++) found.push(list[i].transcript.trim())
+      setAlts(found)
+      setState('done')
+      sfx.blip()
+    }
+    rec.onerror = (e) => {
+      setErrMsg(
+        e?.error === 'not-allowed' || e?.error === 'service-not-allowed'
+          ? 'El micrófono está bloqueado: permítele el acceso al navegador.'
+          : 'No te he oído bien. Habla más alto y prueba otra vez.',
+      )
+      setState('idle')
+    }
+    rec.onend = () => setState((s) => (s === 'listening' ? 'idle' : s))
+    setErrMsg(null)
+    setAlts([])
+    setState('listening')
+    rec.start()
+  }
+
+  /** Puntuación por sílabas: cada carácter del objetivo (≈ sílaba) */
+  const targetChars = [...entry.hanzi]
+  const sylls = syllabify(entry.pinyin)
+  const charOk = targetChars.map((ch) => alts.some((a) => a.includes(ch)))
+  const ratio = targetChars.length ? charOk.filter(Boolean).length / targetChars.length : 0
+  const green = state === 'done' && ratio === 1
+  const yellow = state === 'done' && ratio >= 0.5 && ratio < 1
+
+  return (
+    <div className="flex flex-col items-center gap-3">
+      <Prompt>DESAFÍO ORAL</Prompt>
+
+      {/* objetivo */}
+      <PromptWord entry={entry} />
+
+      <p className="text-center text-sm text-vault-500">
+        {entry.es} — pulsa el micro y pronuncia «{entry.pinyin}»
+      </p>
+
+      {!hasSR && (
+        <Panel className="w-full p-3 text-center">
+          <p className="text-sm text-vault-500">
+            Tu navegador no trae reconocimiento de voz (Chrome o Edge sí). Desafío oral
+            omitido — sin penalización.
+          </p>
+          <Btn className="mt-2 w-full" onClick={() => onResult(true, 0)}>
+            CONTINUAR ▸
+          </Btn>
+        </Panel>
+      )}
+
+      {hasSR && (
+        <>
+          <Btn className="px-6 py-3 text-2xl" variant={state === 'listening' ? 'amber' : 'primary'} onClick={start}>
+            {state === 'listening' ? '🎙️ ESCUCHANDO…' : '🎤 PRONUNCIAR'}
+          </Btn>
+
+          {state === 'listening' && (
+            <p className="font-display text-lg text-vault-400 glow">
+              ▂▃▅ ▁▂▄ ▃▅▂ <span className="blink">▍</span>
+            </p>
+          )}
+          {errMsg && state !== 'done' && <p className="text-sm text-vault-amber">{errMsg}</p>}
+
+          {state === 'done' && (
+            <div className={`w-full space-y-3 ${green ? 'flash-correct' : yellow ? '' : 'shake flash-wrong'}`}>
+              {/* lo que ha oído el terminal */}
+              <Panel className="p-3 text-center">
+                <p className="text-xs text-vault-600">EL TERMINAL HA OÍDO</p>
+                <p className="font-hanzi text-2xl text-vault-200">{alts[0] || '…'}</p>
+                {alts.length > 1 && (
+                  <p className="mt-1 text-xs text-vault-600">también: {alts.slice(1).join(' · ')}</p>
+                )}
+              </Panel>
+
+              {/* puntuación por sílabas */}
+              <div className="flex flex-wrap justify-center gap-1.5">
+                {targetChars.map((ch, i) => (
+                  <div
+                    key={i}
+                    className={`choice rounded px-2.5 py-1.5 text-center ${
+                      charOk[i] ? 'choice-correct' : 'choice-wrong'
+                    }`}
+                  >
+                    <span className="block font-hanzi text-2xl text-vault-100">{ch}</span>
+                    <span className="block text-[10px] text-vault-500">{sylls[i]?.text.normalize('NFC') ?? ''}</span>
+                  </div>
+                ))}
+              </div>
+
+              <p
+                className={`text-center font-display text-xl ${
+                  green ? 'text-vault-400 glow' : yellow ? 'text-vault-amber glow' : 'text-vault-red'
+                }`}
+              >
+                {green ? '▓ PRONUNCIAción PERFECTA ▓' : yellow ? '◐ CASI: alguna sílaba se te escapó' : '✗ NO TE ENTENDIDO'}
+              </p>
+
+              <div className="flex w-full gap-2">
+                <Btn variant="amber" className="flex-1" onClick={start}>
+                  ⟲ OTRA VEZ
+                </Btn>
+                <Btn
+                  className="flex-1"
+                  onClick={() => onResult(green || yellow, awardXp && green ? 10 : awardXp && yellow ? 5 : 0)}
+                >
+                  CONTINUAR ▸
+                </Btn>
+              </div>
+            </div>
+          )}
+
+          {state === 'idle' && !errMsg && (
+            <p className="text-xs text-vault-600">se puntúa por sílabas: verde acierto · rojo fallo</p>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
+
+/* ── Desafío de escritura (trazar el hanzi) ───────────────────────────────── */
+
+const GRID = 240
+
+function WriteView({ step, awardXp, onResult }: CProps<'write'>) {
+  const entry = entriesById.get(step.entry)
+  const guideRef = useRef<HTMLCanvasElement>(null)
+  const drawRef = useRef<HTMLCanvasElement>(null)
+  const drawing = useRef(false)
+  const [hasInk, setHasInk] = useState(false)
+  const [score, setScore] = useState<number | null>(null)
+
+  /** Pinta la cuadrícula 田字格 + el carácter guía tenue */
+  useEffect(() => {
+    const c = guideRef.current
+    if (!c || !entry) return
+    const ctx = c.getContext('2d')!
+    ctx.clearRect(0, 0, GRID, GRID)
+    // fondo
+    ctx.fillStyle = '#020604'
+    ctx.fillRect(0, 0, GRID, GRID)
+    // cuadrícula 田字格: marco + cruces (diagonales discontinuas)
+    ctx.strokeStyle = '#1d7a38'
+    ctx.lineWidth = 2
+    ctx.setLineDash([])
+    ctx.strokeRect(1, 1, GRID - 2, GRID - 2)
+    ctx.setLineDash([6, 8])
+    ctx.lineWidth = 1
+    ctx.beginPath()
+    ctx.moveTo(GRID / 2, 0)
+    ctx.lineTo(GRID / 2, GRID)
+    ctx.moveTo(0, GRID / 2)
+    ctx.lineTo(GRID, GRID / 2)
+    ctx.stroke()
+    ctx.beginPath()
+    ctx.moveTo(0, 0)
+    ctx.lineTo(GRID, GRID)
+    ctx.moveTo(GRID, 0)
+    ctx.lineTo(0, GRID)
+    ctx.stroke()
+    ctx.setLineDash([])
+    // guía del carácter (tenue)
+    ctx.fillStyle = 'rgba(61, 255, 112, 0.14)'
+    ctx.font = `700 ${Math.floor(GRID * 0.72)}px "Noto Sans SC", "Microsoft YaHei", sans-serif`
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText(entry.hanzi, GRID / 2, GRID / 2 + GRID * 0.04)
+  }, [entry])
+
+  const clear = () => {
+    const c = drawRef.current
+    if (!c) return
+    c.getContext('2d')!.clearRect(0, 0, GRID, GRID)
+    setHasInk(false)
+    setScore(null)
+  }
+
+  const pointer = (ev: React.PointerEvent<HTMLCanvasElement>) => {
+    const c = drawRef.current
+    if (!c) return { x: 0, y: 0 }
+    const r = c.getBoundingClientRect()
+    return { x: ((ev.clientX - r.left) / r.width) * GRID, y: ((ev.clientY - r.top) / r.height) * GRID }
+  }
+
+  const startStroke = (ev: React.PointerEvent<HTMLCanvasElement>) => {
+    if (score !== null) return
+    const c = drawRef.current
+    if (!c) return
+    c.setPointerCapture(ev.pointerId)
+    drawing.current = true
+    setHasInk(true)
+    const { x, y } = pointer(ev)
+    const ctx = c.getContext('2d')!
+    ctx.strokeStyle = '#3dff70'
+    ctx.lineWidth = 13
+    ctx.lineCap = 'round'
+    ctx.lineJoin = 'round'
+    ctx.beginPath()
+    ctx.moveTo(x, y)
+  }
+
+  const moveStroke = (ev: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!drawing.current) return
+    const ctx = drawRef.current?.getContext('2d')
+    if (!ctx) return
+    const { x, y } = pointer(ev)
+    ctx.lineTo(x, y)
+    ctx.stroke()
+  }
+
+  const endStroke = () => {
+    drawing.current = false
+  }
+
+  /** IoU del trazo del morador contra el carácter renderizado */
+  const check = () => {
+    const draw = drawRef.current
+    const guide = guideRef.current
+    if (!draw || !guide || !entry || !hasInk) return
+    // render limpio del objetivo (sin cuadrícula)
+    const target = document.createElement('canvas')
+    target.width = GRID
+    target.height = GRID
+    const tctx = target.getContext('2d')!
+    tctx.fillStyle = '#fff'
+    tctx.font = `700 ${Math.floor(GRID * 0.72)}px "Noto Sans SC", "Microsoft YaHei", sans-serif`
+    tctx.textAlign = 'center'
+    tctx.textBaseline = 'middle'
+    tctx.fillText(entry.hanzi, GRID / 2, GRID / 2 + GRID * 0.04)
+
+    const tData = tctx.getImageData(0, 0, GRID, GRID).data
+    const uData = draw.getContext('2d')!.getImageData(0, 0, GRID, GRID).data
+    let inter = 0
+    let union = 0
+    for (let i = 3; i < tData.length; i += 4) {
+      const t = tData[i] > 40
+      const u = uData[i] > 40
+      if (t && u) inter++
+      if (t || u) union++
+    }
+    const iou = union ? inter / union : 0
+    setScore(iou)
+    if (iou >= 0.5) sfx.correct()
+    else sfx.wrong()
+  }
+
+  if (!entry) return null
+
+  const green = score !== null && score >= 0.5
+  const yellow = score !== null && score >= 0.32 && score < 0.5
+
+  return (
+    <div className="flex flex-col items-center gap-3">
+      <Prompt>DESAFÍO DE ESCRITURA</Prompt>
+
+      <div className="text-center">
+        <Pinyin text={entry.pinyin} className="text-2xl" />
+        <p className="text-sm text-vault-500">{entry.es}</p>
+      </div>
+
+      <div className={`relative ${score !== null && !green && !yellow ? 'shake' : ''}`}>
+        <canvas ref={guideRef} width={GRID} height={GRID} className="rounded border border-vault-700" />
+        <canvas
+          ref={drawRef}
+          width={GRID}
+          height={GRID}
+          className="absolute inset-0 cursor-crosshair touch-none rounded"
+          onPointerDown={startStroke}
+          onPointerMove={moveStroke}
+          onPointerUp={endStroke}
+          onPointerLeave={endStroke}
+        />
+      </div>
+
+      {score === null ? (
+        <div className="flex w-full gap-2">
+          <Btn variant="amber" className="flex-1" onClick={clear} disabled={!hasInk}>
+            ⟲ LIMPIAR
+          </Btn>
+          <Btn className="flex-1" onClick={check} disabled={!hasInk}>
+            COMPROBAR ▸
+          </Btn>
+        </div>
+      ) : (
+        <div className="w-full space-y-3">
+          <p
+            className={`text-center font-display text-xl ${
+              green ? 'text-vault-400 glow' : yellow ? 'text-vault-amber glow' : 'text-vault-red'
+            }`}
+          >
+            {green
+              ? `▓ TRAZO MAESTRO · ${Math.round(score * 100)}% ▓`
+              : yellow
+                ? `◐ CASI · ${Math.round(score * 100)}% — la guía era tenue, el pulso también`
+                : `✗ ${Math.round(score * 100)}% — vuelve a intentarlo con calma`}
+          </p>
+          <div className="flex w-full gap-2">
+            <Btn variant="amber" className="flex-1" onClick={clear}>
+              ⟲ OTRA VEZ
+            </Btn>
+            <Btn
+              className="flex-1"
+              onClick={() => onResult(green || yellow, awardXp && green ? 10 : awardXp && yellow ? 5 : 0)}
+            >
+              CONTINUAR ▸
+            </Btn>
+          </div>
+        </div>
+      )}
+
+      <p className="text-center text-xs text-vault-600">
+        traza el carácter sobre la guía tenue · la puntuación compara tu trazo con el original
+      </p>
     </div>
   )
 }

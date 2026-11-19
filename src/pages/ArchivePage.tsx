@@ -3,6 +3,7 @@
    ───────────────────────────────────────────────────────────────────────────── */
 
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { entriesById, modules, seenEntries, unlockedNotes } from '../content'
 import { speakEntry, speakSentence } from '../lib/audio'
 import { useProgress } from '../stores/useProgress'
@@ -10,8 +11,10 @@ import { Panel, Prompt, SectionTitle } from '../components/ui'
 import { Pinyin } from '../components/Pinyin'
 
 export function ArchivePage() {
+  const navigate = useNavigate()
   const [tab, setTab] = useState<'palabras' | 'gramatica'>('palabras')
   const [filter, setFilter] = useState('all')
+  const [mode, setMode] = useState<'listen' | 'speak' | 'write'>('listen')
   const completedKey = useProgress((s) => Object.keys(s.completed).join(','))
   const completed = completedKey ? completedKey.split(',') : []
 
@@ -70,9 +73,36 @@ export function ArchivePage() {
                 </button>
               ))}
           </div>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-xs text-vault-600">TOCAR UNA PALABRA PARA:</span>
+            {(
+              [
+                ['listen', '🔊 ESCUCHAR'],
+                ['speak', '🎤 PRONUNCIAR'],
+                ['write', '✍️ ESCRIBIR'],
+              ] as const
+            ).map(([m, label]) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setMode(m)}
+                className={filterChip(mode === m)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
           <div className="grid grid-cols-2 gap-2">
             {words.map((e) => (
-              <button key={e.id} type="button" className="choice rounded p-3 text-left" onClick={() => speakEntry(e)}>
+              <button
+                key={e.id}
+                type="button"
+                className="choice rounded p-3 text-left"
+                onClick={() => {
+                  if (mode === 'listen') speakEntry(e)
+                  else navigate(`/practice/${mode}/${e.id}`)
+                }}
+              >
                 <div className="flex items-center gap-2">
                   {e.emoji && <span className="text-xl">{e.emoji}</span>}
                   <span className="font-hanzi text-2xl text-vault-100">{e.hanzi}</span>

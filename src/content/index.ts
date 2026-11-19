@@ -62,6 +62,8 @@ export function entryIdsInStep(step: Step): string[] {
     case 'listen':
     case 'type-pinyin':
     case 'dictate':
+    case 'speak':
+    case 'write':
       return [step.entry]
     case 'tone':
       return [step.entry]

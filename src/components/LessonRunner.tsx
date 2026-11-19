@@ -4,12 +4,12 @@
    en el pool SRS (vía store.completeLesson).
    ───────────────────────────────────────────────────────────────────────────── */
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { entriesById, lessonEntryIds } from '../content'
 import { sfx } from '../lib/sfx'
 import { isGraded } from '../lib/questions'
 import { useProgress } from '../stores/useProgress'
-import type { Lesson } from '../types/content'
+import type { Lesson, Step } from '../types/content'
 import type { ScriptMode } from '../types/progress'
 import { SCRIPT_MODES } from '../types/progress'
 import { ChallengeView } from './challenges'
@@ -24,6 +24,30 @@ export interface RunnerResult {
 
 const BONUS_FIRST = 30
 const BONUS_PERFECT = 20
+
+/** Hash estable de un string (elige siempre los mismos retos por lección) */
+function stableHash(str: string): number {
+  let h = 0
+  for (const ch of str) h = (h * 31 + ch.charCodeAt(0)) | 0
+  return Math.abs(h)
+}
+
+/**
+ * Pasos de la lección: las AUDITORÍAS (kind review) reciben automáticamente
+ * un DESAFÍO ORAL y uno de ESCRITURA con palabras vistas de la lección.
+ */
+function lessonSteps(lesson: Lesson): Step[] {
+  if (lesson.kind !== 'review') return lesson.steps
+  const ids = lessonEntryIds(lesson.id).filter((id) => entriesById.has(id))
+  if (ids.length < 2) return lesson.steps
+  const h = stableHash(lesson.id)
+  const speakId = ids[h % ids.length]
+  const writeId = ids[(h + Math.floor(ids.length / 2)) % ids.length]
+  const extra: Step[] = []
+  if (speakId !== writeId) extra.push({ type: 'speak', entry: speakId })
+  extra.push({ type: 'write', entry: writeId })
+  return [...lesson.steps, ...extra]
+}
 
 export function LessonRunner({
   lesson,
@@ -40,7 +64,9 @@ export function LessonRunner({
   const scriptMode = useProgress((s) => s.settings.scriptMode)
   const setSettings = useProgress((s) => s.setSettings)
 
-  const [queue, setQueue] = useState<number[]>(() => lesson.steps.map((_, i) => i))
+  const steps = useMemo(() => lessonSteps(lesson), [lesson])
+
+  const [queue, setQueue] = useState<number[]>(() => steps.map((_, i) => i))
   const [pos, setPos] = useState(0)
   /** firstTry[idx]: true/false la primera vez que se responde; false = reintento sin XP */
   const [firstTry, setFirstTry] = useState<Record<number, boolean>>({})
@@ -50,11 +76,11 @@ export function LessonRunner({
   const [confirmExit, setConfirmExit] = useState(false)
 
   const current = queue[pos]
-  const step = current !== undefined ? lesson.steps[current] : null
+  const step = current !== undefined ? steps[current] : null
   const awardXp = step && current !== undefined ? firstTry[current] !== false : false
 
   const reset = () => {
-    setQueue(lesson.steps.map((_, i) => i))
+    setQueue(steps.map((_, i) => i))
     setPos(0)
     setFirstTry({})
     setPassed([])
@@ -64,7 +90,7 @@ export function LessonRunner({
   }
 
   const finish = () => {
-    const graded = lesson.steps.map((s, i) => (isGraded(s) ? i : -1)).filter((i) => i >= 0)
+    const graded = steps.map((s, i) => (isGraded(s) ? i : -1)).filter((i) => i >= 0)
     const correct = graded.filter((i) => firstTry[i]).length
     const accuracy = graded.length ? correct / graded.length : 1
     const stars = accuracy >= 0.9 ? 3 : accuracy >= 0.65 ? 2 : 1
@@ -152,7 +178,7 @@ export function LessonRunner({
   }
 
   /* ── Ejecución de la lección ────────────────────────────────────────────── */
-  const progress = lesson.steps.length ? passed.length / lesson.steps.length : 1
+  const progress = steps.length ? passed.length / steps.length : 1
 
   return (
     <div className="flex min-h-dvh flex-col">
