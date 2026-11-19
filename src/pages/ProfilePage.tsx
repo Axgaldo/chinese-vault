@@ -45,6 +45,7 @@ export function ProfilePage() {
   const ownedFonts = useProgress((s) => s.ownedFonts)
   const equipVfx = useProgress((s) => s.equipVfx)
   const equipFont = useProgress((s) => s.equipFont)
+  const adminMode = useProgress((s) => s.settings.adminMode)
 
   /** Días que le quedan a la cuenta anónima (Firebase la borra a los 30) */
   const anonDaysLeft = (() => {
@@ -426,7 +427,7 @@ export function ProfilePage() {
         <div className="border-t border-vault-700 pt-3">
           <p className="mb-1 text-sm">VFX del terminal</p>
           <div className="flex flex-wrap gap-1">
-            {VFX_OPTIONS.filter((v) => ownedVfx.includes(v.id)).map((v) => (
+            {VFX_OPTIONS.filter((v) => adminMode || ownedVfx.includes(v.id)).map((v) => (
               <button
                 key={v.id}
                 type="button"
@@ -442,16 +443,20 @@ export function ProfilePage() {
               </button>
             ))}
           </div>
-          <p className="mt-1 text-xs text-vault-600">los VFX faltantes se compran en la Tienda</p>
+          <p className="mt-1 text-xs text-vault-600">
+            {adminMode ? '👁 supervisor: todo desbloqueado para probar' : 'los VFX faltantes se compran en la Tienda'}
+          </p>
         </div>
 
         <div className="flex items-center justify-between border-t border-vault-700 pt-3">
           <span className="text-sm">
             Letra del texto general
-            <span className="block text-xs text-vault-600">las letras faltantes, en la Tienda</span>
+            <span className="block text-xs text-vault-600">
+              {adminMode ? '👁 supervisor: todas las letras a mano' : 'las letras faltantes, en la Tienda'}
+            </span>
           </span>
           <div className="flex flex-wrap justify-end gap-1">
-            {BODY_FONTS.filter((f) => ownedFonts.includes(f.font)).map((f) => (
+            {BODY_FONTS.filter((f) => adminMode || ownedFonts.includes(f.font)).map((f) => (
               <button
                 key={f.font}
                 type="button"

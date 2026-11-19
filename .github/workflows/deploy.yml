@@ -47,6 +47,9 @@ jobs:
       - name: Generar audio del curso (MP3 no viven en Git)
         run: npm run audio
 
+      - name: Generar iconos PNG (rueda dentada del refugio)
+        run: npm run icons
+
       - name: Compilar para Pages (base /chinese-vault/)
         run: npm run build:pages
 

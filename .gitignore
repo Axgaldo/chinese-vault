@@ -13,6 +13,9 @@ dist/
 public/audio/*
 !public/audio/README.md
 
+# Iconos PNG generados con `npm run icons` (favicon.svg es la fuente)
+public/*.png
+
 # OS / editor
 .DS_Store
 Thumbs.db

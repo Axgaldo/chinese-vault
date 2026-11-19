@@ -17,7 +17,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'audio/README.md'],
+      includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'icon-512-maskable.png'],
       manifest: {
         name: 'Chinese Vault — aprende chino desde 0',
         short_name: 'Chinese Vault',
@@ -33,15 +33,15 @@ export default defineConfig({
         background_color: '#030804',
         categories: ['education'],
         icons: [
-          { src: `${base}favicon.svg`, sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
-          { src: `${base}favicon.svg`, sizes: 'any', type: 'image/svg+xml', purpose: 'maskable' },
+          { src: `${base}icon-192.png`, sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: `${base}icon-512.png`, sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: `${base}icon-512-maskable.png`, sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
       workbox: {
         // App shell + fuentes + TODO el audio del curso (offline total)
         globPatterns: ['**/*.{js,css,html,svg,woff2,woff,ttf}', 'audio/*.mp3'],
-        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
-        runtimeCaching: [
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,        runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',

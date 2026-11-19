@@ -281,7 +281,8 @@ export const useProgress = create<ProgressStore>()(
 
       equipTheme(themeId) {
         set((s) => {
-          if (!s.ownedThemes.includes(themeId)) return s
+          // el MODO SUPERVISOR permite equipar sin haber comprado (para probar)
+          if (!s.ownedThemes.includes(themeId) && !s.settings.adminMode) return s
           return { ...s, settings: { ...s.settings, theme: themeId }, updatedAt: Date.now() }
         })
       },
@@ -304,7 +305,7 @@ export const useProgress = create<ProgressStore>()(
 
       equipFont(fontId) {
         set((s) => {
-          if (!s.ownedFonts.includes(fontId)) return s
+          if (!s.ownedFonts.includes(fontId) && !s.settings.adminMode) return s
           return { ...s, settings: { ...s.settings, bodyFont: fontId }, updatedAt: Date.now() }
         })
       },
@@ -327,7 +328,7 @@ export const useProgress = create<ProgressStore>()(
 
       equipVfx(vfxId) {
         set((s) => {
-          if (!s.ownedVfx.includes(vfxId)) return s
+          if (!s.ownedVfx.includes(vfxId) && !s.settings.adminMode) return s
           return { ...s, settings: { ...s.settings, vfx: vfxId }, updatedAt: Date.now() }
         })
       },
@@ -337,10 +338,16 @@ export const useProgress = create<ProgressStore>()(
       },
 
       setSettings(patch) {
-        set((s) => ({
-          settings: { ...s.settings, ...patch },
-          updatedAt: Date.now(),
-        }))
+        set((s) => {
+          const settings = { ...s.settings, ...patch }
+          // Al QUITAR el supervisor, el equipo vuelve a lo comprado de verdad
+          if (patch.adminMode === false) {
+            if (!s.ownedThemes.includes(settings.theme)) settings.theme = 'green'
+            if (!s.ownedFonts.includes(settings.bodyFont)) settings.bodyFont = 'mono'
+            if (!s.ownedVfx.includes(settings.vfx)) settings.vfx = 'crt'
+          }
+          return { settings, updatedAt: Date.now() }
+        })
       },
 
       hydrate(p) {

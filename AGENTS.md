@@ -72,6 +72,7 @@ npm run lint         # ESLint
 npm run test         # Vitest (50 tests: pinyin, SRS, retos, logros, integridad del curso)
 npm run audio        # genera los MP3 que falten (usa src/content como fuente de verdad)
 npm run audio:force  # regenera TODOS los mp3
+npm run icons        # rasteriza favicon.svg → PNGs (icon-192/512, maskable, apple-touch)
 ```
 
 **Regla de oro del contenido:** cada vez que se añadan/editen palabras o frases (`src/content/**`),
@@ -208,7 +209,10 @@ service cloud.firestore {
 - **Logros:** catálogo en `lib/achievements.ts` (se sellan tras cada actividad con toast +
   sfx.log; `main.tsx` hace un `checkAchievements()` de arranque para migraciones).
 - **Modo Supervisor:** `settings.adminMode` (libre, no es secreto) — desbloquea todas las
-  lecciones (Home + LessonPage consultan el flag).
+  lecciones (Home + LessonPage consultan el flag) Y TODO el catálogo de la tienda/VFX/letras
+  para probar sin coste (equip* lo permiten; van marcados con 👁). Al DESACTIVARLO, el equipo
+  vuelve a lo comprado de verdad (setSettings lo reajusta: theme→green, font→mono, vfx→crt
+  si no eran owned).
 
 ## Modo de escritura (pinyin-first)
 
