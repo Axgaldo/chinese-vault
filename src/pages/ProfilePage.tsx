@@ -95,6 +95,8 @@ export function ProfilePage() {
         return 'Proveedor Google no activo: enciéndelo en Authentication → Sign-in method (consola de Firebase).'
       case 'auth/unauthorized-domain':
         return 'Dominio no autorizado: añádelo en Authentication → Settings → Authorized domains.'
+      case 'auth/credential-already-in-use':
+        return 'Ese Google ya pertenece a una cuenta: se entrará a la existente.'
       case 'auth/api-key-not-valid':
         return 'Las claves del .env no son válidas: revisa la config de tu app web en Firebase.'
       case 'auth/network-request-failed':
@@ -108,9 +110,10 @@ export function ProfilePage() {
 
   /**
    * ENTRAR CON GOOGLE:
-   * • si ya hay sesión de Google activa → no se re-autentica (evita errores de popup)
-   * • si la sesión es anónima → linkWithPopup (mismo uid: el progreso local sube sin perder nada)
-   * • si no hay sesión → signInWithPopup (la NUBE PRIORIZA: recupera tu cuenta tal cual)
+   * • sesión anónima → se intenta VINCULAR (primera vez de este dispositivo);
+   *   si ese Google ya tiene cuenta (credential-already-in-use) → se ENTRA a ella
+   * • ya hay sesión de Google → no se re-autentica
+   * • al ENTRAR a una cuenta existente, la NUBE PRIORIZA (recuperas tu progreso de la BBDD)
    */
   const googleSignIn = async () => {
     const fb = await loadFirebase()
@@ -121,14 +124,19 @@ export function ProfilePage() {
       const user = fb.auth.currentUser
       if (user && !user.isAnonymous) {
         // ya hay sesión activa: simplemente refrescar el estado de la UI
-        useAuth
-          .getState()
-          .set('account', user.uid, user.email, user.metadata.creationTime)
+        useAuth.getState().set('account', user.uid, user.email, user.metadata.creationTime)
         setAuthMsg(`Ya tienes sesión activa como ${user.email} ✓`)
         return
       }
       if (user?.isAnonymous) {
-        await linkWithPopup(user, provider)
+        try {
+          await linkWithPopup(user, provider)
+        } catch (err) {
+          if ((err as { code?: string }).code !== 'auth/credential-already-in-use') throw err
+          // ese Google ya está vinculado a una cuenta existente: ENTRAR a ella
+          preferCloudOnNextAuth()
+          await signInWithPopup(fb.auth, provider)
+        }
       } else {
         preferCloudOnNextAuth()
         await signInWithPopup(fb.auth, provider)
