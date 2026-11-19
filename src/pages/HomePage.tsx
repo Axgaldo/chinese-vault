@@ -8,7 +8,7 @@ import { sfx } from '../lib/sfx'
 import { APP_VERSION, GITHUB_URL, GITHUB_USER } from '../lib/version'
 import { useProgress } from '../stores/useProgress'
 import { rankFor, type LessonRecord } from '../types/progress'
-import { CapsIcon, Chip, GithubMark, Meter, Panel, SectionTitle } from '../components/ui'
+import { CapsIcon, Chip, GithubMark, Meter, Panel, SectionTitle, VaultDoorMark } from '../components/ui'
 import type { VaultModule } from '../types/content'
 
 export function HomePage() {
@@ -28,22 +28,24 @@ export function HomePage() {
 
   return (
     <div className="flex flex-col gap-4 p-4 pb-8">
-      <header className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="font-display text-4xl tracking-widest text-vault-400 glow">CHINESE VAULT</h1>
-          <p className="text-xs text-vault-600">SISTEMA DE ENTRENAMIENTO LINGÜÍSTICO · {APP_VERSION}</p>
+      <header className="flex items-center justify-between gap-2">
+        <div className="min-w-0">
+          <h1 className="font-display text-3xl leading-none tracking-wider text-vault-400 glow sm:text-4xl sm:tracking-widest">
+            CHINESE VAULT
+          </h1>
+          <p className="mt-1 truncate text-[10px] leading-tight text-vault-600 sm:text-xs">
+            SISTEMA DE ENTRENAMIENTO LINGÜÍSTICO · {APP_VERSION}
+          </p>
         </div>
-        <div className="flex w-full flex-col gap-1.5 sm:w-auto sm:flex-row sm:items-center">
-          {adminMode && (
-            <Chip className="justify-center text-vault-teal sm:justify-start">👁 SUPERVISOR</Chip>
-          )}
-          <Chip className="flex w-full items-center justify-between gap-3 text-vault-amber sm:w-auto sm:justify-start">
-            <CapsIcon className="text-xl" />
-            <span className="font-display text-xl">{caps}</span>
+        <div className="flex shrink-0 flex-col items-end gap-1">
+          {adminMode && <Chip className="px-1.5 py-0 text-vault-teal">👁</Chip>}
+          <Chip className="flex items-center gap-1 px-1.5 py-0 text-vault-amber">
+            <CapsIcon className="text-lg leading-none" />
+            <span className="font-display text-lg leading-none">{caps}</span>
           </Chip>
-          <Chip className="flex w-full items-center justify-between gap-3 text-vault-amber sm:w-auto sm:justify-start">
-            <span className="text-xl">🔥</span>
-            <span className="font-display text-xl">{streak}</span>
+          <Chip className="flex items-center gap-1 px-1.5 py-0 text-vault-amber">
+            <span className="text-lg leading-none">🔥</span>
+            <span className="font-display text-lg leading-none">{streak}</span>
           </Chip>
         </div>
       </header>
@@ -64,14 +66,16 @@ export function HomePage() {
       {nextLesson && (
         <button
           type="button"
-          className="btn-vault w-full px-4 py-3 text-left"
+          className="btn-vault relative w-full overflow-hidden px-4 py-3 text-left"
           onClick={() => {
             sfx.tap()
             navigate(`/lesson/${nextLesson.id}`)
           }}
         >
-          <span className="block text-lg">CONTINUAR PROTOCOLO ▸</span>
-          <span className="block text-sm text-vault-200">
+          {/* marca de agua: la puerta del refugio asomando por la esquina (~40% visible) */}
+          <VaultDoorMark className="pointer-events-none absolute -bottom-24 -right-4 h-40 w-40 text-vault-700 opacity-70" />
+          <span className="relative block text-lg">CONTINUAR PROTOCOLO ▸</span>
+          <span className="relative block text-sm text-vault-200">
             {nextModule?.code} · {nextLesson.title}
           </span>
         </button>

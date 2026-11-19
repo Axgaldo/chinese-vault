@@ -84,6 +84,36 @@ export function GithubMark({ className = '' }: { className?: string }) {
   )
 }
 
+/** Puerta del refugio (rueda dentada sin carácter) — para marcas de agua */
+export function VaultDoorMark({ className = '' }: { className?: string }) {
+  const teeth = Array.from({ length: 12 }, (_, i) => i * 30)
+  return (
+    <svg viewBox="0 0 64 64" fill="none" aria-hidden className={className}>
+      <g fill="currentColor">
+        {teeth.map((deg) => (
+          <rect
+            key={deg}
+            x="29"
+            y="1.5"
+            width="6"
+            height="10"
+            rx="1.5"
+            transform={`rotate(${deg} 32 32)`}
+          />
+        ))}
+      </g>
+      <circle cx="32" cy="32" r="23" stroke="currentColor" strokeWidth="5" />
+      <g stroke="currentColor" strokeWidth="2">
+        <line x1="32" y1="11" x2="32" y2="15" />
+        <line x1="32" y1="49" x2="32" y2="53" />
+        <line x1="11" y1="32" x2="15" y2="32" />
+        <line x1="49" y1="32" x2="53" y2="32" />
+      </g>
+      <circle cx="32" cy="32" r="19" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  )
+}
+
 /** Chapas: la moneda del refugio — 3 chapas cayendo (SVG, hereda el color) */
 export function CapsIcon({ className = '' }: { className?: string }) {
   return (
