@@ -33,6 +33,9 @@ jobs:
       - name: Instalar dependencias
         run: npm ci
 
+      - name: Tests (vitest)
+        run: npm run test
+
       - name: Generar audio del curso (MP3 no viven en Git)
         run: npm run audio
 

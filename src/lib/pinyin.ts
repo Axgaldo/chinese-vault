@@ -48,8 +48,11 @@ export function syllabify(pinyin: string): Syllable[] {
       current += ch
       continue
     }
-    // apóstrofo separador de sílabas (Xi'an)
-    if (ch === "'" || ch === '’') continue
+    // apóstrofo separador de sílabas: TERMINA la sílaba en curso (Xi'an → xī + ān)
+    if (ch === "'" || ch === '’') {
+      flush()
+      continue
+    }
     // espacio, signos de puntuación… fin de sílaba
     flush()
   }
@@ -62,7 +65,8 @@ export function toneOfSyllable(syl: string): 1 | 2 | 3 | 4 | 5 {
   return syllabify(syl)[0]?.tone ?? 5
 }
 
-/** Pinyin sin marcas de tono: "nǐ hǎo" → "ni hao" (ü se mantiene) */
+/** Pinyin sin marcas de tono: "nǐ hǎo" → "ni hao"
+ *  (la ü también se pierde en el NFD: "lǜ" → "lu" — coherente con slugs/normalización) */
 export function stripTones(pinyin: string): string {
   return pinyin
     .normalize('NFD')

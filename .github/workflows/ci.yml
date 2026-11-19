@@ -1,0 +1,30 @@
+# CI — tests de las libs críticas (pinyin, SRS, retos, integridad del curso)
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Tests (vitest)
+        run: npm run test
+
+      - name: Type-check + build de producción
+        run: npm run build

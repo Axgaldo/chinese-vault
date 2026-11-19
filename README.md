@@ -1,5 +1,6 @@
 # Chinese Vault ☢
 
+[![CI](https://github.com/Axgaldo/chinese-vault/actions/workflows/ci.yml/badge.svg)](https://github.com/Axgaldo/chinese-vault/actions/workflows/ci.yml)
 [![Deploy to GitHub Pages](https://github.com/Axgaldo/chinese-vault/actions/workflows/deploy.yml/badge.svg)](https://github.com/Axgaldo/chinese-vault/actions/workflows/deploy.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
 
@@ -41,6 +42,14 @@ ABRIENDO LA PUERTA DEL REFUGIO 101..
   audio incluido. Instálala en el móvil/escritorio y funciona sin conexión.
 - **Progreso 100% local** (localStorage) y **sincronización opcional con Firebase** gratuito para
   tener cuenta y multi-dispositivo.
+- **Misiones de la Caravana 🐂:** cada día, 3 encargos nuevos (dictados, repasos, lecciones,
+  tonos, XP…) con recompensa en chapas, directamente en el mapa.
+- **Tienda del Refugio ⛓:** gasta tus chapas en temas de color del terminal — Ámbar Fallout,
+  Turquesa Rad, Rojo Alerta y el Pip-Boy 2000 en blanco y negro.
+- **Estadísticas del morador:** registro con XP, racha (con récord), precisión media y por
+  sector, calor de actividad de 14 días y contadores varios.
+- **50 tests automatizados** (Vitest) de pinyin, SRS, retos y la integridad completa del
+  curso, corriendo en CI en cada push.
 - Cero backend, cero binarios en el repo, licencia **MIT**.
 
 ## Arranque rápido
