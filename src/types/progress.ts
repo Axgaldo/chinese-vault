@@ -24,6 +24,43 @@ export interface SrsCard {
   lapses: number
 }
 
+/** Contadores de actividad del DÍA en curso (alimenta las misiones) */
+export interface DailyStats {
+  /** Día local yyyy-mm-dd (cambia → se resetea todo) */
+  date: string
+  lessons: number
+  perfect: number
+  reviews: number
+  dictations: number
+  tones: number
+  steps: number
+  xp: number
+}
+
+/** Estado de una misión de la caravana */
+export interface QuestItem {
+  /** id de la plantilla (también es el id del encargo del día) */
+  id: string
+  progress: number
+  claimed: boolean
+}
+
+/** Misiones generadas para un día concreto */
+export interface QuestState {
+  date: string
+  items: QuestItem[]
+}
+
+/** Tema de color del terminal (Tienda del Refugio) */
+export type ThemeId = 'green' | 'amber' | 'teal' | 'red' | 'mono'
+
+/** Registro de un día del histórico (para estadísticas) */
+export interface DayLog {
+  xp: number
+  lessons: number
+  reviews: number
+}
+
 /** Modo de escritura: pinyin puro · pinyin+hanzi apilados · hanzi puro */
 export type ScriptMode = 'pinyin' | 'both' | 'hanzi'
 
@@ -57,6 +94,8 @@ export interface Settings {
   crt: boolean
   /** Letra del texto general */
   bodyFont: BodyFont
+  /** Tema de color equipado (comprado en la Tienda del Refugio) */
+  theme: ThemeId
 }
 
 export interface ProgressState {
@@ -64,6 +103,8 @@ export interface ProgressState {
   /** Chapas: la moneda del refugio (bono diario + actividades) */
   caps: number
   streakDays: number
+  /** Mejor racha histórica */
+  bestStreak: number
   /** Último día de estudio (ISO yyyy-mm-dd) */
   lastStudyDay: string
   /** Lecciones completadas: lessonId → récord */
@@ -74,6 +115,14 @@ export interface ProgressState {
   reviewsDone: number
   /** Logros desbloqueados: achievementId → timestamp */
   achievements: Record<string, number>
+  /** Contadores del día (misiones de la caravana) */
+  dailyStats: DailyStats
+  /** Misiones de la caravana del día */
+  quests: QuestState
+  /** Temas comprados en la tienda */
+  ownedThemes: ThemeId[]
+  /** Histórico de actividad: yyyy-mm-dd → registro (máx. 60 días) */
+  history: Record<string, DayLog>
   settings: Settings
   updatedAt: number
 }
@@ -82,11 +131,16 @@ export const INITIAL_PROGRESS: ProgressState = {
   xp: 0,
   caps: 0,
   streakDays: 0,
+  bestStreak: 0,
   lastStudyDay: '',
   completed: {},
   srs: {},
   reviewsDone: 0,
   achievements: {},
+  dailyStats: { date: '', lessons: 0, perfect: 0, reviews: 0, dictations: 0, tones: 0, steps: 0, xp: 0 },
+  quests: { date: '', items: [] },
+  ownedThemes: ['green'],
+  history: {},
   settings: {
     audioRate: 0.9,
     scriptMode: 'pinyin',
@@ -95,6 +149,7 @@ export const INITIAL_PROGRESS: ProgressState = {
     contrast: false,
     crt: true,
     bodyFont: 'mono',
+    theme: 'green',
   },
   updatedAt: 0,
 }

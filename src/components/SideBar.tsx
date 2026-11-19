@@ -53,6 +53,9 @@ export function SideBar({ className = '' }: { className?: string }) {
         <NavLink to="/archive" className={linkCls} onClick={() => sfx.tap()}>
           <span className="text-2xl">🗄️</span> ARCHIVO
         </NavLink>
+        <NavLink to="/shop" className={linkCls} onClick={() => sfx.tap()}>
+          <span className="text-2xl">🛒</span> TIENDA
+        </NavLink>
         <NavLink to="/profile" className={linkCls} onClick={() => sfx.tap()}>
           <span className="text-2xl">👤</span> PERFIL
         </NavLink>

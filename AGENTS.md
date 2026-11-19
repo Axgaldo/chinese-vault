@@ -57,6 +57,7 @@ y arreglos. Se muestra en inicio, barra lateral, arranque y perfil: SIEMPRE impo
 | Audio           | msedge-tts + Web Speech API | MP3 pre-generados en `public/audio` (gitignored) con fallback TTS navegador |
 | PWA             | vite-plugin-pwa 2 (workbox)| Service worker + manifest; precachea TODO incluido el audio → offline total |
 | Lint            | ESLint 10 flat config       | `npm run lint`                              |
+| Tests           | Vitest 5 (`npm run test`)   | 50 tests de libs puras + integridad del curso; gate en CI y deploy |
 | SFX             | WebAudio procedural         | pitidos retro, sin archivos de sonido       |
 
 Node >= 20 (desarrollado con Node 26). npm como gestor.
@@ -68,6 +69,7 @@ npm install          # dependencias
 npm run dev          # http://localhost:5173
 npm run build        # tsc -b && vite build (debe pasar sin errores)
 npm run lint         # ESLint
+npm run test         # Vitest (50 tests: pinyin, SRS, retos, logros, integridad del curso)
 npm run audio        # genera los MP3 que falten (usa src/content como fuente de verdad)
 npm run audio:force  # regenera TODOS los mp3
 ```
@@ -243,6 +245,26 @@ service cloud.firestore {
 - UI strings: español. Código/comentarios/docs: inglés (salvo strings visibles al usuario).
 - Prefiere editar archivos existentes con precisión; respeta la estructura descrita arriba.
 - No cambiar decisiones de producto listadas al principio sin pedirlo a Antonio.
+
+## Caravana, Tienda y Estadísticas (v1.2.0)
+
+- **Caravana 🐂** (`lib/quests.ts`): 3 encargos/día generados de forma DETERMINISTA desde la
+  fecha (`questsForDate`); miden contadores de `dailyStats` (lessons, perfect, reviews,
+  dictations, tones, steps, xp). `logActivity(metric, n)` los alimenta desde LessonRunner
+  (steps/dictations/tones) y ReviewPage (reviews). Reclamar paga chapas (`claimQuest`).
+  Al cambiar de día, `refreshDay` resetea contadores y regenera encargos (store).
+- **Tienda ⛓** (`lib/shop.ts` + ShopPage): temas de terminal (green gratis · amber · teal ·
+  red · mono). `buyTheme` descuenta chapas y EQUIPA al instante; `settings.theme` se aplica
+  en App.tsx como `html[data-theme]` (paletas en index.css; los colores de tono pedagógicos
+  no cambian). NUEVA PÁGINA `/shop` (NavBar 5 pestañas + SideBar).
+- **Estadísticas** (ProfilePage → "REGISTRO DEL REFUGIO"): grid (XP, chapas, racha con
+  récord, 3★, precisión media, repasos), calor de 14 días (`history`, poda a 60 días) y
+  precisión por sector. `bestStreak` y `history` viven en el store.
+- **Sincronización blindada** (lib/sync.ts): nunca se sube un progreso VACÍO a la nube, y si
+  el local amanece vacío pero el remoto tiene datos, se RECUPERA desde la nube (anti-reset).
+- **Tests**: 50 vitest en `src/**/*.test.ts` — al tocar `lib/pinyin.ts`, `lib/srs.ts`,
+  `lib/questions.ts`, `lib/achievements.ts` o el contenido, corre `npm run test`. El test de
+  integridad del curso (`content/index.test.ts`) valida TODAS las referencias de ids.
 
 ## Roadmap (siguientes sesiones)
 

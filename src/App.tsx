@@ -16,6 +16,7 @@ import { HomePage } from './pages/HomePage'
 import { LessonPage } from './pages/LessonPage'
 import { ProfilePage } from './pages/ProfilePage'
 import { ReviewPage } from './pages/ReviewPage'
+import { ShopPage } from './pages/ShopPage'
 
 /** Clave compartida con BootScreen (primera visita) */
 const BOOT_KEY = 'cv-boot-v1'
@@ -45,12 +46,14 @@ export default function App() {
   const crt = useProgress((s) => s.settings.crt)
   const contrast = useProgress((s) => s.settings.contrast)
   const bodyFont = useProgress((s) => s.settings.bodyFont)
+  const theme = useProgress((s) => s.settings.theme)
 
   useEffect(() => {
     const el = document.documentElement
     el.classList.toggle('cv-contrast', contrast)
     el.dataset.font = bodyFont
-  }, [contrast, bodyFont])
+    el.dataset.theme = theme
+  }, [contrast, bodyFont, theme])
 
   return (
     <>
@@ -77,6 +80,7 @@ export default function App() {
               <Route path="/lesson/:lessonId" element={<LessonPage />} />
               <Route path="/review" element={<ReviewPage />} />
               <Route path="/archive" element={<ArchivePage />} />
+              <Route path="/shop" element={<ShopPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

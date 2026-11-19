@@ -23,6 +23,10 @@ let pushTimer: ReturnType<typeof setTimeout> | null = null
 async function pushProgress(db: import('firebase/firestore').Firestore) {
   if (!uid) return
   const data = progressData(useProgress.getState())
+  // nunca propagar un reset accidental a la nube
+  if (Object.keys(data.completed).length === 0 && Object.keys(data.srs).length === 0 && data.xp === 0) {
+    return
+  }
   try {
     const { doc, setDoc } = await import('firebase/firestore')
     await setDoc(doc(db, 'users', uid), { progress: data, updatedAt: Date.now() }, { merge: true })
@@ -64,11 +68,22 @@ export function initSync() {
             const snap = await getDoc(doc(db, 'users', user.uid))
             const remote = snap.data() as { progress?: ProgressState } | undefined
             const local = useProgress.getState()
+
+            // ¿El local está "vacío"? (reset accidental / primera visita en este dispositivo)
+            const localEmpty =
+              Object.keys(local.completed).length === 0 &&
+              Object.keys(local.srs).length === 0 &&
+              local.xp === 0
+
             if (remote?.progress && (remote.progress.updatedAt ?? 0) > local.updatedAt) {
               // la nube va por delante: adoptar
               useProgress.getState().hydrate(remote.progress)
-            } else {
-              // el local manda (o el remoto no existe): subir
+            } else if (localEmpty && remote?.progress) {
+              // el local se vació por un accidente pero la nube tiene progreso: RECUPERAR
+              console.warn('[vault] local vacío: recuperando progreso desde la nube')
+              useProgress.getState().hydrate(remote.progress)
+            } else if (!localEmpty || !remote?.progress) {
+              // el local manda (o el remoto no existe): asegurar que la nube se pinta
               schedulePush()
             }
           } catch (err) {

@@ -16,7 +16,7 @@ export function NavBar({ className = '' }: { className?: string }) {
 
   return (
     <nav className={`sticky bottom-0 z-10 border-t border-vault-800 bg-vault-950/95 backdrop-blur ${className}`}>
-      <div className="grid grid-cols-4">
+      <div className="grid grid-cols-5">
         <NavLink to="/" className={linkCls} onClick={() => sfx.tap()}>
           <span className="text-2xl">🗺️</span>
           MAPA
@@ -35,6 +35,10 @@ export function NavBar({ className = '' }: { className?: string }) {
         <NavLink to="/archive" className={linkCls} onClick={() => sfx.tap()}>
           <span className="text-2xl">🗄️</span>
           ARCHIVO
+        </NavLink>
+        <NavLink to="/shop" className={linkCls} onClick={() => sfx.tap()}>
+          <span className="text-2xl">🛒</span>
+          TIENDA
         </NavLink>
         <NavLink to="/profile" className={linkCls} onClick={() => sfx.tap()}>
           <span className="text-2xl">👤</span>

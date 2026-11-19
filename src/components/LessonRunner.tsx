@@ -36,6 +36,7 @@ export function LessonRunner({
 }) {
   const completeLesson = useProgress((s) => s.completeLesson)
   const addXp = useProgress((s) => s.addXp)
+  const logActivity = useProgress((s) => s.logActivity)
   const scriptMode = useProgress((s) => s.settings.scriptMode)
   const setSettings = useProgress((s) => s.setSettings)
 
@@ -71,7 +72,8 @@ export function LessonRunner({
     const bonus = firstTime ? BONUS_FIRST + (accuracy === 1 ? BONUS_PERFECT : 0) : 0
 
     completeLesson(lesson.id, stars, accuracy)
-    addXp(bonus)
+    // el XP de los pasos acertados TAMBIÉN se persiste (no solo el bonus)
+    addXp(xpGain + bonus)
     sfx.complete()
     setResult({ stars, accuracy, xp: xpGain + bonus })
   }
@@ -84,6 +86,10 @@ export function LessonRunner({
     if (correct) {
       setXpGain((x) => x + xp)
       setPassed((p) => (p.includes(idx) ? p : [...p, idx]))
+      // contadores para la caravana
+      logActivity('steps', 1)
+      if (step.type === 'dictate') logActivity('dictations', 1)
+      if (step.type === 'tone') logActivity('tones', 1)
       if (pos + 1 >= queue.length) finish()
       else setPos(pos + 1)
     } else {

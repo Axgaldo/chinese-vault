@@ -4,7 +4,7 @@
 
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { allLessons, seenEntries } from '../content'
+import { allLessons, modules, seenEntries } from '../content'
 import { ACHIEVEMENTS } from '../lib/achievements'
 import { speakHanzi } from '../lib/audio'
 import { sfx } from '../lib/sfx'
@@ -37,6 +37,8 @@ export function ProfilePage() {
   const achievements = useProgress((s) => s.achievements)
   const unlockedCount = Object.keys(achievements).length
   const anonCreatedAt = useAuth((s) => s.anonCreatedAt)
+  const history = useProgress((s) => s.history)
+  const bestStreak = useProgress((s) => s.bestStreak)
 
   /** Días que le quedan a la cuenta anónima (Firebase la borra a los 30) */
   const anonDaysLeft = (() => {
@@ -44,6 +46,39 @@ export function ProfilePage() {
     const msLeft = new Date(anonCreatedAt).getTime() + 30 * 86_400_000 - Date.now()
     return Math.ceil(msLeft / 86_400_000)
   })()
+
+  /** Estadísticas del refugio */
+  const threeStars = Object.values(records).filter((r) => r.stars >= 3).length
+  const avgAccuracy = (() => {
+    const accs = Object.values(records).map((r) => r.accuracy)
+    return accs.length ? accs.reduce((a, b) => a + b, 0) / accs.length : null
+  })()
+  const last14Days = (() => {
+    const days: string[] = []
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date()
+      d.setDate(d.getDate() - i)
+      const p = (n: number) => String(n).padStart(2, '0')
+      days.push(`${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`)
+    }
+    return days
+  })()
+  const sectorAccuracy = modules
+    .map((m) => {
+      const doneRecords = m.lessons
+        .filter((l) => l.id in records)
+        .map((l) => records[l.id])
+      return {
+        code: m.code,
+        name: m.title,
+        done: doneRecords.length,
+        total: m.lessons.length,
+        accuracy: doneRecords.length
+          ? doneRecords.reduce((a, r) => a + r.accuracy, 0) / doneRecords.length
+          : 0,
+      }
+    })
+    .filter((s) => s.done > 0)
 
   /** Errores de Google Sign-In traducidos al idioma del refugio */
   const googleError = (code: string): string => {
@@ -141,6 +176,67 @@ export function ProfilePage() {
           )
         })}
       </div>
+
+      <SectionTitle>REGISTRO DEL REFUGIO</SectionTitle>
+      <Panel className="space-y-4 p-4">
+        <div className="grid grid-cols-3 gap-2 text-sm">
+          <div className="chip px-2 py-1">⚡ XP {xp}</div>
+          <div className="chip px-2 py-1">⛓ CHAPAS {caps}</div>
+          <div className="chip px-2 py-1">
+            🔥 {streak} (RÉCORD {bestStreak})
+          </div>
+          <div className="chip px-2 py-1">⭐ 3★ {threeStars}</div>
+          <div className="chip px-2 py-1">
+            🎯 PRECISIÓN {avgAccuracy !== null ? `${Math.round(avgAccuracy * 100)}%` : '—'}
+          </div>
+          <div className="chip px-2 py-1">📡 REPASOS {reviewsDone}</div>
+        </div>
+
+        {/* Calor de los últimos 14 días */}
+        <div>
+          <p className="mb-1 text-xs text-vault-500">ACTIVIDAD · últimos 14 días</p>
+          <div className="flex items-end gap-1">
+            {last14Days.map((day) => {
+              const xpDay = history[day]?.xp ?? 0
+              return (
+                <div
+                  key={day}
+                  title={`${day} · ${xpDay} XP`}
+                  className="h-6 flex-1 rounded-sm border border-vault-700"
+                  style={{
+                    background:
+                      xpDay > 0
+                        ? `color-mix(in srgb, var(--color-vault-400) ${Math.min(100, 25 + xpDay)}%, #000)`
+                        : undefined,
+                    opacity: xpDay > 0 ? 1 : 0.25,
+                  }}
+                />
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Precisión por sector */}
+        {sectorAccuracy.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-xs text-vault-500">PRECISIÓN POR SECTOR</p>
+            {sectorAccuracy.map(({ code, name, accuracy, done, total }) => (
+              <div key={code} className="flex items-center gap-2">
+                <span className="w-14 shrink-0 font-display text-sm text-vault-400">{code}</span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex justify-between text-xs text-vault-600">
+                    <span className="truncate">{name}</span>
+                    <span>
+                      {done}/{total} · {Math.round(accuracy * 100)}%
+                    </span>
+                  </div>
+                  <Meter value={accuracy} className="mt-0.5 h-2!" />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Panel>
 
       <SectionTitle>CUENTA Y NUBE</SectionTitle>
       <Panel className="p-4">
@@ -326,7 +422,7 @@ export function ProfilePage() {
         )}
       </Panel>
 
-      <p className="text-center text-xs text-vault-600">
+      <div className="flex flex-col items-center gap-1 text-center">
         <a
           href={GITHUB_URL}
           target="_blank"
@@ -336,8 +432,8 @@ export function ProfilePage() {
           <GithubMark />
           {GITHUB_USER}
         </a>
-        <p className="text-center text-xs text-vault-600">Chinese Vault · MIT · {APP_VERSION}</p>
-      </p>
+        <p className="text-xs text-vault-600">Chinese Vault · MIT · {APP_VERSION}</p>
+      </div>
     </div>
   )
 }

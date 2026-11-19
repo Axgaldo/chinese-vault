@@ -135,6 +135,65 @@ body {
   animation: crt-sweep 9s linear infinite;
 }
 
+/* ── Temas del terminal (Tienda del Refugio) ────────────────────────────────
+   Redefinen los tokens vault: los colores de tono (pedagógicos) no cambian. */
+
+html[data-theme='amber'] {
+  --color-vault-950: #0a0600;
+  --color-vault-900: #120c00;
+  --color-vault-850: #171009;
+  --color-vault-800: #1d140a;
+  --color-vault-700: #6b4e00;
+  --color-vault-600: #a87a00;
+  --color-vault-500: #d99800;
+  --color-vault-400: #ffb000;
+  --color-vault-300: #ffc94d;
+  --color-vault-200: #ffd98a;
+  --color-vault-100: #fff1c9;
+}
+
+html[data-theme='teal'] {
+  --color-vault-950: #010807;
+  --color-vault-900: #02110e;
+  --color-vault-850: #031a15;
+  --color-vault-800: #04211b;
+  --color-vault-700: #146360;
+  --color-vault-600: #1f9a8a;
+  --color-vault-500: #2cc4ae;
+  --color-vault-400: #3ce8d5;
+  --color-vault-300: #75f0e2;
+  --color-vault-200: #a8f5ea;
+  --color-vault-100: #dbfaf5;
+}
+
+html[data-theme='red'] {
+  --color-vault-950: #0a0303;
+  --color-vault-900: #120505;
+  --color-vault-850: #170909;
+  --color-vault-800: #1d0a0a;
+  --color-vault-700: #7a1d1d;
+  --color-vault-600: #c22e2e;
+  --color-vault-500: #e34444;
+  --color-vault-400: #ff5c5c;
+  --color-vault-300: #ff8f8f;
+  --color-vault-200: #ffbaba;
+  --color-vault-100: #ffdcdc;
+}
+
+html[data-theme='mono'] {
+  --color-vault-950: #000000;
+  --color-vault-900: #050505;
+  --color-vault-850: #0a0a0a;
+  --color-vault-800: #101010;
+  --color-vault-700: #3d3d3d;
+  --color-vault-600: #8a8a8a;
+  --color-vault-500: #c4c4c4;
+  --color-vault-400: #f5f5f5;
+  --color-vault-300: #d4d4d4;
+  --color-vault-200: #a8a8a8;
+  --color-vault-100: #ffffff;
+}
+
 /* ── Ultra-oscuro (máximo contraste): negro puro + verde fósforo ────────────── */html.cv-contrast {
   --color-vault-950: #000000;
   --color-vault-900: #000000;

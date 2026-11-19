@@ -25,6 +25,7 @@ export function ReviewPage() {
   const addXp = useProgress((s) => s.addXp)
   const gradeEntry = useProgress((s) => s.gradeEntry)
   const finishReviewSession = useProgress((s) => s.finishReviewSession)
+  const logActivity = useProgress((s) => s.logActivity)
   const srs = useProgress((s) => s.srs)
 
   const [queue, setQueue] = useState<ReviewItem[]>(() => {
@@ -58,6 +59,7 @@ export function ReviewPage() {
     if (correct) {
       addXp(XP_REVIEW)
       setXp((x) => x + XP_REVIEW)
+      logActivity('reviews', 1)
       if (pos + 1 >= queue.length) {
         finishReviewSession()
         setDone(true)
