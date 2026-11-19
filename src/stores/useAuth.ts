@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   Estado de sesión del habitante (no se persiste: lo alimenta lib/sync.ts)
+   Estado de sesión del morador (no se persiste: lo alimenta lib/sync.ts)
    ───────────────────────────────────────────────────────────────────────────── */
 
 import { create } from 'zustand'

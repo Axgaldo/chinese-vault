@@ -9,11 +9,12 @@ import { ACHIEVEMENTS } from '../lib/achievements'
 import { speakHanzi } from '../lib/audio'
 import { sfx } from '../lib/sfx'
 import { firebaseEnabled, loadFirebase } from '../lib/firebase'
+import { APP_VERSION, GITHUB_URL, GITHUB_USER } from '../lib/version'
 import { useProgress } from '../stores/useProgress'
 import { useAuth } from '../stores/useAuth'
 import { rankFor, type ScriptMode } from '../types/progress'
 import { BODY_FONTS, SCRIPT_MODES } from '../types/progress'
-import { Btn, Chip, Meter, Panel, Prompt, SectionTitle, Toggle } from '../components/ui'
+import { Btn, Chip, GithubMark, Meter, Panel, Prompt, SectionTitle, Toggle } from '../components/ui'
 
 export function ProfilePage() {
   const navigate = useNavigate()
@@ -98,12 +99,12 @@ export function ProfilePage() {
     if (!fb) return
     const { signOut } = await import('firebase/auth')
     await signOut(fb.auth)
-    setAuthMsg('Sesión cerrada. Has vuelto como habitante anónimo (mismo dispositivo).')
+    setAuthMsg('Sesión cerrada. Has vuelto como morador anónimo (mismo dispositivo).')
   }
 
   return (
     <div className="flex flex-col gap-4 p-4 pb-8">
-      <Prompt className="pt-1">▓ PERFIL DEL HABITANTE ▓</Prompt>
+      <Prompt className="pt-1">▓ PERFIL DEL MORADOR ▓</Prompt>
 
       <Panel className="p-4">
         <div className="flex items-center justify-between">
@@ -169,12 +170,12 @@ export function ProfilePage() {
         {firebaseEnabled && ready && mode === 'anon' && (
           <div className="space-y-2">
             <p className="text-sm text-vault-500">
-              HABITANTE ANÓNIMO ({uid?.slice(0, 8)}) — el progreso se guarda en la nube con ese id.
+              MORADOR ANÓNIMO ({uid?.slice(0, 8)}) — el progreso se guarda en la nube con ese id.
               Entra con Google para llevarlo a cualquier dispositivo (sin perder nada):
             </p>
             {anonDaysLeft !== null && (
               <p className="text-sm text-vault-amber">
-                ⚠ tu habitante anónimo{' '}
+                ⚠ tu morador anónimo{' '}
                 {anonDaysLeft > 0 ? (
                   <>
                     caduca en <span className="font-display text-lg">{anonDaysLeft}</span> día
@@ -326,7 +327,16 @@ export function ProfilePage() {
       </Panel>
 
       <p className="text-center text-xs text-vault-600">
-        Chinese Vault · MIT · hecho por y para Antonio Galdó Seiquer
+        <a
+          href={GITHUB_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-1.5 text-xs text-vault-400 hover:text-vault-100"
+        >
+          <GithubMark />
+          {GITHUB_USER}
+        </a>
+        <p className="text-center text-xs text-vault-600">Chinese Vault · MIT · {APP_VERSION}</p>
       </p>
     </div>
   )

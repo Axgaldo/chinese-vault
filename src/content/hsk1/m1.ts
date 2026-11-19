@@ -76,7 +76,7 @@ export const m1: VaultModule = {
     ),
     lesson(
       'm1-l3',
-      'Cortesía de habitante',
+      'Cortesía de morador',
       'vocab',
       [
         ...practice('w-xie-xie'),

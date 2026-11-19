@@ -1,6 +1,6 @@
 # Chinese Vault ☢
 
-[![Deploy to GitHub Pages](https://github.com/YOUR-USER/chinese-vault/actions/workflows/deploy.yml/badge.svg)](https://github.com/YOUR-USER/chinese-vault/actions/workflows/deploy.yml)
+[![Deploy to GitHub Pages](https://github.com/Axgaldo/chinese-vault/actions/workflows/deploy.yml/badge.svg)](https://github.com/Axgaldo/chinese-vault/actions/workflows/deploy.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
 
 **Aprende chino mandarín desde cero, en español, dentro de tu refugio.**
@@ -76,10 +76,9 @@ Puesta en marcha (una sola vez):
 
 1. Repo → **Settings → Pages → Source: "GitHub Actions"**.
 2. Haz push a `main`; el workflow construye y despliega solo (primera vez: ~2 min).
-3. Como usa tu dominio de Pages (`https://tuusuario.github.io/chinese-vault/`), añádelo en
+3. Como usa tu dominio de Pages (`https://axgaldo.github.io/chinese-vault/`), añádelo en
    **Firebase → Authentication → Settings → Authorized domains** para que el login de Google
    funcione también en producción.
-4. Sustituye `YOUR-USER` por tu usuario de GitHub en los badges de arriba.
 
 Para simular el build de Pages en local: `npm run build:pages && npm run preview` (con
 `dist/` ya generado, ábrelo vía `npx serve dist` para respetar la subcarpeta).
@@ -108,7 +107,7 @@ service cloud.firestore {
 ```
 
 4. Copia `.env.example` a `.env` y pega tus claves. Reinicia `npm run dev`.
-5. En la app: **Perfil → 🔴 ENTRAR CON GOOGLE**. Tu habitante anónimo se convierte en tu
+5. En la app: **Perfil → 🔴 ENTRAR CON GOOGLE**. Tu morador anónimo se convierte en tu
    cuenta de Google conservando todo el progreso.
 
 ## Estructura del aprendizaje
@@ -142,6 +141,6 @@ apps como HelloChinese.
 
 ## Créditos
 
-Proyecto personal de **Antonio Galdó Seiquer** — hecho para aprender (¡en todos los sentidos!).
+Proyecto personal de **[Axgaldo](https://github.com/Axgaldo)** — hecho para aprender (¡en todos los sentidos!).
 Sonido: voz neuronal `zh-CN-XiaoxiaoNeural` vía el servicio gratuito Read Aloud de Microsoft Edge.
 Licencia MIT — ver [LICENSE](./LICENSE).

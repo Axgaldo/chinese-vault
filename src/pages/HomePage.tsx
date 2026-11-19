@@ -5,9 +5,10 @@
 import { useNavigate } from 'react-router-dom'
 import { lessonById, moduleOfLesson, modules, nextLessonId } from '../content'
 import { sfx } from '../lib/sfx'
+import { APP_VERSION, GITHUB_URL, GITHUB_USER } from '../lib/version'
 import { useProgress } from '../stores/useProgress'
 import { rankFor, type LessonRecord } from '../types/progress'
-import { Chip, Meter, Panel, SectionTitle } from '../components/ui'
+import { Chip, GithubMark, Meter, Panel, SectionTitle } from '../components/ui'
 import type { VaultModule } from '../types/content'
 
 export function HomePage() {
@@ -30,7 +31,7 @@ export function HomePage() {
       <header className="flex items-end justify-between">
         <div>
           <h1 className="font-display text-4xl tracking-widest text-vault-400 glow">CHINESE VAULT</h1>
-          <p className="text-xs text-vault-600">SISTEMA DE ENTRENAMIENTO LINGÜÍSTICO · v1.0</p>
+          <p className="text-xs text-vault-600">SISTEMA DE ENTRENAMIENTO LINGÜÍSTICO · {APP_VERSION}</p>
         </div>
         <div className="flex items-center gap-1.5">
           {adminMode && <Chip className="text-vault-teal">👁 SUPERVISOR</Chip>}
@@ -89,7 +90,19 @@ export function HomePage() {
         ))}
       </div>
 
-      <p className="text-center text-xs text-vault-600">中文 · aprende chino desde cero, en español</p>
+      <footer className="flex flex-col items-center gap-1 text-center">
+        <p className="text-xs text-vault-500">中文 · aprende chino desde cero, en español</p>
+        <a
+          href={GITHUB_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-1.5 text-xs text-vault-400 hover:text-vault-100"
+          title={`github.com/${GITHUB_USER}`}
+        >
+          <GithubMark />
+          {GITHUB_USER}
+        </a>
+      </footer>
     </div>
   )
 }

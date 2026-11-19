@@ -54,7 +54,7 @@ export const m8: VaultModule = {
       ],
       [
         grammar('n-verbos', 'Los verbos no se conjugan', [
-          'Los verbos chinos NO se conjugan: no existe "voy / iba / fui / iré". La misma sílaba 去 (qù) sirve para hoy, ayer y el año que viene. El verbo no envejece, habitante.',
+          'Los verbos chinos NO se conjugan: no existe "voy / iba / fui / iré". La misma sílaba 去 (qù) sirve para hoy, ayer y el año que viene. El verbo no envejece, morador.',
           '¿De dónde sale el tiempo, entonces? Del contexto… o marcándolo con las palabras del Sector 7: 我今天去 = "hoy voy", 我明天去 = "mañana iré", 我昨天去 = "ayer fui". El reloj lo pone la frase, no el verbo.',
           '看 (kàn) funciona igual: 我看电视 = "veo la tele". Ayer fue "vi la tele" y mañana será "veré la tele"… con la misma forma. Memoria ahorrada para más vocabulario.',
         ], [

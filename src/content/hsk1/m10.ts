@@ -43,7 +43,7 @@ export const m10: VaultModule = {
       ],
       [
         grammar('n-overseer', 'Dictado del Overseer: COMPLETADO', [
-          'ACCESO CONCEDIDO, habitante. Dieciséis palabras al oído puro, sin pinyin que te sostenga: has superado el dictado del Overseer.',
+          'ACCESO CONCEDIDO, morador. Dieciséis palabras al oído puro, sin pinyin que te sostenga: has superado el dictado del Overseer.',
           'Antes de cerrar el sector, registra los 5 pilares de la gramática HSK 1 en tu terminal: ① preguntas con 吗 (你是学生吗？) ② posesión con 的 (我的猫) ③ 在 para el lugar (我在学校) ④ 很 + adjetivo, sin "ser" (今天很热) ⑤ 会 y 能, saber y poder (我会说中文).',
           'Con esas cinco llaves abres casi cualquier frase del refugio. Guárdalas juntas, como el resto de tus provisiones.',
         ], [
@@ -69,7 +69,7 @@ export const m10: VaultModule = {
       ],
       [
         grammar('n-finale', 'CERTIFICADO DEL VAULT', [
-          'PROTOCOLO HSK 1 COMPLETADO: ~150 palabras, los 5 pilares de gramática y un refugio en pie. Esto ya no es supervivencia, habitante: es dominio.',
+          'PROTOCOLO HSK 1 COMPLETADO: ~150 palabras, los 5 pilares de gramática y un refugio en pie. Esto ya no es supervivencia, morador: es dominio.',
           'El Overseer está orgulloso de ti. La siguiente puerta lleva al HSK 2: más palabras, más frases y el mundo de fuera esperando a que lo saludes en chino.',
           'Hasta entonces, mantén la racha: el SRS nunca duerme y el refugio tampoco.',
         ], [

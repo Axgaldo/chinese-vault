@@ -76,7 +76,7 @@ export function initSync() {
           }
         })()
       } else {
-        // primera visita / sesión cerrada: entra como habitante anónimo
+        // primera visita / sesión cerrada: entra como morador anónimo
         signInAnonymously(auth).catch((err) => {
           console.warn('[vault] auth anónima falló', err)
         })

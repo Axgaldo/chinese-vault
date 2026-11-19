@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   Progreso del habitante — zustand + persistencia en localStorage.
+   Progreso del morador — zustand + persistencia en localStorage.
    El shape completo es el que se sincroniza con Firestore (lib/sync.ts).
    ───────────────────────────────────────────────────────────────────────────── */
 

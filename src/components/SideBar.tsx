@@ -4,9 +4,10 @@
 
 import { NavLink } from 'react-router-dom'
 import { sfx } from '../lib/sfx'
+import { APP_VERSION, GITHUB_URL, GITHUB_USER } from '../lib/version'
 import { useProgress } from '../stores/useProgress'
 import { rankFor } from '../types/progress'
-import { Chip, Meter } from './ui'
+import { Chip, GithubMark, Meter } from './ui'
 
 const linkCls = ({ isActive }: { isActive: boolean }) =>
   `flex items-center gap-3 rounded border px-3 py-2 font-display text-xl tracking-wider ${
@@ -26,7 +27,7 @@ export function SideBar({ className = '' }: { className?: string }) {
     <aside className={`flex flex-col gap-4 border-r border-vault-800 p-4 ${className}`}>
       <div>
         <h1 className="font-display text-3xl tracking-widest text-vault-400 glow">CHINESE VAULT</h1>
-        <p className="text-xs text-vault-600">SISTEMA DE ENTRENAMIENTO LINGÜÍSTICO · v1.0</p>
+        <p className="text-xs text-vault-600">SISTEMA DE ENTRENAMIENTO LINGÜÍSTICO · {APP_VERSION}</p>
       </div>
 
       <div className="panel p-3">
@@ -59,7 +60,17 @@ export function SideBar({ className = '' }: { className?: string }) {
 
       <div className="mt-auto space-y-1 border-t border-vault-800 pt-3">
         <p className="text-xs text-vault-500">中文 · aprende chino desde 0, en español</p>
-        <p className="text-xs text-vault-600">MIT · Antonio Galdó Seiquer</p>
+        <a
+          href={GITHUB_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-1.5 text-xs text-vault-300 hover:text-vault-100"
+          title={`github.com/${GITHUB_USER}`}
+        >
+          <GithubMark />
+          {GITHUB_USER}
+        </a>
+        <p className="text-xs text-vault-600">MIT · {APP_VERSION}</p>
       </div>
     </aside>
   )

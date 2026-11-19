@@ -22,8 +22,27 @@ Filosofía de producto (decisiones del owner, no negociarlas sin consultar):
    el resto 100% local.
 7. **Sin binarios en Git** (imágenes/audios se generan o usan emoji/SVG/web APIs).
 
-Owner: **Antonio Galdó Seiquer** · Licencia: **MIT** · Repo público de GitHub.
+Owner: **Axgaldo** (Antonio Galdó Seiquer) · Licencia: **MIT** (a nombre del handle) ·
+Repo: https://github.com/Axgaldo/chinese-vault — público en GitHub.
 Antonio vibecodea y hace push desde GitHub Desktop; los agentes hacen commits en local.
+
+## Terminología Fallout (obligatoria en toda la UI)
+
+El vocabulario del refugio SIEMPRE en la traducción española de Fallout:
+
+- **morador** — NUNCA "habitante" (el usuario es un morador del refugio)
+- **refugio** — el vault; "Overseer" puede quedarse en inglés o como "Supervisor"
+- **supervisor / superviviente / guía de supervivencia / saqueador / caravana /
+  miembro de la hermandad** — para rangos, misiones y futuros modos
+- Rangos actuales: Morador Errante → Morador del Refugio → Superviviente → Explorador →
+  Jefe de Caravana → Miembro de la Hermandad → Supervisor del Refugio (máximo)
+
+## Versionado (semver)
+
+`src/lib/version.ts` define `APP_VERSION` (formato `vX.Y.Z`) y debe coincidir con
+`package.json`. Regla: **X** = cambios muy grandes · **Y** = nuevas features · **Z** = bugs
+y arreglos. Se muestra en inicio, barra lateral, arranque y perfil: SIEMPRE importar de
+`lib/version.ts`, nunca hardcodear "v1.0" suelto.
 
 ## Stack (nov 2026)
 

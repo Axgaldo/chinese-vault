@@ -87,7 +87,7 @@ function Feedback({
   )
 }
 
-/** Modo de escritura del habitante: 拼 (pinyin) → 拼+漢 (ambos) → 漢 (hanzi) */
+/** Modo de escritura del morador: 拼 (pinyin) → 拼+漢 (ambos) → 漢 (hanzi) */
 function useScriptMode(): ScriptMode {
   return useProgress((s) => s.settings.scriptMode)
 }

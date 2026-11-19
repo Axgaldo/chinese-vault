@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   Registro de progreso del habitante (lo que se persiste/localStorage/Firestore)
+   Registro de progreso del morador (lo que se persiste/localStorage/Firestore)
    ───────────────────────────────────────────────────────────────────────────── */
 
 export interface LessonRecord {
@@ -99,20 +99,20 @@ export const INITIAL_PROGRESS: ProgressState = {
   updatedAt: 0,
 }
 
-/** Rangos del refugio por XP */
+/** Rangos del refugio por XP (terminología Fallout ES) */
 export interface Rank {
   xp: number
   name: string
 }
 
 export const RANKS: Rank[] = [
-  { xp: 0, name: 'Habitante Errante' },
-  { xp: 120, name: 'Residente del Vault' },
-  { xp: 300, name: 'Explorador' },
-  { xp: 600, name: 'Técnico de Campo' },
-  { xp: 1000, name: 'Supervisor Adjunto' },
-  { xp: 1500, name: 'Supervisor del Refugio' },
-  { xp: 2200, name: 'Leyenda del Vault' },
+  { xp: 0, name: 'Morador Errante' },
+  { xp: 120, name: 'Morador del Refugio' },
+  { xp: 300, name: 'Superviviente' },
+  { xp: 600, name: 'Explorador' },
+  { xp: 1000, name: 'Jefe de Caravana' },
+  { xp: 1500, name: 'Miembro de la Hermandad' },
+  { xp: 2200, name: 'Supervisor del Refugio' },
 ]
 
 export function rankFor(xp: number): { current: Rank; next: Rank | null; progress: number } {

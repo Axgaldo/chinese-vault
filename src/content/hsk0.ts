@@ -67,7 +67,7 @@ export const hsk0: VaultModule = {
           'El chino es un idioma tonal: la misma sílaba significa cosas distintas según la "melodía" con la que la pronuncies. El tono afecta a toda la sílaba.',
           'Mira el cuarteto clásico con la sílaba "ma":',
           '1 (alto y plano)   mā  妈  mamá\n2 (ascendente)      má  麻  cáñamo, soso\n3 (baja y sube)     mǎ  马  caballo\n4 (descendente)     mà  骂  regañar',
-          'Tip de habitante: el tono 3 en solitario suele pronunciarse bajo, sin subir demasiado. ¡Practica cantando cada tono!',
+          'Tip de morador: el tono 3 en solitario suele pronunciarse bajo, sin subir demasiado. ¡Practica cantando cada tono!',
         ], [
           ['妈', 'mā', 'mamá (tono 1)'],
           ['马', 'mǎ', 'caballo (tono 3)'],

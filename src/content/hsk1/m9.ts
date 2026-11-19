@@ -1,7 +1,7 @@
 /* ─────────────────────────────────────────────────────────────────────────────
    SECTOR 9 · HSK 1 — CUALIDADES (módulo 9/10)
 
-   Cómo es y cómo está el habitante: 大/小/高 para el tamaño, 高兴/累/忙 para
+   Cómo es y cómo está el morador: 大/小/高 para el tamaño, 高兴/累/忙 para
    el ánimo, 便宜 para los precios y los gustos con 喜欢 y 爱.
    ───────────────────────────────────────────────────────────────────────────── */
 
@@ -13,7 +13,7 @@ export const m9: VaultModule = {
   hsk: 1,
   code: 'S-09',
   title: 'Cualidades',
-  subtitle: 'Adjetivos, estados y gustos del habitante',
+  subtitle: 'Adjetivos, estados y gustos del morador',
   entries: [
     // (很, 不, 的, 猫, 狗, 今天, 想, 喝, 茶, 睡觉… viven en otros sectores: aquí solo se referencian)
     e('w-da4', '大', 'dà', 'grande', '🐘'),
@@ -60,7 +60,7 @@ export const m9: VaultModule = {
     ),
     lesson(
       'm9-l2',
-      'Estados del habitante',
+      'Estados del morador',
       'vocab',
       [
         ...drill('w-gao-xing'),

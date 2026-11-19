@@ -4,11 +4,12 @@
 
 import { useEffect, useState } from 'react'
 import { sfx } from '../lib/sfx'
+import { APP_VERSION } from '../lib/version'
 import { Btn } from './ui'
 
 const BOOT_LINES = [
-  'VAULT-OS v1.0 // TERMINAL DE ENTRENAMIENTO',
-  'PROPIEDAD DEL HABITANTE ANTONIO GALDÓ',
+  `VAULT-OS ${APP_VERSION} // TERMINAL DE ENTRENAMIENTO`,
+  'PROPIETARIO DEL REFUGIO: AXGALDO',
   '',
   'INICIALIZANDO PROTOCOLO CHINO........ OK',
   'CARGANDO FONÉTICA MANDARÍN........... OK',
