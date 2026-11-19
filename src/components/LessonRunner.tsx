@@ -8,12 +8,14 @@ import { useMemo, useState } from 'react'
 import { entriesById, lessonEntryIds } from '../content'
 import { sfx } from '../lib/sfx'
 import { isGraded } from '../lib/questions'
+import { QUEST_POOL } from '../lib/quests'
 import { useProgress } from '../stores/useProgress'
 import type { Lesson, Step } from '../types/content'
 import type { ScriptMode } from '../types/progress'
 import { SCRIPT_MODES } from '../types/progress'
 import { ChallengeView } from './challenges'
-import { Btn, Chip, Meter, Panel } from './ui'
+import { QuestsList } from './QuestsPanel'
+import { Btn, CapsIcon, Chip, Meter, Panel } from './ui'
 import { Pinyin } from './Pinyin'
 
 export interface RunnerResult {
@@ -73,6 +75,7 @@ export function LessonRunner({
   const [passed, setPassed] = useState<number[]>([])
   const [xpGain, setXpGain] = useState(0)
   const [result, setResult] = useState<RunnerResult | null>(null)
+  const [caravanGain, setCaravanGain] = useState(0)
   const [confirmExit, setConfirmExit] = useState(false)
 
   const current = queue[pos]
@@ -97,10 +100,26 @@ export function LessonRunner({
     const firstTime = !useProgress.getState().completed[lesson.id]
     const bonus = firstTime ? BONUS_FIRST + (accuracy === 1 ? BONUS_PERFECT : 0) : 0
 
+    // caravana: qué encargos estaban ya canjeados ANTES de completar
+    const claimedBefore = new Set(
+      useProgress.getState().quests.items.filter((q) => q.claimed).map((q) => q.id),
+    )
+
     completeLesson(lesson.id, stars, accuracy)
     // el XP de los pasos acertados TAMBIÉN se persiste (no solo el bonus)
     addXp(xpGain + bonus)
     sfx.complete()
+
+    // encargos auto-canjeados con ESTA lección (para el popup de la caravana)
+    const claimedNow = useProgress
+      .getState()
+      .quests.items.filter((q) => q.claimed && !claimedBefore.has(q.id))
+    const capsGained = claimedNow.reduce((sum, q) => {
+      const t = QUEST_POOL.find((x) => x.id === q.id)
+      return sum + (t?.caps ?? 0)
+    }, 0)
+    setCaravanGain(capsGained)
+
     setResult({ stars, accuracy, xp: xpGain + bonus })
   }
 
@@ -157,6 +176,22 @@ export function LessonRunner({
                 <Pinyin text={e.pinyin} className="text-sm" />
               </Chip>
             ))}
+          </div>
+        </Panel>
+
+        {/* popup de la caravana: barras del día + auto-canjeo */}
+        <Panel className="pop-in mt-2 w-full p-3">
+          <div className="flex items-center justify-between">
+            <span className="font-display text-xl text-vault-300">🐂 CARAVANA</span>
+            {caravanGain > 0 && (
+              <span className="flex items-center gap-1 font-display text-lg text-vault-amber">
+                <CapsIcon />
+                +{caravanGain} auto-canjeadas
+              </span>
+            )}
+          </div>
+          <div className="mt-2">
+            <QuestsList />
           </div>
         </Panel>
 

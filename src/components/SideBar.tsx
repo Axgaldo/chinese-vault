@@ -7,7 +7,7 @@ import { sfx } from '../lib/sfx'
 import { APP_VERSION, GITHUB_URL, GITHUB_USER } from '../lib/version'
 import { useProgress } from '../stores/useProgress'
 import { rankFor } from '../types/progress'
-import { Chip, GithubMark, Meter } from './ui'
+import { Chip, CapsIcon, GithubMark, Meter } from './ui'
 
 const linkCls = ({ isActive }: { isActive: boolean }) =>
   `flex items-center gap-3 rounded border px-3 py-2 font-display text-xl tracking-wider ${
@@ -37,7 +37,10 @@ export function SideBar({ className = '' }: { className?: string }) {
           {xp} XP{nextRank ? ` · a ${nextRank.name}: ${nextRank.xp - xp}` : ' · rango máximo'}
         </p>
         <div className="mt-2 flex gap-1.5">
-          <Chip className="text-vault-amber">⛓ {caps}</Chip>
+          <Chip className="flex items-center gap-1 text-vault-amber">
+            <CapsIcon />
+            {caps}
+          </Chip>
           <Chip className="text-vault-amber">🔥 {streak}</Chip>
         </div>
       </div>

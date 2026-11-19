@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom'
 import { FONTS, THEMES, VFX } from '../lib/shop'
 import { sfx } from '../lib/sfx'
 import { useProgress } from '../stores/useProgress'
-import { Btn, Chip, Panel, Prompt, SectionTitle } from '../components/ui'
+import { Btn, CapsIcon, Chip, Panel, Prompt, SectionTitle } from '../components/ui'
 
 /** Tarjeta de producto de la tienda (tema/fuente/VFX) */
 function ShopCard({
@@ -55,8 +55,14 @@ function ShopCard({
           EQUIPAR ▸
         </Btn>
       ) : (
-        <Btn variant="amber" className="mt-3 w-full" disabled={!canBuy} onClick={onBuy}>
-          ⛓ {price}
+        <Btn
+          variant="amber"
+          className="mt-3 flex w-full items-center justify-center gap-1.5"
+          disabled={!canBuy}
+          onClick={onBuy}
+        >
+          <CapsIcon />
+          {price}
         </Btn>
       )}
     </Panel>
@@ -92,7 +98,10 @@ export function ShopPage() {
               el mercader despliega sus cajas… temas, fuentes y VFX, recién pulidos
             </p>
           </div>
-          <Chip className="text-xl text-vault-amber">⛓ {caps}</Chip>
+          <Chip className="flex items-center gap-1.5 text-xl text-vault-amber">
+            <CapsIcon />
+            {caps}
+          </Chip>
         </div>
         {adminMode && (
           <p className="mt-2 text-sm text-vault-teal">
@@ -199,7 +208,7 @@ export function ShopPage() {
       </div>
 
       <p className="text-center text-xs text-vault-600">
-        las chapas salen de las misiones de la caravana (mapa) — el mercader no acepta otra moneda
+        las chapas salen de los encargos de la caravana (Perfil) — el mercader no acepta otra moneda
       </p>
 
       <Btn variant="amber" className="w-full" onClick={() => navigate('/')}>

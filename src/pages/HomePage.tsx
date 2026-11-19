@@ -5,11 +5,10 @@
 import { useNavigate } from 'react-router-dom'
 import { lessonById, moduleOfLesson, modules, nextLessonId } from '../content'
 import { sfx } from '../lib/sfx'
-import { QUEST_POOL } from '../lib/quests'
 import { APP_VERSION, GITHUB_URL, GITHUB_USER } from '../lib/version'
 import { useProgress } from '../stores/useProgress'
 import { rankFor, type LessonRecord } from '../types/progress'
-import { Btn, Chip, GithubMark, Meter, Panel, SectionTitle } from '../components/ui'
+import { CapsIcon, Chip, GithubMark, Meter, Panel, SectionTitle } from '../components/ui'
 import type { VaultModule } from '../types/content'
 
 export function HomePage() {
@@ -21,8 +20,6 @@ export function HomePage() {
   const streak = useProgress((s) => s.streakDays)
   const adminMode = useProgress((s) => s.settings.adminMode)
   const due = useProgress((s) => Object.values(s.srs).filter((c) => c.due <= Date.now()).length)
-  const quests = useProgress((s) => s.quests)
-  const claimQuest = useProgress((s) => s.claimQuest)
   const { current: rank, next: nextRank, progress: rankProgress } = rankFor(xp)
 
   const nextId = nextLessonId(completed)
@@ -31,15 +28,23 @@ export function HomePage() {
 
   return (
     <div className="flex flex-col gap-4 p-4 pb-8">
-      <header className="flex items-end justify-between">
+      <header className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="font-display text-4xl tracking-widest text-vault-400 glow">CHINESE VAULT</h1>
           <p className="text-xs text-vault-600">SISTEMA DE ENTRENAMIENTO LINGÜÍSTICO · {APP_VERSION}</p>
         </div>
-        <div className="flex items-center gap-1.5">
-          {adminMode && <Chip className="text-vault-teal">👁 SUPERVISOR</Chip>}
-          <Chip className="text-vault-amber">⛓ {caps}</Chip>
-          <Chip className="text-vault-amber">🔥 {streak}</Chip>
+        <div className="flex w-full flex-col gap-1.5 sm:w-auto sm:flex-row sm:items-center">
+          {adminMode && (
+            <Chip className="justify-center text-vault-teal sm:justify-start">👁 SUPERVISOR</Chip>
+          )}
+          <Chip className="flex w-full items-center justify-between gap-3 text-vault-amber sm:w-auto sm:justify-start">
+            <CapsIcon className="text-xl" />
+            <span className="font-display text-xl">{caps}</span>
+          </Chip>
+          <Chip className="flex w-full items-center justify-between gap-3 text-vault-amber sm:w-auto sm:justify-start">
+            <span className="text-xl">🔥</span>
+            <span className="font-display text-xl">{streak}</span>
+          </Chip>
         </div>
       </header>
 
@@ -55,55 +60,6 @@ export function HomePage() {
           </p>
         )}
       </Panel>
-
-      {quests.items.length > 0 && (
-        <Panel className="p-3">
-          <div className="flex items-center justify-between">
-            <span className="font-display text-xl text-vault-300">🐂 CARAVANA DE HOY</span>
-            <span className="text-xs text-vault-600">
-              {quests.items.filter((q) => q.claimed).length}/{quests.items.length} reclamados
-            </span>
-          </div>
-          <div className="mt-2 space-y-2">
-            {quests.items.map((item) => {
-              const template = QUEST_POOL.find((t) => t.id === item.id)
-              if (!template) return null
-              const done = item.progress >= template.goal
-              return (
-                <div key={item.id} className="flex items-center gap-2">
-                  <span className="text-xl">{template.emoji}</span>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-baseline justify-between gap-2">
-                      <span className={`truncate text-sm ${done ? 'text-vault-200' : 'text-vault-400'}`}>
-                        {template.title}
-                      </span>
-                      <span className="shrink-0 text-xs text-vault-500">
-                        {Math.min(item.progress, template.goal)}/{template.goal}
-                      </span>
-                    </div>
-                    <Meter value={item.progress / template.goal} className="mt-1 h-2!" />
-                  </div>
-                  {item.claimed ? (
-                    <span className="font-display text-lg text-vault-600">✔</span>
-                  ) : done ? (
-                    <Btn
-                      className="px-2 py-0.5 text-lg"
-                      onClick={() => {
-                        sfx.log()
-                        claimQuest(item.id)
-                      }}
-                    >
-                      ⛓{template.caps}
-                    </Btn>
-                  ) : (
-                    <span className="font-display text-lg text-vault-600">⛓{template.caps}</span>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        </Panel>
-      )}
 
       {nextLesson && (
         <button

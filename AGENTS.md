@@ -207,8 +207,9 @@ service cloud.firestore {
   good (×ease), easy (×ease×1.3), ease 2.5→mín 1.3.
 - Racha: cuenta al completar lección o repaso (día local, no UTC).
 - Rangos en `types/progress.ts` (Habitante Errante → Leyenda del Vault).
-- **Chapas ⛓ (moneda):** bono diario +5 con la primera actividad de cada día, lección nueva +3,
-  repetida +1, sesión de repaso +2. Constantes en `stores/useProgress.ts`.
+- **Chapas (moneda):** icono `CapsIcon` (ui.tsx, 3 chapas SVG apiladas — chips, botones,
+  tienda y toasts; NUNCA el emoji ⛓). Bono diario +5 con la primera actividad de cada día,
+  lección nueva +3, repetida +1, sesión de repaso +2. Constantes en `stores/useProgress.ts`.
 - **Logros:** catálogo en `lib/achievements.ts` (se sellan tras cada actividad con toast +
   sfx.log; `main.tsx` hace un `checkAchievements()` de arranque para migraciones).
 - **Modo Supervisor:** `settings.adminMode` (libre, no es secreto) — desbloquea todas las
@@ -276,8 +277,11 @@ service cloud.firestore {
 - **Caravana 🐂** (`lib/quests.ts`): 3 encargos/día generados de forma DETERMINISTA desde la
   fecha (`questsForDate`); miden contadores de `dailyStats` (lessons, perfect, reviews,
   dictations, tones, steps, xp). `logActivity(metric, n)` los alimenta desde LessonRunner
-  (steps/dictations/tones) y ReviewPage (reviews). Reclamar paga chapas (`claimQuest`).
-  Al cambiar de día, `refreshDay` resetea contadores y regenera encargos (store).
+  (steps/dictations/tones) y ReviewPage (reviews). **Los encargos completados se AUTO-CANJEAN**
+  al terminar lección/repaso (`autoClaimQuests` en el store). Las barras viven SOLO en el
+  Perfil (`components/QuestsPanel.tsx`, con reclamación manual para lo completado fuera de
+  lección) y en el POPUP de la pantalla de fin de lección (LessonRunner: diff de claimed
+  antes/después + "+N auto-canjeadas").
 - **Tienda ⛓** (`lib/shop.ts` + ShopPage): temas de terminal (green gratis · amber · teal ·
   red · mono). `buyTheme` descuenta chapas y EQUIPA al instante; `settings.theme` se aplica
   en App.tsx como `html[data-theme]` (paletas en index.css; los colores de tono pedagógicos

@@ -84,6 +84,28 @@ export function GithubMark({ className = '' }: { className?: string }) {
   )
 }
 
+/** Chapas: la moneda del refugio — 3 chapas cayendo (SVG, hereda el color) */
+export function CapsIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" aria-hidden className={className}>
+      <g stroke="currentColor" strokeWidth="1.7">
+        <g transform="rotate(-16 8 6)">
+          <circle cx="8" cy="6" r="4.6" strokeDasharray="2 1.2" />
+          <circle cx="8" cy="6" r="2" strokeWidth="1.2" />
+        </g>
+        <g transform="rotate(12 16 10)">
+          <circle cx="16" cy="10" r="4.6" strokeDasharray="2 1.2" />
+          <circle cx="16" cy="10" r="2" strokeWidth="1.2" />
+        </g>
+        <g transform="translate(-2 5)">
+          <circle cx="12" cy="14" r="4.6" strokeDasharray="2 1.2" />
+          <circle cx="12" cy="14" r="2" strokeWidth="1.2" />
+        </g>
+      </g>
+    </svg>
+  )
+}
+
 /** Botón interruptor estilo terminal (sustituye a los checkboxes nativos,
  *  que se renderizan invisibles en algunos navegadores oscuros) */
 export function Toggle({

@@ -17,7 +17,8 @@ import { useAuth } from '../stores/useAuth'
 import { rankFor, SCRIPT_MODES, type ScriptMode, VFX_OPTIONS } from '../types/progress'
 import { BODY_FONTS } from '../types/progress'
 import { THEMES } from '../lib/shop'
-import { Btn, Chip, GithubMark, Meter, Panel, Prompt, SectionTitle, Toggle } from '../components/ui'
+import { Btn, CapsIcon, Chip, GithubMark, Meter, Panel, Prompt, SectionTitle, Toggle } from '../components/ui'
+import { QuestsList } from '../components/QuestsPanel'
 
 export function ProfilePage() {
   const navigate = useNavigate()
@@ -209,18 +210,32 @@ export function ProfilePage() {
       <Panel className="p-4">
         <div className="flex items-center justify-between">
           <span className="font-display text-2xl text-vault-300">{rank.name}</span>
-          <Chip className="text-vault-amber">🔥 {streak} días</Chip>
+          <Chip className="text-vault-amber">
+            🔥 {streak} {streak === 1 ? 'día' : 'días'}
+          </Chip>
         </div>
         <Meter value={rankProgress} className="mt-2" />
         <p className="mt-1 text-xs text-vault-600">
           {xp} XP{nextRank ? ` · siguiente: ${nextRank.name} (${nextRank.xp - xp} XP)` : ' · rango máximo'}
         </p>
         <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
-          <div className="chip px-2 py-1">⛓ CHAPAS {caps}</div>
+          <div className="chip flex items-center gap-1.5 px-2 py-1">
+            <CapsIcon className="text-vault-amber" />
+            CHAPAS {caps}
+          </div>
           <div className="chip px-2 py-1">LECCIONES {completed.length}/{allLessons.length}</div>
           <div className="chip px-2 py-1">PALABRAS {seenCount}</div>
           <div className="chip px-2 py-1">REPASOS {reviewsDone}</div>
         </div>
+      </Panel>
+
+      <SectionTitle>🐂 CARAVANA DE HOY</SectionTitle>
+      <Panel className="p-4">
+        <QuestsList />
+        <p className="mt-3 text-xs text-vault-600">
+          los encargos completados se auto-canjean al terminar lecciones y repasos —
+          aquí puedes reclamar los que falten
+        </p>
       </Panel>
 
       <SectionTitle>LOGROS ({unlockedCount}/{ACHIEVEMENTS.length})</SectionTitle>
@@ -246,7 +261,10 @@ export function ProfilePage() {
       <Panel className="space-y-4 p-4">
         <div className="grid grid-cols-3 gap-2 text-sm">
           <div className="chip px-2 py-1">⚡ XP {xp}</div>
-          <div className="chip px-2 py-1">⛓ CHAPAS {caps}</div>
+          <div className="chip flex items-center gap-1.5 px-2 py-1">
+            <CapsIcon className="text-vault-amber" />
+            CHAPAS {caps}
+          </div>
           <div className="chip px-2 py-1">
             🔥 {streak} (RÉCORD {bestStreak})
           </div>

@@ -148,7 +148,7 @@ function bumpDaily(s: ProgressState, metric: DailyKey, amount: number): Progress
     if (!template || template.metric !== metric || item.claimed) return item
     const progress = Math.min(template.goal, item.progress + amount)
     if (item.progress < template.goal && progress >= template.goal) {
-      useToasts.getState().push(template.emoji, `CARAVANA — encargo listo: reclama tus chapas`)
+      useToasts.getState().push(template.emoji, `CARAVANA — encargo completado`)
     }
     return { ...item, progress }
   })
@@ -167,6 +167,30 @@ function sealAchievements(state: ProgressState): ProgressState {
     toastAchievement(a.emoji, a.title)
   }
   return { ...state, achievements }
+}
+
+/** Auto-canjea los encargos de la caravana ya completados (pagando sus chapas) */
+function autoClaimQuests(state: ProgressState): ProgressState {
+  const ready = state.quests.items.filter((q) => {
+    if (q.claimed) return false
+    const t = QUEST_POOL.find((x) => x.id === q.id)
+    return t ? q.progress >= t.goal : false
+  })
+  if (!ready.length) return state
+  const capsGain = ready.reduce(
+    (sum, q) => sum + (QUEST_POOL.find((t) => t.id === q.id)?.caps ?? 0),
+    0,
+  )
+  const ids = new Set(ready.map((q) => q.id))
+  toastCaps(capsGain, 'caravana: encargos auto-canjeados')
+  return {
+    ...state,
+    caps: state.caps + capsGain,
+    quests: {
+      ...state.quests,
+      items: state.quests.items.map((q) => (ids.has(q.id) ? { ...q, claimed: true } : q)),
+    },
+  }
 }
 
 export const useProgress = create<ProgressStore>()(
@@ -215,14 +239,15 @@ export const useProgress = create<ProgressStore>()(
           let withDay = bumpDaily(day, 'lessons', 1)
           if (stars >= 3) withDay = bumpDaily(withDay, 'perfect', 1)
 
-          const next = sealAchievements({
+          // encargos de la caravana completados → AUTO-CANJEO con sus chapas
+          const withQuests = autoClaimQuests({
             ...withDay,
             completed,
             srs,
             caps: s.caps + capsGain,
             updatedAt: Date.now(),
           })
-          return next
+          return sealAchievements(withQuests)
         })
       },
 
@@ -238,12 +263,13 @@ export const useProgress = create<ProgressStore>()(
           const day = refreshDay(s)
           const capsGain = (day.lastStudyDay !== s.lastStudyDay ? CAPS_DAILY_BONUS : 0) + CAPS_REVIEW
           toastCaps(capsGain, day.lastStudyDay !== s.lastStudyDay ? 'bono diario' : 'repaso completado')
-          return sealAchievements({
+          const withQuests = autoClaimQuests({
             ...day,
             reviewsDone: s.reviewsDone + 1,
             caps: s.caps + capsGain,
             updatedAt: Date.now(),
           })
+          return sealAchievements(withQuests)
         })
       },
 

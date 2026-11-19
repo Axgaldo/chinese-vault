@@ -4,17 +4,19 @@
    ───────────────────────────────────────────────────────────────────────────── */
 
 import { create } from 'zustand'
+import type { ReactNode } from 'react'
 import { sfx } from '../lib/sfx'
+import { CapsIcon } from '../components/ui'
 
 export interface Toast {
   id: number
-  emoji: string
+  emoji: ReactNode
   text: string
 }
 
 interface ToastStore {
   toasts: Toast[]
-  push(emoji: string, text: string): void
+  push(emoji: ReactNode, text: string): void
   remove(id: number): void
 }
 
@@ -39,5 +41,5 @@ export function toastAchievement(emoji: string, title: string) {
 
 export function toastCaps(amount: number, reason: string) {
   sfx.blip()
-  useToasts.getState().push('⛓️', `+${amount} chapas — ${reason}`)
+  useToasts.getState().push(<CapsIcon />, `+${amount} chapas — ${reason}`)
 }
