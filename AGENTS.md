@@ -304,6 +304,15 @@ service cloud.firestore {
 - **Práctica libre**: ruta `/practice/:mode/:entryId` (PracticePage) — en el Archivo el
   selector 🔊 ESCUCHAR / 🎤 PRONUNCIAR / ✍️ ESCRIBIR decide si tocar la palabra la
   reproduce o abre su desafío. +10/+5 XP por acierto.
+- **Palabra en contexto (v2.4.0)**: `contextSentences(entryId, completed, excludeLesson)` —
+  la INTRO de cada palabra muestra hasta 2 frases reales del curso donde suena (prioriza
+  lecciones completadas; excluye la lección en curso para no spoilear su propio build),
+  con su pinyin sandhi-correcto y audio (speakSentence). LessonRunner pasa `lessonId` a
+  ChallengeView para la exclusión.
+- **Variedad de presentación (v2.4.0)**: `drill(id)` alterna 3 variantes por hash del id
+  (mismos 4 retos, distinto orden — choose-es siempre temprano por pedagogía).
+- **LessonPage usa `key={location.key}`**: re-navegar a la misma lección REMONTA el runner
+  (antes mostraba la pantalla de completado anterior).
 
 ## Radio del Refugio 📻 y HSK 2 (v2.0.0)
 

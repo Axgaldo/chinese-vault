@@ -70,13 +70,24 @@ export const practice = (id: string): Step[] => [
   { type: 'listen', entry: id },
 ]
 
-/** Ciclo completo de una palabra nueva */
-export const drill = (id: string): Step[] => [
-  { type: 'intro', entry: id },
-  { type: 'choose-es', entry: id },
-  { type: 'listen', entry: id },
-  { type: 'choose-hanzi', entry: id },
-]
+/** Hash estable de un id (elige la variante del ciclo siempre igual por palabra) */
+function stableHash(id: string): number {
+  let h = 0
+  for (const ch of id) h = (h * 31 + ch.charCodeAt(0)) | 0
+  return Math.abs(h)
+}
+
+/**
+ * Ciclo completo de una palabra nueva — 3 variantes (por hash del id) para
+ * que las presentaciones no se hagan siempre con el mismo orden de retos.
+ * Todas mantienen la traducción (choose-es) temprana: es lo más suave tras la intro.
+ */
+export const drill = (id: string): Step[] => {
+  const v = stableHash(id) % 3
+  if (v === 1) return [{ type: 'intro', entry: id }, { type: 'listen', entry: id }, { type: 'choose-es', entry: id }, { type: 'choose-hanzi', entry: id }]
+  if (v === 2) return [{ type: 'intro', entry: id }, { type: 'choose-es', entry: id }, { type: 'choose-hanzi', entry: id }, { type: 'listen', entry: id }]
+  return [{ type: 'intro', entry: id }, { type: 'choose-es', entry: id }, { type: 'listen', entry: id }, { type: 'choose-hanzi', entry: id }]
+}
 
 /** Entrenador de tonos sobre una sílaba */
 export const toneDrill = (entry: string, syllable: string, tone: Tone): Step => ({

@@ -173,8 +173,8 @@ apps como HelloChinese.
 - Cómo se añade contenido (palabras, lecciones, módulos nuevos): ver **AGENTS.md**.
 - Próximos sectores: **S-07 Tiempo**, **S-08 Rutina (verbos)**, **S-09 Cualidades** y
   **S-10 Auditoría final** — con eso se completa el HSK 1 (~150 palabras).
-- Ideas en la nevera: misión diaria, tienda de chapas (temas de color), quiz de escucha pura,
-  HSK 2, modo escritura de caracteres.
+- Ideas en la nevera: mini-diálogos con huecos (reto `dialog`), misión diaria mejorada,
+  HSK 3, estadísticas con gráficas.
 
 ## Créditos
 

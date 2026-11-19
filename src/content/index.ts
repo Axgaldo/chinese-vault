@@ -7,6 +7,7 @@
    ───────────────────────────────────────────────────────────────────────────── */
 
 import type { Step, VaultModule } from '../types/content'
+import type { Sentence } from '../types/content'
 import { hsk0 } from './hsk0'
 import { m1 } from './hsk1/m1'
 import { m2 } from './hsk1/m2'
@@ -117,4 +118,39 @@ export function unlockedNotes(completedLessonIds: string[]) {
   return allLessons
     .filter((l) => completedLessonIds.includes(l.id))
     .flatMap((l) => l.notes)
+}
+
+/**
+ * Frases reales del curso donde suena una palabra (para verla en contexto).
+ * Prioriza frases de lecciones ya completadas; excluye la lección en curso
+ * (que suele contener el build que viene justo después).
+ */
+export function contextSentences(
+  entryId: string,
+  completedLessonIds: string[],
+  excludeLessonId?: string,
+  max = 2,
+): Sentence[] {
+  const entry = entriesById.get(entryId)
+  if (!entry) return []
+  const seen = new Set<string>()
+  const out: Sentence[] = []
+  // pasada 1: lecciones completadas · pasada 2: resto (adelantos con traducción)
+  for (const pass of [1, 2]) {
+    for (const lesson of allLessons) {
+      const isCompleted = completedLessonIds.includes(lesson.id)
+      if ((pass === 1) !== isCompleted) continue
+      if (lesson.id === excludeLessonId) continue
+      for (const step of lesson.steps) {
+        if (step.type !== 'build') continue
+        const s = step.sentence
+        if (!s.hanzi.includes(entry.hanzi)) continue
+        if (seen.has(s.pinyin)) continue
+        seen.add(s.pinyin)
+        out.push(s)
+        if (out.length >= max) return out
+      }
+    }
+  }
+  return out
 }

@@ -6,7 +6,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
-import { entriesById, notesById } from '../content'
+import { contextSentences, entriesById, notesById } from '../content'
 import { speakEntry, speakSentence } from '../lib/audio'
 import { sfx } from '../lib/sfx'
 import { optionsFor, shuffle } from '../lib/questions'
@@ -21,6 +21,8 @@ export interface ChallengeProps {
   step: Step
   /** false cuando es el reintento de un paso ya fallado (no da XP otra vez) */
   awardXp: boolean
+  /** Lección en curso: para no spoilear sus propios builds como "contexto" */
+  lessonId?: string
   onResult: (correct: boolean, xp: number) => void
 }
 
@@ -30,7 +32,7 @@ interface CoreProps {
 }
 
 /** Props de un reto concreto: el paso llega ya acotado a su variante */
-type CProps<T extends Step['type']> = CoreProps & { step: Extract<Step, { type: T }> }
+type CProps<T extends Step['type']> = CoreProps & { step: Extract<Step, { type: T }>; lessonId?: string }
 
 export function ChallengeView({ step, ...rest }: ChallengeProps) {
   switch (step.type) {
@@ -201,8 +203,16 @@ function EntryHanzi({ entry, className = '' }: { entry: VocabEntry; className?: 
 
 /* ── Presentación de palabra ───────────────────────────────────────────────── */
 
-function IntroVocab({ step, onResult }: CProps<'intro'>) {
+function IntroVocab({ step, lessonId, onResult }: CProps<'intro'>) {
   const entry = entriesById.get(step.entry)
+  const completedKey = useCompletedKey()
+  const context = useMemo(
+    () =>
+      entry
+        ? contextSentences(entry.id, completedKey ? completedKey.split(',') : [], lessonId, 2)
+        : [],
+    [entry, completedKey, lessonId],
+  )
   const [pop, setPop] = useState(false)
 
   useEffect(() => {
@@ -224,7 +234,27 @@ function IntroVocab({ step, onResult }: CProps<'intro'>) {
       <Pinyin text={entry.pinyin} className="text-4xl" />
       <p className="text-xl text-vault-100">{entry.es}</p>
       {entry.literal && <p className="text-sm text-vault-500">{entry.literal}</p>}
-      <Btn className="mt-3 w-full" onClick={() => onResult(true, 0)}>
+
+      {context.length > 0 && (
+        <div className="w-full space-y-1.5 border-t border-vault-800 pt-2 text-left">
+          <p className="text-xs text-vault-600">▓ EN CONTEXTO — toca para oírla ▓</p>
+          {context.map((s, i) => (
+            <button
+              key={i}
+              type="button"
+              className="block w-full rounded px-2 py-1 text-left hover:bg-vault-800/60"
+              onClick={() => speakSentence(s)}
+              title="pulsa para escuchar la frase"
+            >
+              <span className="font-hanzi text-lg text-vault-200">{s.hanzi}</span>{' '}
+              <Pinyin text={s.pinyin} className="text-xs" />
+              <span className="block text-xs text-vault-600">{s.es}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      <Btn className="mt-2 w-full" onClick={() => onResult(true, 0)}>
         REGISTRAR ENTRADA ▸
       </Btn>
     </div>

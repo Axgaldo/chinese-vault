@@ -2,7 +2,7 @@
    LECTOR DE LECCIÓN — envoltorio de ruta del LessonRunner
    ───────────────────────────────────────────────────────────────────────────── */
 
-import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { isLessonUnlocked, lessonById, nextLessonId } from '../content'
 import { LessonRunner } from '../components/LessonRunner'
 import { useProgress } from '../stores/useProgress'
@@ -10,6 +10,7 @@ import { useProgress } from '../stores/useProgress'
 export function LessonPage() {
   const { lessonId } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
   const completedKey = useProgress((s) => Object.keys(s.completed).join(','))
   const adminMode = useProgress((s) => s.settings.adminMode)
   const completed = completedKey ? completedKey.split(',') : []
@@ -20,6 +21,7 @@ export function LessonPage() {
 
   return (
     <LessonRunner
+      key={location.key}
       lesson={lesson}
       onExit={() => navigate('/')}
       onNext={() => {

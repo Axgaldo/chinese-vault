@@ -229,7 +229,7 @@ export function LessonRunner({
         </div>
       ) : step && current !== undefined ? (
         <div className="flex flex-1 flex-col justify-center p-4">
-          <ChallengeView key={pos} step={step} awardXp={awardXp} onResult={handleResult} />
+          <ChallengeView key={pos} step={step} lessonId={lesson.id} awardXp={awardXp} onResult={handleResult} />
         </div>
       ) : null}
     </div>

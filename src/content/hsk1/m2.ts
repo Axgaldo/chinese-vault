@@ -40,16 +40,16 @@ export const m2: VaultModule = {
       [
         ...practice('w-ni-hao'),
         ...drill('w-nin2'),
-        ...drill('w-ta1'),
-        ...drill('w-ta1-she'),
+        ...practice('w-ta1'),
+        ...practice('w-ta1-she'),
         noteStep('n-ta-homofono'),
         build('他叫安东。', 'tā jiào Āndōng.', 'Él se llama Antonio.'),
         build('她叫玛丽亚。', 'tā jiào Mǎlìyà.', 'Ella se llama María.'),
       ],
       [
         grammar('n-ta-homofono', '他 y 她: mismo sonido (tā)', [
-          '他 (él) y 她 (ella) suenan IGUAL: tā. El género no se oye: solo se ve en el carácter — 他 lleva 人 "persona" a un lado y 她 lleva 女 "mujer".',
-          'Al escuchar, el género se deduce del contexto: tā jiào Mǎlìyà… será ella. El oído no distingue; el ojo, sí.',
+          'Ya conoces la caja de pronombres del Sector 1. Hoy le sacamos jugo al detalle más curioso: 他 (él) y 她 (ella) suenan IGUAL: tā. El género no se oye: solo se ve en el carácter — 他 lleva 人 "persona" a un lado y 她 lleva 女 "mujer".',
+          'Al escuchar, el género se deduce del contexto: tā jiào Mǎlìyà… será ella. El oído no distingue; el ojo, sí. Y el nuevo del día es 您 (nín): el "tú" con sombrero — usted. 你好 → 您好: misma frase, más respeto.',
         ], [
           ['他叫安东。', 'tā jiào Āndōng.', 'Él se llama Antonio.'],
           ['她叫玛丽亚。', 'tā jiào Mǎlìyà.', 'Ella se llama María.'],
