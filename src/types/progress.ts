@@ -108,6 +108,8 @@ export interface Settings {
   bodyFont: BodyFont
   /** Tema de color equipado (comprado en la Tienda del Refugio) */
   theme: ThemeId
+  /** Recordatorio de racha: notificación unas horas antes de perderla */
+  streakReminder: boolean
 }
 
 export interface ProgressState {
@@ -168,6 +170,7 @@ export const INITIAL_PROGRESS: ProgressState = {
     highContrast: false,
     bodyFont: 'mono',
     theme: 'green',
+    streakReminder: false,
   },
   updatedAt: 0,
 }

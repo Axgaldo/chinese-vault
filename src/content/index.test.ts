@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { pinyinSlug } from '../lib/pinyin'
+import { pinyinSlug, syllabify } from '../lib/pinyin'
 import type { LessonKind } from '../types/content'
 import {
   allLessons,
@@ -121,5 +121,20 @@ describe('integridad del curso', () => {
 
   it('seenEntries(["hsk0-l1"]) → el cuarteto de "ma"', () => {
     expect(seenEntries(['hsk0-l1'])).toEqual(['w-ma1', 'w-ma2', 'w-ma3', 'w-ma4'])
+  })
+
+  it('builds: cada frase tiene tantas sílabas de pinyin como caracteres (alineación 1:1)', () => {
+    const problems: string[] = []
+    for (const lesson of allLessons) {
+      for (const step of lesson.steps) {
+        if (step.type !== 'build') continue
+        const chars = step.sentence.hanzi.replace(/[。，？！、]/g, '').length
+        const syls = syllabify(step.sentence.pinyin).length
+        if (chars !== syls) {
+          problems.push(`${lesson.id}: "${step.sentence.hanzi}" ${syls} syl ≠ ${chars} caracteres`)
+        }
+      }
+    }
+    expect(problems).toEqual([])
   })
 })

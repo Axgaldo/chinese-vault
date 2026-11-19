@@ -8,9 +8,11 @@ import { createRoot } from 'react-dom/client'
 import { HashRouter } from 'react-router-dom'
 import App from './App'
 import { setAudioRate } from './lib/audio'
+import { maybeShowStreakReminder, snoozeStreakReminder, SNOOZE_HOURS } from './lib/notify'
 import { initSync } from './lib/sync'
 import { initSfx, setSfxEnabled } from './lib/sfx'
 import { useProgress } from './stores/useProgress'
+import { useToasts } from './stores/useToasts'
 import './index.css'
 
 // Aplica los ajustes persistidos (audio/sfx) y escucha cambios
@@ -30,6 +32,21 @@ window.addEventListener('pointerdown', () => initSfx(), { once: true, capture: t
 
 // Firebase (si hay .env) — auth anónima + sincronización Firestore
 initSync()
+
+// Recordatorio de racha ☢: el SW avisa cuando se pospone; se comprueba
+// al arrancar, al volver a la app y cada 5 minutos.
+navigator.serviceWorker?.addEventListener('message', (event) => {
+  if ((event.data as { type?: string } | undefined)?.type === 'snooze-streak') {
+    snoozeStreakReminder()
+    useToasts.getState().push('😴', `Recordatorio pospuesto ${SNOOZE_HOURS} horas`)
+  }
+})
+const reminderTick = () => void maybeShowStreakReminder()
+setTimeout(reminderTick, 15_000)
+setInterval(reminderTick, 5 * 60_000)
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') reminderTick()
+})
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

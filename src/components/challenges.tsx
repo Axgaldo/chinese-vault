@@ -688,34 +688,46 @@ function Dictation({ step, awardXp, onResult }: CProps<'dictate'>) {
 function BuildView({ step, awardXp, onResult }: CProps<'build'>) {
   const { sentence } = step
   const mode = useScriptMode()
-  const target = useMemo(() => sentence.hanzi.replace(/[。，？！、]/g, ''), [sentence])
-  const bank = useMemo(() => shuffle(Array.from(target)), [target])
-  /** Sílabas alineadas con los caracteres (para el modo pinyin) */
+  /** Frase objetivo sin puntuación, por caracteres */
+  const target = useMemo(() => [...sentence.hanzi.replace(/[。，？！、]/g, '')], [sentence])
+  /** Sílabas alineadas 1:1 con target (mismo índice = mismo carácter) */
   const sylls = useMemo(() => {
     const syl = syllabify(sentence.pinyin)
     return syl.length === target.length ? syl : null
   }, [sentence, target])
+  /** Orden barajado de ÍNDICES: cada ficha i = target[i] con sylls[i] (coherentes) */
+  const bank = useMemo(() => shuffle(target.map((_, i) => i)), [target])
   const [placed, setPlaced] = useState<number[]>([])
   const [state, setState] = useState<'building' | 'ok' | 'ko'>('building')
 
-  const answer = placed.map((i) => bank[i]).join('')
+  const answer = placed.map((i) => target[i]).join('')
   const ready = answer.length === target.length
 
-  /** Contenido de la pieza i según el modo de escritura */
+  /** Contenido de la ficha del carácter i según el modo de escritura */
   const chip = (i: number) => {
-    const syl = sylls?.[i]?.text ?? bank[i]
-    if (mode === 'pinyin') return <Pinyin text={syl} className="text-xl text-vault-200" />
+    const ch = target[i]
+    const syl = sylls ? sylls[i]?.text.normalize('NFC') : null
+    if (mode === 'pinyin') {
+      // sin sílaba fiable (desalineado) se muestra el hanzi: NUNCA un pinyin ajeno
+      return syl ? (
+        <Pinyin text={syl} className="text-xl text-vault-200" />
+      ) : (
+        <span className="font-hanzi text-2xl text-vault-200">{ch}</span>
+      )
+    }
     return (
       <span className="flex flex-col items-center leading-none">
-        <span className="font-hanzi text-2xl text-vault-200">{bank[i]}</span>
-        {mode === 'both' && <span className="text-[10px] text-vault-500">{stripTones(syl)}</span>}
+        <span className="font-hanzi text-2xl text-vault-200">{ch}</span>
+        {mode === 'both' && (
+          <span className="text-[10px] text-vault-500">{syl ? stripTones(syl) : ''}</span>
+        )}
       </span>
     )
   }
 
   const check = () => {
     if (!ready || state !== 'building') return
-    if (answer === target) {
+    if (answer === target.join('')) {
       setState('ok')
       sfx.correct()
     } else {
@@ -756,15 +768,15 @@ function BuildView({ step, awardXp, onResult }: CProps<'build'>) {
       {state === 'building' && (
         <>
           <div className="flex flex-wrap justify-center gap-1">
-            {bank.map((_, i) => (
+            {bank.map((targetIdx, pos) => (
               <button
-                key={i}
+                key={pos}
                 type="button"
-                disabled={placed.includes(i)}
-                className={`choice rounded px-3 py-2 ${placed.includes(i) ? 'opacity-20' : 'hover:border-vault-400'}`}
-                onClick={() => setPlaced([...placed, i])}
+                disabled={placed.includes(targetIdx)}
+                className={`choice rounded px-3 py-2 ${placed.includes(targetIdx) ? 'opacity-20' : 'hover:border-vault-400'}`}
+                onClick={() => setPlaced([...placed, targetIdx])}
               >
-                {chip(i)}
+                {chip(targetIdx)}
               </button>
             ))}
           </div>
@@ -782,7 +794,7 @@ function BuildView({ step, awardXp, onResult }: CProps<'build'>) {
       {state !== 'building' && (
         <Feedback correct={state === 'ok'} onContinue={() => onResult(state === 'ok', awardXp && state === 'ok' ? 10 : 0)}>
           <p className="text-center">
-            <span className="font-hanzi text-xl text-vault-200">{target}</span>
+            <span className="font-hanzi text-xl text-vault-200">{sentence.hanzi}</span>
             <Pinyin text={sentence.pinyin} className="block text-sm" />
             <span className="text-sm text-vault-500">{sentence.es}</span>
           </p>

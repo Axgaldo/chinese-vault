@@ -11,6 +11,11 @@ import { speakHanzi } from '../lib/audio'
 import { sfx } from '../lib/sfx'
 import { firebaseEnabled, loadFirebase } from '../lib/firebase'
 import { preferCloudOnNextAuth } from '../lib/sync'
+import {
+  notificationPermission,
+  requestNotificationPermission,
+  SNOOZE_HOURS,
+} from '../lib/notify'
 import { APP_VERSION, GITHUB_URL, GITHUB_USER } from '../lib/version'
 import { useProgress } from '../stores/useProgress'
 import { useAuth } from '../stores/useAuth'
@@ -396,6 +401,32 @@ export function ProfilePage() {
               🔊
             </Btn>
           </div>
+        </div>
+
+        <div className="border-t border-vault-700 pt-3">
+          <Toggle
+            label="☢ Recordatorio de racha"
+            hint="notificación unas 8 h antes de perder la racha (app instalada)"
+            on={settings.streakReminder}
+            onToggle={async () => {
+              if (!settings.streakReminder) {
+                const perm = await requestNotificationPermission()
+                if (perm !== 'granted') {
+                  setAuthMsg(
+                    perm === 'denied'
+                      ? 'El navegador ha bloqueado las notificaciones: actívalas en los ajustes del sitio.'
+                      : 'Sin permiso de notificaciones no puede avisarte.',
+                  )
+                  return
+                }
+              }
+              setSettings({ streakReminder: !settings.streakReminder })
+            }}
+          />
+          <p className="mt-1 text-xs text-vault-600">
+            estado del permiso: {notificationPermission() === 'granted' ? 'concedido ✓' : notificationPermission()}
+            {settings.streakReminder ? ` · posponer = ${SNOOZE_HOURS} h` : ''}
+          </p>
         </div>
 
         <div className="flex items-center justify-between border-t border-vault-700 pt-3">

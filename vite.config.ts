@@ -16,6 +16,10 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
+      // SW propio (src/sw.ts): precache + clic de las notificaciones de racha
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'icon-512-maskable.png'],
       manifest: {
@@ -39,26 +43,10 @@ export default defineConfig({
         ],
       },
       workbox: {
-        // App shell + fuentes + TODO el audio del curso (offline total)
+        // App shell + fuentes + TODO el audio del curso (offline total).
+        // (El runtime caching de fuentes vive en src/sw.ts)
         globPatterns: ['**/*.{js,css,html,svg,woff2,woff,ttf}', 'audio/*.mp3'],
-        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,        runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'google-fonts-stylesheets',
-              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
-            },
-          },
-          {
-            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'google-fonts-webfonts',
-              expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 365 },
-            },
-          },
-        ],
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
       },
     }),
   ],

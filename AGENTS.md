@@ -55,7 +55,7 @@ y arreglos. Se muestra en inicio, barra lateral, arranque y perfil: SIEMPRE impo
 | Router          | react-router-dom 7          | **HashRouter** (deploy estático sin rewrites) |
 | Nube (opcional) | Firebase 13 (JS SDK)       | Auth anónima+email, Firestore; **chunk perezoso** (solo carga si hay `.env`) |
 | Audio           | msedge-tts + Web Speech API | MP3 pre-generados en `public/audio` (gitignored) con fallback TTS navegador |
-| PWA             | vite-plugin-pwa 2 (workbox)| Service worker + manifest; precachea TODO incluido el audio → offline total |
+| PWA             | vite-plugin-pwa 2 · **injectManifest** (SW propio `src/sw.ts`): precache + clic de notificaciones |
 | Lint            | ESLint 10 flat config       | `npm run lint`                              |
 | Tests           | Vitest 5 (`npm run test`)   | 50 tests de libs puras + integridad del curso; gate en CI y deploy |
 | SFX             | WebAudio procedural         | pitidos retro, sin archivos de sonido       |
@@ -317,6 +317,20 @@ service cloud.firestore {
   (mismos 4 retos, distinto orden — choose-es siempre temprano por pedagogía).
 - **LessonPage usa `key={location.key}`**: re-navegar a la misma lección REMONTA el runner
   (antes mostraba la pantalla de completado anterior).
+- **Silabificador de pinyin (v2.6.0)**: `syllabify` trocea cada PALABRA en sílabas válidas
+  (tabla SYLLABLES + DP en `lib/pinyin.ts`): `zhōngwén` → zhōng+wén, `nǐmen` → nǐ+men,
+  ü y tonos NFD incluidos. INVARIANTE: una sílaba de pinyin = un carácter hanzi — el
+  test de integridad (`content/index.test.ts`, test "builds: alineación 1:1") lo garantiza
+  en TODO build. El reto `build` aparea ficha↔carácter↔sílaba por el MISMO índice
+  (el banco son índices barajados de target, nunca texto suelto: bug histórico de fichas
+  con hanzi de una posición y pinyin de otra).
+- **Recordatorio de racha ☢ (v2.6.0)**: `lib/notify.ts` + SW propio (`src/sw.ts`, PWA en
+  modo `injectManifest` en vite.config.ts): ~8 h antes de medianoche, con racha activa y
+  sin haber estudiado hoy, notificación del sistema (PWA instalada) con botones
+  "Posponer 3 h" (SW → message → snoozeStreakReminder) y "A entrenar". Se activa en
+  Perfil → Ajustes (`settings.streakReminder`, pide permiso al habilitarlo) y se
+  comprueba al arrancar, al volver a la app y cada 5 min (main.tsx). Sin servidor: no
+  avisa si la app está cerrada del todo (limitación PWA sin push).
 
 ## Radio del Refugio 📻 y HSK 2 (v2.0.0)
 

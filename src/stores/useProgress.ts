@@ -386,7 +386,7 @@ export const useProgress = create<ProgressStore>()(
     }),
     {
       name: 'chinese-vault-progress',
-      version: 5,
+      version: 6,
       migrate: (persisted) => {
         const raw = persisted as Partial<ProgressState> & {
           settings?: Partial<Settings> & { showHanzi?: boolean; contrast?: boolean; crt?: boolean }
