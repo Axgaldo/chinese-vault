@@ -59,8 +59,31 @@ export function initSync() {
     const fb = await loadFirebase()
     if (!fb) return
     const { auth, db } = fb
-    const { onAuthStateChanged, signInAnonymously } = await import('firebase/auth')
+    const {
+      browserLocalPersistence,
+      getRedirectResult,
+      onAuthStateChanged,
+      setPersistence,
+      signInAnonymously,
+      signInWithCredential,
+    } = await import('firebase/auth')
     const { doc, getDoc } = await import('firebase/firestore')
+
+    // Persistencia EXPLÍCITA local: la sesión sobrevive a cerrar la pestaña/navegador
+    // (multi-sesión: misma cuenta en PC + móvil + PWA, cada dispositivo restaurado).
+    await setPersistence(auth, browserLocalPersistence)
+
+    // Retorno del login por REDIRECT: si el Google elegido ya tenía cuenta, el link
+    // llega como error aquí (tras la recarga) — reutilizamos su credencial para
+    // ENTRAR a la cuenta, sin volver a pedir nada al morador.
+    getRedirectResult(auth).catch(
+      (err: { code?: string; customData?: { credential?: unknown } }) => {
+        if (err?.code === 'auth/credential-already-in-use' && err.customData?.credential) {
+          preferCloudOnNextAuth()
+          void signInWithCredential(auth, err.customData.credential as never)
+        }
+      },
+    )
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
