@@ -52,7 +52,7 @@ export interface QuestState {
 }
 
 /** Tema de color del terminal (Tienda del Refugio) */
-export type ThemeId = 'green' | 'amber' | 'teal' | 'red' | 'mono'
+export type ThemeId = 'green' | 'amber' | 'teal' | 'red' | 'mono' | 'notebook' | 'atompunk' | 'calido'
 
 /** Registro de un día del histórico (para estadísticas) */
 export interface DayLog {
@@ -71,12 +71,24 @@ export const SCRIPT_MODES: { mode: ScriptMode; label: string; icon: string }[] =
 ]
 
 /** Letra del texto general */
-export type BodyFont = 'mono' | 'pixel' | 'sans'
+export type BodyFont = 'mono' | 'pixel' | 'sans' | 'hand' | 'round'
 
 export const BODY_FONTS: { font: BodyFont; label: string }[] = [
   { font: 'mono', label: 'MONO' },
   { font: 'pixel', label: 'PIXEL' },
   { font: 'sans', label: 'SANS' },
+  { font: 'hand', label: 'MANO' },
+  { font: 'round', label: 'REDONDA' },
+]
+
+/** Efectos visuales del terminal (VFX) */
+export type VfxId = 'none' | 'crt' | 'glitch' | 'neon'
+
+export const VFX_OPTIONS: { id: VfxId; label: string }[] = [
+  { id: 'none', label: 'NINGUNO' },
+  { id: 'crt', label: 'CRT' },
+  { id: 'glitch', label: 'GLITCH' },
+  { id: 'neon', label: 'NEÓN' },
 ]
 
 export interface Settings {
@@ -88,11 +100,11 @@ export interface Settings {
   sfxOn: boolean
   /** MODO SUPERVISOR: desbloquea todas las lecciones (libre, para explorar) */
   adminMode: boolean
-  /** Ultra-oscuro: negro puro + verde fósforo (máximo contraste) */
-  contrast: boolean
-  /** Efecto CRT (scanlines, viñeta, barrido y parpadeo) */
-  crt: boolean
-  /** Letra del texto general */
+  /** Efecto visual del terminal (VFX): se compran en la tienda */
+  vfx: VfxId
+  /** Alto contraste: todo el texto en blanco sobre negro (accesibilidad) */
+  highContrast: boolean
+  /** Letra del texto general (se compran en la tienda) */
   bodyFont: BodyFont
   /** Tema de color equipado (comprado en la Tienda del Refugio) */
   theme: ThemeId
@@ -121,6 +133,10 @@ export interface ProgressState {
   quests: QuestState
   /** Temas comprados en la tienda */
   ownedThemes: ThemeId[]
+  /** Fuentes compradas en la tienda */
+  ownedFonts: BodyFont[]
+  /** VFX comprados en la tienda */
+  ownedVfx: VfxId[]
   /** Histórico de actividad: yyyy-mm-dd → registro (máx. 60 días) */
   history: Record<string, DayLog>
   settings: Settings
@@ -140,14 +156,16 @@ export const INITIAL_PROGRESS: ProgressState = {
   dailyStats: { date: '', lessons: 0, perfect: 0, reviews: 0, dictations: 0, tones: 0, steps: 0, xp: 0 },
   quests: { date: '', items: [] },
   ownedThemes: ['green'],
+  ownedFonts: ['mono', 'pixel', 'sans'],
+  ownedVfx: ['none', 'crt'],
   history: {},
   settings: {
     audioRate: 0.9,
     scriptMode: 'pinyin',
     sfxOn: true,
     adminMode: false,
-    contrast: false,
-    crt: true,
+    vfx: 'crt',
+    highContrast: false,
     bodyFont: 'mono',
     theme: 'green',
   },

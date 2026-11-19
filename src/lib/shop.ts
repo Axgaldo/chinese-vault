@@ -1,10 +1,9 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   Catálogo de la TIENDA DEL REFUGIO ⛓ — temas de color del terminal.
-   El verde fósforo es gratis; el resto se compran con chapas y se equipan.
-   Los colores exactos viven en index.css (html[data-theme='...']).
+   Catálogo de la TIENDA DEL REFUGIO ⛓ — temas, fuentes y VFX.
+   Los colores exactos viven en index.css (html[data-theme/-font/-vfx]).
    ───────────────────────────────────────────────────────────────────────────── */
 
-import type { ThemeId } from '../types/progress'
+import type { BodyFont, ThemeId, VfxId } from '../types/progress'
 
 export interface ThemeProduct {
   id: ThemeId
@@ -13,6 +12,8 @@ export interface ThemeProduct {
   price: number
   /** color de muestra para la preview de la tarjeta */
   swatch: string
+  /** fondo de muestra para la preview (temas claros) */
+  swatchBg?: string
 }
 
 export const THEMES: ThemeProduct[] = [
@@ -51,4 +52,57 @@ export const THEMES: ThemeProduct[] = [
     price: 60,
     swatch: '#f5f5f5',
   },
+  {
+    id: 'notebook',
+    name: 'Cuaderno',
+    desc: 'papel rayado y tinta: apuntes a mano',
+    price: 50,
+    swatch: '#2b241a',
+    swatchBg: '#f5efdc',
+  },
+  {
+    id: 'atompunk',
+    name: 'Atompunk Frío',
+    desc: 'aceró y cian: los años atómicos',
+    price: 50,
+    swatch: '#57c7ff',
+  },
+  {
+    id: 'calido',
+    name: 'Cálido',
+    desc: 'crema y naranja: suave como el sol de la tarde',
+    price: 50,
+    swatch: '#ffab7a',
+  },
+]
+
+export interface FontProduct {
+  id: BodyFont
+  name: string
+  desc: string
+  price: number
+  /** familia CSS para la preview de la tarjeta */
+  previewFamily: string
+}
+
+export const FONTS: FontProduct[] = [
+  { id: 'mono', name: 'Mono', desc: 'Share Tech Mono: la del terminal', price: 0, previewFamily: '"Share Tech Mono", monospace' },
+  { id: 'pixel', name: 'Pixel', desc: 'VT323: bite de píxel retro', price: 0, previewFamily: 'VT323, monospace' },
+  { id: 'sans', name: 'Sans', desc: 'la limpia del sistema', price: 0, previewFamily: 'system-ui, sans-serif' },
+  { id: 'hand', name: 'Manuscrita', desc: 'Caveat: como apuntes a mano (encaja con el Cuaderno)', price: 15, previewFamily: 'Caveat, cursive' },
+  { id: 'round', name: 'Redonda', desc: 'Nunito: suave y amable', price: 15, previewFamily: 'Nunito, sans-serif' },
+]
+
+export interface VfxProduct {
+  id: VfxId
+  name: string
+  desc: string
+  price: number
+}
+
+export const VFX: VfxProduct[] = [
+  { id: 'none', name: 'Ninguno', desc: 'terminal plano, sin adornos', price: 0 },
+  { id: 'crt', name: 'CRT', desc: 'scanlines, viñeta, barrido y parpadeo', price: 0 },
+  { id: 'glitch', name: 'Glitch', desc: 'interferencias y saltos de señal', price: 20 },
+  { id: 'neon', name: 'Neón', desc: 'fósforo a tope: brillos por todas partes', price: 20 },
 ]

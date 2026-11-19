@@ -11,10 +11,10 @@ import { persist } from 'zustand/middleware'
 import { lessonEntryIds } from '../content'
 import { newlyUnlocked } from '../lib/achievements'
 import { questsForDate, QUEST_POOL } from '../lib/quests'
-import { THEMES } from '../lib/shop'
+import { FONTS, THEMES, VFX } from '../lib/shop'
 import { gradeCard, newCard, type Grade } from '../lib/srs'
 import { toastAchievement, toastCaps, useToasts } from './useToasts'
-import type { DailyStats, ThemeId } from '../types/progress'
+import type { BodyFont, DailyStats, ThemeId, VfxId } from '../types/progress'
 import {
   INITIAL_PROGRESS,
   type ProgressState,
@@ -49,6 +49,14 @@ interface ProgressActions {
   buyTheme(themeId: ThemeId): void
   /** Equipa un tema ya comprado */
   equipTheme(themeId: ThemeId): void
+  /** Compra una fuente de la tienda (gasta chapas) */
+  buyFont(fontId: BodyFont): void
+  /** Equipa una fuente ya comprada */
+  equipFont(fontId: BodyFont): void
+  /** Compra un VFX de la tienda (gasta chapas) */
+  buyVfx(vfxId: VfxId): void
+  /** Equipa un VFX ya comprado */
+  equipVfx(vfxId: VfxId): void
   /** Sella logros pendientes de estados migrados (se llama al arrancar) */
   checkAchievements(): void
   setSettings(patch: Partial<Settings>): void
@@ -278,6 +286,52 @@ export const useProgress = create<ProgressStore>()(
         })
       },
 
+      buyFont(fontId) {
+        set((s) => {
+          if (s.ownedFonts.includes(fontId)) return s
+          const product = FONTS.find((f) => f.id === fontId)
+          if (!product || s.caps < product.price) return s
+          toastCaps(0, `fuente adquirida: ${product.name}`)
+          return {
+            ...s,
+            caps: s.caps - product.price,
+            ownedFonts: [...s.ownedFonts, fontId],
+            settings: { ...s.settings, bodyFont: fontId },
+            updatedAt: Date.now(),
+          }
+        })
+      },
+
+      equipFont(fontId) {
+        set((s) => {
+          if (!s.ownedFonts.includes(fontId)) return s
+          return { ...s, settings: { ...s.settings, bodyFont: fontId }, updatedAt: Date.now() }
+        })
+      },
+
+      buyVfx(vfxId) {
+        set((s) => {
+          if (s.ownedVfx.includes(vfxId)) return s
+          const product = VFX.find((v) => v.id === vfxId)
+          if (!product || s.caps < product.price) return s
+          toastCaps(0, `VFX adquirido: ${product.name}`)
+          return {
+            ...s,
+            caps: s.caps - product.price,
+            ownedVfx: [...s.ownedVfx, vfxId],
+            settings: { ...s.settings, vfx: vfxId },
+            updatedAt: Date.now(),
+          }
+        })
+      },
+
+      equipVfx(vfxId) {
+        set((s) => {
+          if (!s.ownedVfx.includes(vfxId)) return s
+          return { ...s, settings: { ...s.settings, vfx: vfxId }, updatedAt: Date.now() }
+        })
+      },
+
       checkAchievements() {
         set((s) => sealAchievements({ ...s }))
       },
@@ -299,12 +353,16 @@ export const useProgress = create<ProgressStore>()(
     }),
     {
       name: 'chinese-vault-progress',
-      version: 4,
+      version: 5,
       migrate: (persisted) => {
         const raw = persisted as Partial<ProgressState> & {
-          settings?: Partial<Settings> & { showHanzi?: boolean }
+          settings?: Partial<Settings> & { showHanzi?: boolean; contrast?: boolean; crt?: boolean }
         }
-        const rawSettings = (raw.settings ?? {}) as Partial<Settings> & { showHanzi?: boolean }
+        const rawSettings = (raw.settings ?? {}) as Partial<Settings> & {
+          showHanzi?: boolean
+          contrast?: boolean
+          crt?: boolean
+        }
         const p = {
           ...structuredClone(INITIAL_PROGRESS),
           ...raw,
@@ -312,12 +370,25 @@ export const useProgress = create<ProgressStore>()(
         // v2→v3: showHanzi (boolean) → scriptMode ('pinyin' | 'both' | 'hanzi')
         const scriptMode: ScriptMode =
           rawSettings.scriptMode ?? (rawSettings.showHanzi ? 'hanzi' : 'pinyin')
-        // v3→v4: caravana, tienda, histórico y bestStreak
-        p.settings = { ...INITIAL_PROGRESS.settings, ...rawSettings, scriptMode } as Settings
+        // v4→v5: contrast se retira (el look base YA es ultra-oscuro); crt → vfx;
+        // fuentes y VFX pasan por la tienda (ownedFonts/ownedVfx)
+        const vfx: VfxId = rawSettings.vfx ?? (rawSettings.crt === false ? 'none' : 'crt')
+        p.settings = {
+          ...INITIAL_PROGRESS.settings,
+          ...rawSettings,
+          scriptMode,
+          vfx,
+        } as Settings
+        delete (p.settings as Settings & { contrast?: boolean }).contrast
+        delete (p.settings as Settings & { crt?: boolean }).crt
         p.bestStreak = Math.max(raw.bestStreak ?? 0, raw.streakDays ?? 0)
         p.dailyStats = raw.dailyStats ?? emptyStats('')
         p.quests = raw.quests ?? { date: '', items: [] }
         p.ownedThemes = raw.ownedThemes ?? ['green']
+        p.ownedFonts = raw.ownedFonts ?? ['mono', 'pixel', 'sans']
+        if (!p.ownedFonts.includes('mono')) p.ownedFonts = ['mono', ...p.ownedFonts]
+        p.ownedVfx = raw.ownedVfx ?? ['none', 'crt']
+        if (!p.ownedVfx.includes('none')) p.ownedVfx = ['none', ...p.ownedVfx]
         p.history = raw.history ?? {}
         return p
       },
@@ -340,6 +411,8 @@ export function progressData(s: ProgressStore): ProgressState {
     dailyStats,
     quests,
     ownedThemes,
+    ownedFonts,
+    ownedVfx,
     history,
     settings,
     updatedAt,
@@ -357,6 +430,8 @@ export function progressData(s: ProgressStore): ProgressState {
     dailyStats,
     quests,
     ownedThemes,
+    ownedFonts,
+    ownedVfx,
     history,
     settings,
     updatedAt,

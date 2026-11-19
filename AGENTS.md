@@ -239,10 +239,19 @@ service cloud.firestore {
 - Componentes de UI en `components/ui.tsx`: NO inventar botones nuevos, usar `Btn`/`Panel`/etc.
   Para ajustes on/off usa SIEMPRE `Toggle` (botón `[ ■ ACTIVADO ]`) — los checkboxes nativos se
   renderizan invisibles en algunos navegadores oscuros (bug real reportado).
-- **Apariencia (Perfil):** `settings.contrast` (ultra-oscuro: clase `cv-contrast` en `<html>`,
-  redefine los tokens vault a negro puro/verde fósforo), `settings.crt` (scanlines/viñeta/barrido/
-  parpadeo on-off, condicional en App.tsx) y `settings.bodyFont` ('mono'|'pixel'|'sans' vía
-  `html[data-font]`). Los TRES se aplican con un useEffect en App.tsx.
+- **Apariencia (Perfil + Tienda):** la base del tema es ULTRA-OSCURA (texto brillante sobre
+  paneles casi negros: tokens vault-100/200 para texto, paneles `#020604`). El toggle
+  "Ultra-oscuro" se retiró en v5 (el look base YA es ese). `settings.highContrast`
+  (clase `cv-highcontrast`: todo blanco sobre negro puro, accesibilidad) y
+  `settings.vfx` (`html[data-vfx]`: none · crt (scanlines/viñeta/barrido/parpadeo) ·
+  glitch (`vfx-glitch`) · neon (`vfx-neon`)). Se aplican con el useEffect de App.tsx.
+- **Tienda (3 catálogos en `lib/shop.ts`):** TEMAS (green gratis · amber · teal · red ·
+  mono · **notebook** (papel rayado, claro) · **atompunk** (aceró/cian) · **calido**
+  (crema/naranja)), FUENTES (mono/pixel/sans gratis · **hand** (Caveat, encaja con
+  Cuaderno) · **round** (Nunito)) y VFX (none/crt gratis · glitch 20 · neon 20).
+  `buyTheme/buyFont/buyVfx` + `equipTheme/equipFont/equipVfx` en el store;
+  `ownedThemes/ownedFonts/ownedVfx` en el progreso. El perfil solo deja equipar lo
+  comprado. Fuentes extra en index.html (Caveat, Nunito).
 - Textos de UI en español con sabor Fallout pero sin ser insoportables: "REGISTRAR ENTRADA",
   "ACCESO CONCEDIDO", "ERROR DE PROTOCOLO", "ENTRADAS REGISTRADAS", "ZONA PELIGROSA"…
 

@@ -37,8 +37,9 @@ ABRIENDO LA PUERTA DEL REFUGIO 101..
 - **3 modos de escritura (estilo HelloChinese):** botón 拼 → 拼+漢 → 漢 en plena lección —
   pinyin puro (con toque-revelado del hanzi), hanzi con pinyin apilado, o hanzi. El pinyin va
   coloreado por tono (1 rojo, 2 ámbar, 3 turquesa, 4 violeta).
-- **Apariencia configurable:** ultra-oscuro (negro puro + verde fósforo), efecto CRT on/off y
-  selector de letra (mono/pixel/sans) desde el Perfil.
+- **Apariencia configurable:** tema de color (8 en la Tienda: incluidos Cuaderno de papel
+  rayado, Atompunk frío y Cálido), **VFX** (CRT, Glitch, Neón) y letra del texto
+  (mono/pixel/sans/manuscrita/redonda) + alto contraste (todo blanco) en el Perfil.
 - **Chapas ⛓ y logros:** la moneda del refugio — bono diario +5, chapas por lecciones y repasos;
   10 logros con sus toasts ("Puerta 101", "El Rey de las Chapas"…).
 - **👁 Modo Supervisor (libre):** en Ajustes del Perfil, desbloquea todas las lecciones para
@@ -49,8 +50,9 @@ ABRIENDO LA PUERTA DEL REFUGIO 101..
   tener cuenta y multi-dispositivo.
 - **Misiones de la Caravana 🐂:** cada día, 3 encargos nuevos (dictados, repasos, lecciones,
   tonos, XP…) con recompensa en chapas, directamente en el mapa.
-- **Tienda del Refugio ⛓:** gasta tus chapas en temas de color del terminal — Ámbar Fallout,
-  Turquesa Rad, Rojo Alerta y el Pip-Boy 2000 en blanco y negro.
+- **Tienda del Refugio ⛓:** gasta tus chapas en **temas de terminal** (Ámbar, Turquesa,
+  Rojo Alerta, Pip-Boy 2000, Cuaderno de papel, Atompunk, Cálido), **letras** extra
+  (manuscrita y redonda) y **VFX** (Glitch y Neón, además del CRT de serie).
 - **Estadísticas del morador:** registro con XP, racha (con récord), precisión media y por
   sector, calor de actividad de 14 días y contadores varios.
 - **50 tests automatizados** (Vitest) de pinyin, SRS, retos y la integridad completa del

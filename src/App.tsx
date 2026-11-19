@@ -1,6 +1,6 @@
 /* ─────────────────────────────────────────────────────────────────────────────
    CHINESE VAULT — shell de la app
-   Móvil-first (max 460px centrado), con overlay CRT (scanlines + viñeta).
+   Móvil-first (max 460px centrado) con VFX (CRT por defecto).
    La barra de navegación se oculta durante las lecciones (modo inmersivo).
    ───────────────────────────────────────────────────────────────────────────── */
 
@@ -43,23 +43,24 @@ export default function App() {
   const [booted, setBooted] = useState(() => Boolean(localStorage.getItem(BOOT_KEY)))
   const inLesson = location.pathname.startsWith('/lesson')
 
-  // Apariencia del terminal (ajustes del perfil)
-  const crt = useProgress((s) => s.settings.crt)
-  const contrast = useProgress((s) => s.settings.contrast)
+  // Apariencia del terminal (tema/fuente/VFX/alto contraste — tienda y perfil)
   const bodyFont = useProgress((s) => s.settings.bodyFont)
   const theme = useProgress((s) => s.settings.theme)
+  const vfx = useProgress((s) => s.settings.vfx)
+  const highContrast = useProgress((s) => s.settings.highContrast)
 
   useEffect(() => {
     const el = document.documentElement
-    el.classList.toggle('cv-contrast', contrast)
     el.dataset.font = bodyFont
     el.dataset.theme = theme
-  }, [contrast, bodyFont, theme])
+    el.dataset.vfx = vfx
+    el.classList.toggle('cv-highcontrast', highContrast)
+  }, [bodyFont, theme, vfx, highContrast])
 
   return (
     <>
-      {/* capa CRT global */}
-      {crt && (
+      {/* capa CRT global (VFX) */}
+      {vfx === 'crt' && (
         <>
           <div className="crt-overlay" aria-hidden />
           <div className="crt-vignette" aria-hidden />
@@ -69,9 +70,9 @@ export default function App() {
 
       {/* carcasa: móvil (columna) · escritorio ≥lg (sidebar + contenido) */}
       <div
-        className={`relative mx-auto flex min-h-dvh w-full max-w-[460px] flex-col md:max-w-[560px] md:border-x md:border-vault-800 lg:grid lg:max-w-5xl lg:grid-cols-[260px_1fr] lg:border-vault-800 ${
-          crt ? 'crt-flicker' : ''
-        }`}
+        className={`relative mx-auto flex min-h-dvh w-full max-w-[460px] flex-col md:max-w-[560px] md:border-x md:border-vault-800 lg:grid lg:max-w-5xl lg:grid-cols-[260px_1fr] lg:border-x lg:border-vault-800 ${
+          vfx === 'crt' ? 'crt-flicker' : ''
+        } ${vfx === 'glitch' ? 'vfx-glitch' : ''} ${vfx === 'neon' ? 'vfx-neon' : ''}`}
       >
         <SideBar className="hidden lg:flex" />
         <div className="flex min-h-dvh flex-1 flex-col">

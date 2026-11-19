@@ -14,8 +14,8 @@ import { preferCloudOnNextAuth } from '../lib/sync'
 import { APP_VERSION, GITHUB_URL, GITHUB_USER } from '../lib/version'
 import { useProgress } from '../stores/useProgress'
 import { useAuth } from '../stores/useAuth'
-import { rankFor, type ScriptMode } from '../types/progress'
-import { BODY_FONTS, SCRIPT_MODES } from '../types/progress'
+import { rankFor, SCRIPT_MODES, type ScriptMode, VFX_OPTIONS } from '../types/progress'
+import { BODY_FONTS } from '../types/progress'
 import { Btn, Chip, GithubMark, Meter, Panel, Prompt, SectionTitle, Toggle } from '../components/ui'
 
 export function ProfilePage() {
@@ -41,6 +41,10 @@ export function ProfilePage() {
   const anonCreatedAt = useAuth((s) => s.anonCreatedAt)
   const history = useProgress((s) => s.history)
   const bestStreak = useProgress((s) => s.bestStreak)
+  const ownedVfx = useProgress((s) => s.ownedVfx)
+  const ownedFonts = useProgress((s) => s.ownedFonts)
+  const equipVfx = useProgress((s) => s.equipVfx)
+  const equipFont = useProgress((s) => s.equipFont)
 
   /** Días que le quedan a la cuenta anónima (Firebase la borra a los 30) */
   const anonDaysLeft = (() => {
@@ -413,25 +417,41 @@ export function ProfilePage() {
       <SectionTitle>APARIENCIA DEL TERMINAL</SectionTitle>
       <Panel className="space-y-3 p-4">
         <Toggle
-          label="Ultra-oscuro"
-          hint="negro puro y verde fósforo: contraste máximo"
-          on={settings.contrast}
-          onToggle={() => setSettings({ contrast: !settings.contrast })}
+          label="Alto contraste"
+          hint="todo el texto en blanco sobre negro (accesibilidad)"
+          on={settings.highContrast}
+          onToggle={() => setSettings({ highContrast: !settings.highContrast })}
         />
+
         <div className="border-t border-vault-700 pt-3">
-          <Toggle
-            label="Efecto CRT"
-            hint="scanlines, viñeta, barrido y parpadeo"
-            on={settings.crt}
-            onToggle={() => setSettings({ crt: !settings.crt })}
-          />
+          <p className="mb-1 text-sm">VFX del terminal</p>
+          <div className="flex flex-wrap gap-1">
+            {VFX_OPTIONS.filter((v) => ownedVfx.includes(v.id)).map((v) => (
+              <button
+                key={v.id}
+                type="button"
+                className={`choice rounded px-2.5 py-1 font-display text-sm ${
+                  settings.vfx === v.id ? 'choice-selected text-vault-300' : 'text-vault-600'
+                }`}
+                onClick={() => {
+                  sfx.tap()
+                  equipVfx(v.id)
+                }}
+              >
+                {v.label}
+              </button>
+            ))}
+          </div>
+          <p className="mt-1 text-xs text-vault-600">los VFX faltantes se compran en la Tienda</p>
         </div>
+
         <div className="flex items-center justify-between border-t border-vault-700 pt-3">
           <span className="text-sm">
             Letra del texto general
+            <span className="block text-xs text-vault-600">las letras faltantes, en la Tienda</span>
           </span>
-          <div className="flex gap-1">
-            {BODY_FONTS.map((f) => (
+          <div className="flex flex-wrap justify-end gap-1">
+            {BODY_FONTS.filter((f) => ownedFonts.includes(f.font)).map((f) => (
               <button
                 key={f.font}
                 type="button"
@@ -440,7 +460,7 @@ export function ProfilePage() {
                 }`}
                 onClick={() => {
                   sfx.tap()
-                  setSettings({ bodyFont: f.font })
+                  equipFont(f.font)
                 }}
               >
                 {f.label}
@@ -448,6 +468,10 @@ export function ProfilePage() {
             ))}
           </div>
         </div>
+
+        <p className="border-t border-vault-700 pt-3 text-xs text-vault-600">
+          el tema de color se equipa en la Tienda del Refugio
+        </p>
       </Panel>
 
       <SectionTitle>ZONA PELIGROSA</SectionTitle>

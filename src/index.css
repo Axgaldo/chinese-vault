@@ -7,18 +7,18 @@
    ───────────────────────────────────────────────────────────────────────────── */
 
 @theme {
-  /* Fósforo verde (recuadros oscurecidos ~12% para mejor lectura) */
+  /* Fósforo verde — base ULTRA-OSCURA: texto brillante, paneles casi negros */
   --color-vault-950: #030804;
-  --color-vault-900: #050e07;
-  --color-vault-850: #081509;
-  --color-vault-800: #0a1f0c;
-  --color-vault-700: #123017;
-  --color-vault-600: #1d7a38;
-  --color-vault-500: #2fae52;
-  --color-vault-400: #3dff70;
-  --color-vault-300: #6bffa0;
-  --color-vault-200: #9cffc0;
-  --color-vault-100: #c8ffdb;
+  --color-vault-900: #030b06;
+  --color-vault-850: #061409;
+  --color-vault-800: #0b2412;
+  --color-vault-700: #0f4522;
+  --color-vault-600: #2fae52;
+  --color-vault-500: #3dff70;
+  --color-vault-400: #52ff85;
+  --color-vault-300: #86ffab;
+  --color-vault-200: #b8ffd1;
+  --color-vault-100: #e2ffee;
 
   /* Acentos del sistema */
   --color-vault-amber: #ffb000;
@@ -194,39 +194,183 @@ html[data-theme='mono'] {
   --color-vault-100: #ffffff;
 }
 
-/* ── Ultra-oscuro (máximo contraste): negro puro + verde fósforo ────────────── */html.cv-contrast {
+/* Cuaderno: papel rayado y tinta (encaja con la fuente Manuscrita) */
+html[data-theme='notebook'] {
+  --color-vault-950: #efe7d2;
+  --color-vault-900: #f5efdd;
+  --color-vault-850: #e9e0c8;
+  --color-vault-800: #d8c9a4;
+  --color-vault-700: #c4b28a;
+  --color-vault-600: #8a7a58;
+  --color-vault-500: #b3541e;
+  --color-vault-400: #c0392b;
+  --color-vault-300: #9a2f22;
+  --color-vault-200: #3a3226;
+  --color-vault-100: #2b241a;
+}
+
+html[data-theme='notebook'] body {
+  background: #efe7d2;
+  color: #3a3226;
+}
+
+html[data-theme='notebook'] .glow,
+html[data-theme='notebook'] .glow-soft {
+  text-shadow: none;
+}
+
+html[data-theme='notebook'] .panel {
+  background: #f7f1df;
+  border-color: #c9b78d;
+}
+
+html[data-theme='notebook'] .panel-solid {
+  background: #f7f1df;
+}
+
+/* Panel de lectura: papel rayado de cuaderno */
+html[data-theme='notebook'] .panel-read {
+  background: repeating-linear-gradient(
+    to bottom,
+    #f9f3e3 0px,
+    #f9f3e3 25px,
+    #e3d5b4 26px
+  );
+  border-color: #b3541e;
+}
+
+html[data-theme='notebook'] .meter {
+  background: #e9e0c8;
+}
+
+html[data-theme='notebook'] .choice {
+  background: #f7f1df;
+}
+
+/* Atompunk Frío: aceró y cian */
+html[data-theme='atompunk'] {
+  --color-vault-950: #04090f;
+  --color-vault-900: #061019;
+  --color-vault-850: #081522;
+  --color-vault-800: #0e2130;
+  --color-vault-700: #1c4258;
+  --color-vault-600: #3f7d9e;
+  --color-vault-500: #57c7ff;
+  --color-vault-400: #7cd4ff;
+  --color-vault-300: #a8e2ff;
+  --color-vault-200: #cdeeff;
+  --color-vault-100: #eaf7ff;
+}
+
+html[data-theme='atompunk'] body {
+  background:
+    radial-gradient(ellipse 120% 80% at 50% -10%, #0c2233 0%, transparent 60%),
+    #04090f;
+}
+
+/* Cálido: crema y naranja de tarde */
+html[data-theme='calido'] {
+  --color-vault-950: #120903;
+  --color-vault-900: #1a0e05;
+  --color-vault-850: #221206;
+  --color-vault-800: #33190a;
+  --color-vault-700: #6b3a1a;
+  --color-vault-600: #a86a3f;
+  --color-vault-500: #e8925c;
+  --color-vault-400: #ffab7a;
+  --color-vault-300: #ffc4a0;
+  --color-vault-200: #ffdcc4;
+  --color-vault-100: #ffeee1;
+}
+
+html[data-theme='calido'] body {
+  background:
+    radial-gradient(ellipse 120% 80% at 50% -10%, #2e1a0a 0%, transparent 60%),
+    #120903;
+}
+
+/* ── Alto contraste (accesibilidad): todo el texto en blanco sobre negro ──── */
+
+html.cv-highcontrast {
   --color-vault-950: #000000;
   --color-vault-900: #000000;
   --color-vault-850: #000000;
-  --color-vault-800: #00180b;
-  --color-vault-700: #00552b;
-  --color-vault-600: #00cc55;
-  --color-vault-500: #22ff77;
-  --color-vault-400: #3dff70;
-  --color-vault-300: #5cff8f;
-  --color-vault-200: #9cffc0;
-  --color-vault-100: #d9ffe8;
+  --color-vault-800: #1e1e1e;
+  --color-vault-700: #2e2e2e;
+  --color-vault-600: #e8e8e8;
+  --color-vault-500: #ffffff;
+  --color-vault-400: #ffffff;
+  --color-vault-300: #ffffff;
+  --color-vault-200: #ffffff;
+  --color-vault-100: #ffffff;
 }
 
-html.cv-contrast body {
+html.cv-highcontrast body {
   background: #000;
 }
 
-html.cv-contrast .panel,
-html.cv-contrast .panel-solid,
-html.cv-contrast .panel-read,
-html.cv-contrast .chip {
+html.cv-highcontrast .panel,
+html.cv-highcontrast .panel-solid,
+html.cv-highcontrast .panel-read,
+html.cv-highcontrast .chip {
   background: #000;
 }
 
-html.cv-contrast .meter {
+html.cv-highcontrast .meter {
   background: #000;
 }
 
-/* ── Letra del texto general (Ajustes → Apariencia) ──────────────────────── */
+/* ── VFX (efectos del terminal) ───────────────────────────────────────────── */
 
-/* Pixel (VT323) es ópticamente más pequeña: escala el raíz (18px) para
-   agrandar todo el texto rem-basado de la UI */
+/* GLITCH: interferencias y saltos de señal ocasionales */
+@keyframes vfx-glitch {
+  0%, 90.9%, 91.4%, 93.9%, 94.3%, 97.9%, 98.2%, 100% {
+    transform: none;
+    filter: none;
+  }
+  91% {
+    transform: translateX(-4px) skewX(-1.5deg);
+    filter: hue-rotate(45deg) saturate(1.6);
+  }
+  91.1% {
+    transform: translateX(4px);
+    filter: hue-rotate(-45deg) contrast(1.25);
+  }
+  94% {
+    transform: translateY(2px) translateX(-2px);
+    filter: brightness(1.3);
+  }
+  98% {
+    transform: translateY(-1px);
+    filter: invert(0.04);
+  }
+}
+.vfx-glitch {
+  animation: vfx-glitch 8s infinite steps(1, end);
+}
+
+/* NEÓN: fósforo a tope, brillos por todas partes */
+.vfx-neon .glow {
+  text-shadow: 0 0 4px currentColor, 0 0 16px currentColor;
+}
+.vfx-neon .panel {
+  box-shadow:
+    0 0 14px color-mix(in srgb, var(--color-vault-500) 22%, transparent),
+    inset 0 0 20px color-mix(in srgb, var(--color-vault-500) 7%, transparent);
+}
+.vfx-neon .btn-vault {
+  box-shadow: 0 0 10px color-mix(in srgb, var(--color-vault-500) 28%, transparent);
+}
+.vfx-neon .meter-fill {
+  box-shadow: 0 0 14px var(--color-vault-400);
+}
+.vfx-neon .choice {
+  box-shadow: inset 0 0 12px color-mix(in srgb, var(--color-vault-500) 6%, transparent);
+}
+
+/* ── Letras del texto general (Tienda → Fuente) ──────────────────────────── */
+
+/* Pixel (VT323) es ópticamente más pequeña: escala el raíz (18px) */
 html[data-font='pixel'] {
   font-size: 112.5%;
 }
@@ -239,22 +383,32 @@ html[data-font='sans'] body {
   font-family: system-ui, 'Segoe UI', sans-serif;
 }
 
+/* Manuscrita (Caveat): de trazo fino, necesita más cuerpo */
+html[data-font='hand'] body {
+  font-family: 'Caveat', cursive;
+  font-size: 127%;
+}
+
+html[data-font='round'] body {
+  font-family: 'Nunito', sans-serif;
+}
+
 /* ── Componentes del refugio ──────────────────────────────────────────────── */
 
 /* Panel con esquinas biseladas estilo Pip-Boy */
 .panel {
   position: relative;
-  background: color-mix(in srgb, var(--color-vault-900) 92%, transparent);
+  background: #020604;
   border: 1px solid var(--color-vault-700);
   clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px);
 }
 .panel-solid {
-  background: var(--color-vault-900);
+  background: #020604;
 }
 
-/* Panel de lectura: fondo casi negro y texto claro para párrafos largos */
+/* Panel de lectura: negro casi puro y texto muy claro para párrafos largos */
 .panel-read {
-  background: #020604;
+  background: #010302;
   border-color: var(--color-vault-600);
 }
 .panel-read p {
