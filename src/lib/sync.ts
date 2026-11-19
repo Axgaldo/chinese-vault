@@ -22,6 +22,9 @@ let pushTimer: ReturnType<typeof setTimeout> | null = null
 /** El próximo inicio de sesión explícito debe priorizar la nube (recuperación de cuenta) */
 let cloudPreferred = false
 
+/** Clave sessionStorage para que el flag sobreviva al login por REDIRECT (recarga total) */
+const CLOUD_FLAG = 'cv-cloud-preferred'
+
 async function pushProgress(db: import('firebase/firestore').Firestore) {
   if (!uid) return
   const data = progressData(useProgress.getState())
@@ -63,8 +66,11 @@ export function initSync() {
       if (user) {
         // Política: el inicio de sesión EXPLÍCITO con Google prioriza la nube
         // (recuperas tu cuenta tal cual estaba en la base de datos).
-        const preferCloud = cloudPreferred && Boolean(user.email)
+        // El flag sobrevive a la recarga del login por REDIRECT (sessionStorage).
+        const preferCloud =
+          (cloudPreferred || sessionStorage.getItem(CLOUD_FLAG) === '1') && Boolean(user.email)
         cloudPreferred = false
+        sessionStorage.removeItem(CLOUD_FLAG)
         uid = user.uid
         useAuth
           .getState()
@@ -112,7 +118,9 @@ export function initSync() {
   })
 }
 
-/** Marca el próximo inicio de sesión como "recuperación de cuenta": la nube prioriza */
+/** Marca el próximo inicio de sesión como "recuperación de cuenta": la nube prioriza.
+ *  Se guarda también en sessionStorage para sobrevivir al login por redirect. */
 export function preferCloudOnNextAuth() {
   cloudPreferred = true
+  sessionStorage.setItem(CLOUD_FLAG, '1')
 }

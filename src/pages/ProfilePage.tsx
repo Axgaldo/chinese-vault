@@ -4,6 +4,7 @@
 
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import type { OAuthCredential } from 'firebase/auth'
 import { allLessons, modules, seenEntries } from '../content'
 import { ACHIEVEMENTS } from '../lib/achievements'
 import { speakHanzi } from '../lib/audio'
@@ -89,7 +90,7 @@ export function ProfilePage() {
       case 'auth/cancelled-popup-request':
         return 'Ventana cerrada antes de terminar. Inténtalo otra vez.'
       case 'auth/popup-blocked':
-        return 'El navegador bloqueó la ventana emergente: permite pop-ups para esta web.'
+        return 'Sin pop-ups disponibles: la app redirigirá a Google automáticamente.'
       case 'auth/operation-not-allowed':
       case 'auth/configuration-not-found':
         return 'Proveedor Google no activo: enciéndelo en Authentication → Sign-in method (consola de Firebase).'
@@ -109,16 +110,26 @@ export function ProfilePage() {
   }
 
   /**
-   * ENTRAR CON GOOGLE:
-   * • sesión anónima → se intenta VINCULAR (primera vez de este dispositivo);
-   *   si ese Google ya tiene cuenta (credential-already-in-use) → se ENTRA a ella
-   * • ya hay sesión de Google → no se re-autentica
-   * • al ENTRAR a una cuenta existente, la NUBE PRIORIZA (recuperas tu progreso de la BBDD)
+   * ENTRAR CON GOOGLE (flujo a prueba de popups):
+   * • sesión anónima → VINCULAR. Si ese Google ya tiene cuenta, el propio popup ya
+   *   autenticó al usuario → se reutiliza SU credencial (signInWithCredential,
+   *   sin abrir un segundo popup).
+   * • si el navegador BLOQUEA la ventana → REDIRECCIÓN a Google (página entera,
+   *   cero pop-ups; la sesión se completa al volver de la recarga).
+   * • al ENTRAR a una cuenta existente, la NUBE PRIORIZA (flag en sessionStorage:
+   *   sobrevive al viaje de ida y vuelta del redirect).
    */
   const googleSignIn = async () => {
     const fb = await loadFirebase()
     if (!fb) return
-    const { GoogleAuthProvider, linkWithPopup, signInWithPopup } = await import('firebase/auth')
+    const {
+      GoogleAuthProvider,
+      linkWithPopup,
+      linkWithRedirect,
+      signInWithCredential,
+      signInWithPopup,
+      signInWithRedirect,
+    } = await import('firebase/auth')
     const provider = new GoogleAuthProvider()
     try {
       const user = fb.auth.currentUser
@@ -132,14 +143,36 @@ export function ProfilePage() {
         try {
           await linkWithPopup(user, provider)
         } catch (err) {
-          if ((err as { code?: string }).code !== 'auth/credential-already-in-use') throw err
-          // ese Google ya está vinculado a una cuenta existente: ENTRAR a ella
-          preferCloudOnNextAuth()
-          await signInWithPopup(fb.auth, provider)
+          const code = (err as { code?: string }).code ?? ''
+          if (code === 'auth/credential-already-in-use') {
+            // ese Google ya pertenece a una cuenta: la credencial del popup SIRVE
+            const credential = (err as { customData?: { credential?: OAuthCredential } })
+              .customData?.credential
+            preferCloudOnNextAuth()
+            if (credential) {
+              await signInWithCredential(fb.auth, credential)
+            } else {
+              await signInWithPopup(fb.auth, provider)
+            }
+          } else if (code === 'auth/popup-blocked') {
+            setAuthMsg('Ventana bloqueada: redirigiendo a Google… (la app se recargará)')
+            await linkWithRedirect(user, provider)
+          } else {
+            throw err
+          }
         }
       } else {
         preferCloudOnNextAuth()
-        await signInWithPopup(fb.auth, provider)
+        try {
+          await signInWithPopup(fb.auth, provider)
+        } catch (err) {
+          if ((err as { code?: string }).code === 'auth/popup-blocked') {
+            setAuthMsg('Ventana bloqueada: redirigiendo a Google… (la app se recargará)')
+            await signInWithRedirect(fb.auth, provider)
+          } else {
+            throw err
+          }
+        }
       }
       // aplicar el estado de sesión inmediatamente
       const u = fb.auth.currentUser

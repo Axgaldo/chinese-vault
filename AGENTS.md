@@ -161,7 +161,10 @@ Sin `.env` la app es 100% local. Con `.env` (ver `.env.example`):
 - **Auth anónima automática** → cada dispositivo = un uid anónimo; su Firestore doc guarda el progreso.
   En la consola hay que activar los DOS proveedores: **Google** y **Anónimo**.
 - **ENTRAR CON GOOGLE** (Perfil): si la sesión es anónima hace `linkWithPopup` (mismo uid → el
-  progreso local sube sin perder nada); si no hay sesión, `signInWithPopup` recupera la nube.
+  progreso local sube sin perder nada); si ese Google YA tiene cuenta, se reutiliza la credencial
+  del propio popup (`signInWithCredential` — sin segundo popup). Si el navegador BLOQUEA popups
+  → **redirect automático** (`linkWithRedirect`/`signInWithRedirect`) y el flag `cv-cloud-preferred`
+  viaja en sessionStorage para que al volver de la recarga siga aplicándose la prioridad de nube.
   Errores típicos traducidos: `operation-not-allowed` (proveedor sin activar) y
   `unauthorized-domain` (dominio no añadido en Authentication → Settings).
 - Sincronización **local-first**: debounce 3s tras cada cambio; si el remoto tiene `updatedAt` mayor,
