@@ -15,6 +15,7 @@ import { ArchivePage } from './pages/ArchivePage'
 import { HomePage } from './pages/HomePage'
 import { LessonPage } from './pages/LessonPage'
 import { ProfilePage } from './pages/ProfilePage'
+import { RadioPage } from './pages/RadioPage'
 import { ReviewPage } from './pages/ReviewPage'
 import { ShopPage } from './pages/ShopPage'
 
@@ -79,6 +80,7 @@ export default function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/lesson/:lessonId" element={<LessonPage />} />
               <Route path="/review" element={<ReviewPage />} />
+              <Route path="/radio" element={<RadioPage />} />
               <Route path="/archive" element={<ArchivePage />} />
               <Route path="/shop" element={<ShopPage />} />
               <Route path="/profile" element={<ProfilePage />} />

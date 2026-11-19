@@ -50,6 +50,9 @@ export function SideBar({ className = '' }: { className?: string }) {
           <span className="text-2xl">📡</span> REPASO
           {due > 0 && <span className="ml-auto rounded-full bg-vault-red px-1.5 text-xs text-vault-950">{due}</span>}
         </NavLink>
+        <NavLink to="/radio" className={linkCls} onClick={() => sfx.tap()}>
+          <span className="text-2xl">📻</span> RADIO
+        </NavLink>
         <NavLink to="/archive" className={linkCls} onClick={() => sfx.tap()}>
           <span className="text-2xl">🗄️</span> ARCHIVO
         </NavLink>
