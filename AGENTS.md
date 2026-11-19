@@ -73,8 +73,9 @@ npm run test         # Vitest (50 tests: pinyin, SRS, retos, logros, integridad 
 npm run audio        # genera los MP3 que falten (usa src/content como fuente de verdad)
 npm run audio:force  # regenera TODOS los mp3
 npm run icons        # rasteriza favicon.svg → PNGs (icon-192/512, maskable, apple-touch)
-                       # el 中 del icono es GEOMETRÍA (sin <text>): el CI no tiene fuentes chinas
-                       # y un <text> rasteriza como tofu "4E2D". Nunca poner texto en el SVG.
+                       # el carácter del icono (对) es GEOMETRÍA (sin <text>): el CI no tiene
+                       # fuentes chinas y un <text> rasteriza como tofu "4E2D". Nunca poner
+                       # texto en el SVG.
 ```
 
 **Regla de oro del contenido:** cada vez que se añadan/editen palabras o frases (`src/content/**`),

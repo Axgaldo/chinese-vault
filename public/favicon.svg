@@ -25,11 +25,14 @@
   </g>
   <!-- Pantalla del terminal -->
   <circle cx="32" cy="32" r="19" fill="#030804" stroke="#1d7a38" stroke-width="1.5"/>
-  <!-- 中 dibujado con geometría (sin fuentes: rasteriza igual en cualquier máquina) -->
-  <g stroke="#3dff70" stroke-width="4.6" stroke-linecap="square" fill="none">
-    <!-- caja 口 -->
-    <path d="M19 22.5 h26 M19 41.5 h26 M19 22.5 v19 M45 22.5 v19"/>
-    <!-- trazo vertical central -->
-    <path d="M32 14.5 v35"/>
+  <!-- 对 (duì, "correcto") dibujado con geometría (sin fuentes) -->
+  <g stroke="#3dff70" stroke-width="4.4" stroke-linecap="square" fill="none">
+    <!-- 又: 横撇 + 捺 -->
+    <path d="M18.5 29 L25 27 L20 41"/>
+    <path d="M24 30 L31 41"/>
+    <!-- 寸: 横 + 竖钩 + 点 -->
+    <path d="M33.5 26.5 L46 26.5"/>
+    <path d="M40.5 23.5 L40.5 40 L37.5 38"/>
+    <path d="M35.5 31 L37.5 33.5" stroke-linecap="round"/>
   </g>
 </svg>
