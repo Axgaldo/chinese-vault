@@ -16,6 +16,7 @@ import { useProgress } from '../stores/useProgress'
 import { useAuth } from '../stores/useAuth'
 import { rankFor, SCRIPT_MODES, type ScriptMode, VFX_OPTIONS } from '../types/progress'
 import { BODY_FONTS } from '../types/progress'
+import { THEMES } from '../lib/shop'
 import { Btn, Chip, GithubMark, Meter, Panel, Prompt, SectionTitle, Toggle } from '../components/ui'
 
 export function ProfilePage() {
@@ -43,8 +44,10 @@ export function ProfilePage() {
   const bestStreak = useProgress((s) => s.bestStreak)
   const ownedVfx = useProgress((s) => s.ownedVfx)
   const ownedFonts = useProgress((s) => s.ownedFonts)
+  const ownedThemes = useProgress((s) => s.ownedThemes)
   const equipVfx = useProgress((s) => s.equipVfx)
   const equipFont = useProgress((s) => s.equipFont)
+  const equipTheme = useProgress((s) => s.equipTheme)
   const adminMode = useProgress((s) => s.settings.adminMode)
 
   /** Días que le quedan a la cuenta anónima (Firebase la borra a los 30) */
@@ -425,6 +428,35 @@ export function ProfilePage() {
         />
 
         <div className="border-t border-vault-700 pt-3">
+          <p className="mb-1 text-sm">Tema del terminal</p>
+          <div className="flex flex-wrap gap-1">
+            {THEMES.filter((t) => adminMode || ownedThemes.includes(t.id)).map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                title={t.desc}
+                className={`choice flex items-center gap-1.5 rounded px-2.5 py-1 font-display text-sm ${
+                  settings.theme === t.id ? 'choice-selected text-vault-300' : 'text-vault-600'
+                }`}
+                onClick={() => {
+                  sfx.tap()
+                  equipTheme(t.id)
+                }}
+              >
+                <span
+                  className="inline-block h-2.5 w-2.5 rounded-full border border-vault-700"
+                  style={{ background: t.swatch }}
+                />
+                {t.name}
+              </button>
+            ))}
+          </div>
+          <p className="mt-1 text-xs text-vault-600">
+            {adminMode ? '👁 supervisor: todo el catálogo a mano' : 'los temas faltantes se compran en la Tienda'}
+          </p>
+        </div>
+
+        <div className="border-t border-vault-700 pt-3">
           <p className="mb-1 text-sm">VFX del terminal</p>
           <div className="flex flex-wrap gap-1">
             {VFX_OPTIONS.filter((v) => adminMode || ownedVfx.includes(v.id)).map((v) => (
@@ -475,7 +507,7 @@ export function ProfilePage() {
         </div>
 
         <p className="border-t border-vault-700 pt-3 text-xs text-vault-600">
-          el tema de color se equipa en la Tienda del Refugio
+          temas, letras y VFX sin comprar se consiguen en la Tienda del Refugio
         </p>
       </Panel>
 

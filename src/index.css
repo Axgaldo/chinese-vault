@@ -200,18 +200,18 @@ html[data-theme='notebook'] {
   --color-vault-900: #f5efdd;
   --color-vault-850: #e9e0c8;
   --color-vault-800: #d8c9a4;
-  --color-vault-700: #c4b28a;
-  --color-vault-600: #8a7a58;
-  --color-vault-500: #b3541e;
-  --color-vault-400: #c0392b;
-  --color-vault-300: #9a2f22;
-  --color-vault-200: #3a3226;
-  --color-vault-100: #2b241a;
+  --color-vault-700: #b3a17c;
+  --color-vault-600: #6e5f42;
+  --color-vault-500: #8f4216;
+  --color-vault-400: #a03324;
+  --color-vault-300: #7c1f12;
+  --color-vault-200: #241c10;
+  --color-vault-100: #17110a;
 }
 
 html[data-theme='notebook'] body {
   background: #efe7d2;
-  color: #3a3226;
+  color: #17110a;
 }
 
 html[data-theme='notebook'] .glow,
@@ -236,7 +236,7 @@ html[data-theme='notebook'] .panel-read {
     #f9f3e3 25px,
     #e3d5b4 26px
   );
-  border-color: #b3541e;
+  border-color: #a03324;
 }
 
 html[data-theme='notebook'] .meter {
@@ -247,46 +247,58 @@ html[data-theme='notebook'] .choice {
   background: #f7f1df;
 }
 
-/* Atompunk Frío: aceró y cian */
+/* Atompunk Frío: synthwave — azul eléctrico y magenta */
 html[data-theme='atompunk'] {
-  --color-vault-950: #04090f;
-  --color-vault-900: #061019;
-  --color-vault-850: #081522;
-  --color-vault-800: #0e2130;
-  --color-vault-700: #1c4258;
-  --color-vault-600: #3f7d9e;
+  --color-vault-950: #05040f;
+  --color-vault-900: #0a0720;
+  --color-vault-850: #0f0a2e;
+  --color-vault-800: #181040;
+  --color-vault-700: #2a1c6e;
+  --color-vault-600: #5732d9;
   --color-vault-500: #57c7ff;
   --color-vault-400: #7cd4ff;
   --color-vault-300: #a8e2ff;
   --color-vault-200: #cdeeff;
   --color-vault-100: #eaf7ff;
+  /* acentos: el magenta manda, cian y violeta de refuerzo */
+  --color-vault-amber: #ff4fd8;
+  --color-vault-red: #ff5c8a;
+  --color-vault-teal: #57e6ff;
+  --color-vault-purple: #b388ff;
 }
 
 html[data-theme='atompunk'] body {
   background:
-    radial-gradient(ellipse 120% 80% at 50% -10%, #0c2233 0%, transparent 60%),
-    #04090f;
+    radial-gradient(ellipse 120% 80% at 50% -10%, #1a0f4d 0%, transparent 60%),
+    radial-gradient(ellipse 90% 60% at 85% 110%, rgba(255, 79, 216, 0.08) 0%, transparent 55%),
+    #05040f;
 }
 
-/* Cálido: crema y naranja de tarde */
+/* Cálido: atardecer — naranjas, corales y ámbar combinados */
 html[data-theme='calido'] {
-  --color-vault-950: #120903;
-  --color-vault-900: #1a0e05;
-  --color-vault-850: #221206;
-  --color-vault-800: #33190a;
-  --color-vault-700: #6b3a1a;
-  --color-vault-600: #a86a3f;
-  --color-vault-500: #e8925c;
-  --color-vault-400: #ffab7a;
-  --color-vault-300: #ffc4a0;
-  --color-vault-200: #ffdcc4;
-  --color-vault-100: #ffeee1;
+  --color-vault-950: #150a04;
+  --color-vault-900: #1d0e05;
+  --color-vault-850: #261206;
+  --color-vault-800: #38190a;
+  --color-vault-700: #7a3d16;
+  --color-vault-600: #c1712f;
+  --color-vault-500: #ffab7a;
+  --color-vault-400: #ffc4a0;
+  --color-vault-300: #ffd9bf;
+  --color-vault-200: #ffe8d6;
+  --color-vault-100: #fff3e8;
+  /* acentos: coral, dorado y rosa atardecer */
+  --color-vault-amber: #ffb000;
+  --color-vault-red: #ff7a5c;
+  --color-vault-teal: #ffd28a;
+  --color-vault-purple: #ff9a8a;
 }
 
 html[data-theme='calido'] body {
   background:
-    radial-gradient(ellipse 120% 80% at 50% -10%, #2e1a0a 0%, transparent 60%),
-    #120903;
+    radial-gradient(ellipse 120% 80% at 50% -10%, #47220c 0%, transparent 60%),
+    radial-gradient(ellipse 90% 60% at 85% 110%, rgba(255, 122, 92, 0.07) 0%, transparent 55%),
+    #150a04;
 }
 
 /* ── Alto contraste (accesibilidad): todo el texto en blanco sobre negro ──── */
