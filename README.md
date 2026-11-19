@@ -89,10 +89,21 @@ en GitHub Pages.
 Puesta en marcha (una sola vez):
 
 1. Repo → **Settings → Pages → Source: "GitHub Actions"**.
-2. Haz push a `main`; el workflow construye y despliega solo (primera vez: ~2 min).
-3. Como usa tu dominio de Pages (`https://axgaldo.github.io/chinese-vault/`), añádelo en
-   **Firebase → Authentication → Settings → Authorized domains** para que el login de Google
-   funcione también en producción.
+2. Para que el **login con Google funcione en la web publicada**, el workflow necesita tu
+   configuración de Firebase (el `.env` no se commitea al repo):
+   - Repo → **Settings → Secrets and variables → Actions → "New repository secret"**
+   - Nombre: **`FIREBASE_ENV`**
+   - Valor: **pega el contenido completo de tu `.env` local** (las 6 líneas `VITE_FB_...`)
+   - Haz push (o repo → Actions → *Deploy to GitHub Pages* → *Run workflow*).
+3. Añade tu dominio de Pages (`axgaldo.github.io`) en
+   **Firebase → Authentication → Settings → Authorized domains** (imprescindible: sin esto,
+   Google bloquea el login desde ese dominio).
+4. Sin el secret, la app se publica igualmente en **modo local** (el deploy nunca se rompe).
+
+> Nota de seguridad: la configuración web de Firebase está diseñada para ser pública (va
+> embebida en el JS que recibe cualquier visitante). La protección real son las reglas de
+> Firestore (solo tu uid lee/escribe tu documento), el login de Google y los dominios
+> autorizados. Usamos secrets por higiene, para que bots de GitHub no escaneen la clave.
 
 Para simular el build de Pages en local: `npm run build:pages && npm run preview` (con
 `dist/` ya generado, ábrelo vía `npx serve dist` para respetar la subcarpeta).

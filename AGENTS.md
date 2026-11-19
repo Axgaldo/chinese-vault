@@ -305,11 +305,13 @@ escritura de caracteres (trazos), estadísticas con gráficas, PWA iOS pulida.
 
 ## Despliegue (GitHub Pages)
 
-- Workflow `.github/workflows/deploy.yml`: push a main → `npm ci` → `npm run audio` (los MP3 se
-  regeneran en CI, nunca en Git) → `npm run build:pages` (base `/chinese-vault/` vía
+- Workflow `.github/workflows/deploy.yml`: push a main → `npm ci` → **escribe `.env` desde el
+  secret `FIREBASE_ENV`** (Settings → Secrets → Actions; vacío = modo local) → `npm run audio`
+  (los MP3 se regeneran en CI, nunca en Git) → `npm run build:pages` (base `/chinese-vault/` vía
   `VITE_BASE_PATH` y cross-env) → `actions/deploy-pages`.
-- Configuración única del repo: **Settings → Pages → Source: GitHub Actions**.
-- Al usar dominio de Pages, añadirlo a Firebase → Authentication → Authorized domains.
+- Configuración única del repo: **Settings → Pages → Source: GitHub Actions** + secret
+  `FIREBASE_ENV` (contenido del `.env` pegado tal cual) + dominio de Pages en
+  Firebase → Authentication → Authorized domains.
 - HashRouter + base: no necesita rewrites ni 404.html.
 - La app funciona en escritorio (≥lg: sidebar + contenido, NavBar inferior solo en móvil).
 

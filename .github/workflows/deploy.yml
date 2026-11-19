@@ -33,6 +33,14 @@ jobs:
       - name: Instalar dependencias
         run: npm ci
 
+      # Firebase: el .env no vive en el repo — se inyecta desde el secret FIREBASE_ENV
+      # (Settings → Secrets and variables → Actions). Si el secret está vacío,
+      # la app se compila en modo local sin romper el deploy.
+      - name: Escribir .env de Firebase (desde secrets)
+        env:
+          FIREBASE_ENV: ${{ secrets.FIREBASE_ENV }}
+        run: echo "$FIREBASE_ENV" > .env
+
       - name: Tests (vitest)
         run: npm run test
 
