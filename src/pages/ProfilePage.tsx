@@ -26,7 +26,7 @@ export function ProfilePage() {
   const settings = useProgress((s) => s.settings)
   const setSettings = useProgress((s) => s.setSettings)
   const reset = useProgress((s) => s.reset)
-  const { mode, email, uid } = useAuth()
+  const { mode, email, uid, ready } = useAuth()
 
   const [authMsg, setAuthMsg] = useState<string | null>(null)
   const [confirmReset, setConfirmReset] = useState(false)
@@ -35,6 +35,14 @@ export function ProfilePage() {
   const seenCount = seenEntries(completed).length
   const achievements = useProgress((s) => s.achievements)
   const unlockedCount = Object.keys(achievements).length
+  const anonCreatedAt = useAuth((s) => s.anonCreatedAt)
+
+  /** Días que le quedan a la cuenta anónima (Firebase la borra a los 30) */
+  const anonDaysLeft = (() => {
+    if (!anonCreatedAt) return null
+    const msLeft = new Date(anonCreatedAt).getTime() + 30 * 86_400_000 - Date.now()
+    return Math.ceil(msLeft / 86_400_000)
+  })()
 
   /** Errores de Google Sign-In traducidos al idioma del refugio */
   const googleError = (code: string): string => {
@@ -59,6 +67,8 @@ export function ProfilePage() {
    * ENTRAR CON GOOGLE:
    * • si la sesión es anónima → linkWithPopup (mismo uid: el progreso local sube sin perder nada)
    * • si no hay sesión → signInWithPopup (recupera el progreso de la nube en este dispositivo)
+   * Tras resolver, el estado de sesión se aplica EN CALIENTE (sin depender del listener,
+   * que a veces llega tarde: bug del "hay que refrescar a mano").
    */
   const googleSignIn = async () => {
     const fb = await loadFirebase()
@@ -69,11 +79,15 @@ export function ProfilePage() {
       const user = fb.auth.currentUser
       if (user?.isAnonymous) {
         await linkWithPopup(user, provider)
-        setAuthMsg('Progreso vinculado a tu cuenta de Google ✓ te sigue en cualquier dispositivo')
       } else {
         await signInWithPopup(fb.auth, provider)
-        setAuthMsg('Sesión iniciada con Google ✓')
       }
+      // aplicar el estado de sesión inmediatamente
+      const u = fb.auth.currentUser
+      if (u) {
+        useAuth.getState().set(u.email ? 'account' : 'anon', u.uid, u.email, u.metadata.creationTime)
+      }
+      setAuthMsg('Progreso sincronizado con Google ✓ ya te sigue en cualquier dispositivo')
     } catch (err) {
       setAuthMsg(googleError((err as { code?: string })?.code ?? ''))
     }
@@ -137,7 +151,11 @@ export function ProfilePage() {
           </p>
         )}
 
-        {firebaseEnabled && mode === 'account' && (
+        {firebaseEnabled && !ready && (
+          <p className="text-sm text-vault-600">conectando con la nube…</p>
+        )}
+
+        {firebaseEnabled && ready && mode === 'account' && (
           <div className="space-y-2">
             <p className="text-sm">
               CUENTA DE GOOGLE: <span className="text-vault-300">{email}</span>
@@ -148,12 +166,26 @@ export function ProfilePage() {
           </div>
         )}
 
-        {firebaseEnabled && mode === 'anon' && (
+        {firebaseEnabled && ready && mode === 'anon' && (
           <div className="space-y-2">
             <p className="text-sm text-vault-500">
               HABITANTE ANÓNIMO ({uid?.slice(0, 8)}) — el progreso se guarda en la nube con ese id.
               Entra con Google para llevarlo a cualquier dispositivo (sin perder nada):
             </p>
+            {anonDaysLeft !== null && (
+              <p className="text-sm text-vault-amber">
+                ⚠ tu habitante anónimo{' '}
+                {anonDaysLeft > 0 ? (
+                  <>
+                    caduca en <span className="font-display text-lg">{anonDaysLeft}</span> día
+                    {anonDaysLeft === 1 ? '' : 's'}
+                  </>
+                ) : (
+                  'caduca HOY'
+                )}{' '}
+                — Firebase lo borrará: entra con Google para hacerlo permanente
+              </p>
+            )}
             <Btn className="w-full" onClick={() => void googleSignIn()}>
               <span className="mr-2">🔴</span> ENTRAR CON GOOGLE ▸
             </Btn>

@@ -7,11 +7,11 @@
    ───────────────────────────────────────────────────────────────────────────── */
 
 @theme {
-  /* Fósforo verde */
+  /* Fósforo verde (recuadros oscurecidos ~12% para mejor lectura) */
   --color-vault-950: #030804;
-  --color-vault-900: #071309;
-  --color-vault-850: #0a1a0d;
-  --color-vault-800: #0c2410;
+  --color-vault-900: #050e07;
+  --color-vault-850: #081509;
+  --color-vault-800: #0a1f0c;
   --color-vault-700: #123017;
   --color-vault-600: #1d7a38;
   --color-vault-500: #2fae52;
@@ -166,10 +166,10 @@ html.cv-contrast .meter {
 
 /* ── Letra del texto general (Ajustes → Apariencia) ──────────────────────── */
 
-/* Pixel (VT323) es ópticamente más pequeña: escala el raíz para agrandar
-   todo el texto rem-basado de la UI en ~25% (equivalente a +2-3 pts) */
+/* Pixel (VT323) es ópticamente más pequeña: escala el raíz (18px) para
+   agrandar todo el texto rem-basado de la UI */
 html[data-font='pixel'] {
-  font-size: 125%;
+  font-size: 112.5%;
 }
 
 html[data-font='pixel'] body {

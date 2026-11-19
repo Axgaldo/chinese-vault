@@ -11,11 +11,11 @@ const linkCls = ({ isActive }: { isActive: boolean }) =>
     isActive ? 'text-vault-400 glow' : 'text-vault-600'
   }`
 
-export function NavBar() {
+export function NavBar({ className = '' }: { className?: string }) {
   const due = useProgress((s) => Object.values(s.srs).filter((c) => c.due <= Date.now()).length)
 
   return (
-    <nav className="sticky bottom-0 z-10 border-t border-vault-800 bg-vault-950/95 backdrop-blur">
+    <nav className={`sticky bottom-0 z-10 border-t border-vault-800 bg-vault-950/95 backdrop-blur ${className}`}>
       <div className="grid grid-cols-4">
         <NavLink to="/" className={linkCls} onClick={() => sfx.tap()}>
           <span className="text-2xl">🗺️</span>

@@ -56,7 +56,9 @@ export function initSync() {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         uid = user.uid
-        useAuth.getState().set(user.email ? 'account' : 'anon', user.uid, user.email)
+        useAuth
+          .getState()
+          .set(user.email ? 'account' : 'anon', user.uid, user.email, user.metadata.creationTime)
         void (async () => {
           try {
             const snap = await getDoc(doc(db, 'users', user.uid))

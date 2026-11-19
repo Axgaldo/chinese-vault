@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { BootScreen } from './components/BootScreen'
 import { NavBar } from './components/NavBar'
+import { SideBar } from './components/SideBar'
 import { useToasts } from './stores/useToasts'
 import { useProgress } from './stores/useProgress'
 import { ArchivePage } from './pages/ArchivePage'
@@ -62,23 +63,26 @@ export default function App() {
         </>
       )}
 
-      {/* carcasa del dispositivo */}
+      {/* carcasa: móvil (columna) · escritorio ≥lg (sidebar + contenido) */}
       <div
-        className={`relative mx-auto flex min-h-dvh w-full max-w-[460px] flex-col md:my-4 md:min-h-[calc(100dvh-2rem)] md:border-x md:border-vault-800 ${
+        className={`relative mx-auto flex min-h-dvh w-full max-w-[460px] flex-col md:max-w-[560px] md:border-x md:border-vault-800 lg:grid lg:max-w-5xl lg:grid-cols-[260px_1fr] lg:border-vault-800 ${
           crt ? 'crt-flicker' : ''
         }`}
       >
-        <main className="flex-1">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/lesson/:lessonId" element={<LessonPage />} />
-            <Route path="/review" element={<ReviewPage />} />
-            <Route path="/archive" element={<ArchivePage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </main>
-        {!inLesson && <NavBar />}
+        <SideBar className="hidden lg:flex" />
+        <div className="flex min-h-dvh flex-1 flex-col">
+          <main className="mx-auto flex w-full max-w-xl flex-1 flex-col">
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/lesson/:lessonId" element={<LessonPage />} />
+              <Route path="/review" element={<ReviewPage />} />
+              <Route path="/archive" element={<ArchivePage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </main>
+          {!inLesson && <NavBar className="lg:hidden" />}
+        </div>
       </div>
 
       <ToastStack />

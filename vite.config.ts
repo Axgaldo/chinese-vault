@@ -3,8 +3,15 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
+/**
+ * Base path: '/' en local. Para GitHub Pages se compila con
+ * `npm run build:pages` (VITE_BASE_PATH=/chinese-vault/).
+ */
+const base = process.env.VITE_BASE_PATH ?? '/'
+
 // https://vite.dev/config/
 export default defineConfig({
+  base,
   plugins: [
     react(),
     tailwindcss(),
@@ -18,16 +25,16 @@ export default defineConfig({
           'Aprende chino mandarín desde cero en tu refugio: tonos, pinyin, HSK 0-1 y retos diarios. Todo en español.',
         lang: 'es',
         dir: 'ltr',
-        start_url: '/',
-        scope: '/',
+        start_url: base,
+        scope: base,
         display: 'standalone',
         orientation: 'portrait',
         theme_color: '#030804',
         background_color: '#030804',
         categories: ['education'],
         icons: [
-          { src: '/favicon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
-          { src: '/favicon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'maskable' },
+          { src: `${base}favicon.svg`, sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
+          { src: `${base}favicon.svg`, sizes: 'any', type: 'image/svg+xml', purpose: 'maskable' },
         ],
       },
       workbox: {

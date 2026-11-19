@@ -1,5 +1,8 @@
 # Chinese Vault ☢
 
+[![Deploy to GitHub Pages](https://github.com/YOUR-USER/chinese-vault/actions/workflows/deploy.yml/badge.svg)](https://github.com/YOUR-USER/chinese-vault/actions/workflows/deploy.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
+
 **Aprende chino mandarín desde cero, en español, dentro de tu refugio.**
 
 Chinese Vault es una web-app con estética de terminal post-apocalíptico (hola, Fallout 👋) para
@@ -61,7 +64,25 @@ npm run dev       # http://localhost:5173
 
 > **PWA offline:** el service worker se genera al hacer `npm run build` (en `dev` no hace falta).
 > Sirve `dist/` con cualquier hosting estático y la app instalará como app con su icono,
-> funcionando sin conexión. Con Firebase Hosting: `npm i -g firebase-tools && firebase init hosting && firebase deploy`.
+> funcionando sin conexión.
+
+## Despliegue a GitHub Pages (automático)
+
+El repo incluye el workflow `.github/workflows/deploy.yml`: en cada push a `main` compila la app
+(con `base = /chinese-vault/`), **regenera los MP3** del curso (no viven en Git) y publica `dist/`
+en GitHub Pages.
+
+Puesta en marcha (una sola vez):
+
+1. Repo → **Settings → Pages → Source: "GitHub Actions"**.
+2. Haz push a `main`; el workflow construye y despliega solo (primera vez: ~2 min).
+3. Como usa tu dominio de Pages (`https://tuusuario.github.io/chinese-vault/`), añádelo en
+   **Firebase → Authentication → Settings → Authorized domains** para que el login de Google
+   funcione también en producción.
+4. Sustituye `YOUR-USER` por tu usuario de GitHub en los badges de arriba.
+
+Para simular el build de Pages en local: `npm run build:pages && npm run preview` (con
+`dist/` ya generado, ábrelo vía `npx serve dist` para respetar la subcarpeta).
 
 ## Cuenta en la nube (opcional y gratis)
 

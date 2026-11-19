@@ -246,3 +246,24 @@ con frases completas.
   inofensivo, el paquete funciona igual.
 - El chunk de Firebase pesa ~580KB (gzip ~173KB) y solo se descarga con `.env` activo.
 - `dialog`/`confirm` nativos: no usar; hay confirmaciones inline ya hechas.
+
+## Despliegue (GitHub Pages)
+
+- Workflow `.github/workflows/deploy.yml`: push a main → `npm ci` → `npm run audio` (los MP3 se
+  regeneran en CI, nunca en Git) → `npm run build:pages` (base `/chinese-vault/` vía
+  `VITE_BASE_PATH` y cross-env) → `actions/deploy-pages`.
+- Configuración única del repo: **Settings → Pages → Source: GitHub Actions**.
+- Al usar dominio de Pages, añadirlo a Firebase → Authentication → Authorized domains.
+- HashRouter + base: no necesita rewrites ni 404.html.
+- La app funciona en escritorio (≥lg: sidebar + contenido, NavBar inferior solo en móvil).
+
+## Sobre Firebase y el plan Blaze
+
+- Auth anónima: no es un riesgo de seguridad por sí misma — el uid anónimo es un secreto
+  local del dispositivo y las reglas de Firestore solo dejan leer/escribir SU documento al uid
+  propietario. El único "riesgo" real es de PÉRDIDA: si activas la caducidad de 30 días y no
+  pasas a Google a tiempo, Firebase borra el usuario anónimo y la nube queda huérfana (el
+  progreso local en localStorage sigue a salvo). El Perfil muestra la cuenta atrás.
+- Blaze NO hace falta para nada de lo que usa la app (Auth + Firestore entran gratis también
+  en Blaze). Hazlo solo si algún día queremos Storage (ficheros binarios de usuarios) o Cloud
+  Functions, y SIEMPRE con budget alert configurado (console → Usage and billing).
