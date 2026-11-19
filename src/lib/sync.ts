@@ -19,6 +19,8 @@ const PUSH_DEBOUNCE_MS = 3000
 
 let uid: string | null = null
 let pushTimer: ReturnType<typeof setTimeout> | null = null
+/** El próximo inicio de sesión explícito debe priorizar la nube (recuperación de cuenta) */
+let cloudPreferred = false
 
 async function pushProgress(db: import('firebase/firestore').Firestore) {
   if (!uid) return
@@ -59,6 +61,10 @@ export function initSync() {
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
+        // Política: el inicio de sesión EXPLÍCITO con Google prioriza la nube
+        // (recuperas tu cuenta tal cual estaba en la base de datos).
+        const preferCloud = cloudPreferred && Boolean(user.email)
+        cloudPreferred = false
         uid = user.uid
         useAuth
           .getState()
@@ -75,14 +81,14 @@ export function initSync() {
               Object.keys(local.srs).length === 0 &&
               local.xp === 0
 
-            if (remote?.progress && (remote.progress.updatedAt ?? 0) > local.updatedAt) {
-              // la nube va por delante: adoptar
+            if (remote?.progress && (preferCloud || (remote.progress.updatedAt ?? 0) > local.updatedAt)) {
+              // la nube manda: adoptar (siempre al iniciar sesión explícito con cuenta)
               useProgress.getState().hydrate(remote.progress)
             } else if (localEmpty && remote?.progress) {
               // el local se vació por un accidente pero la nube tiene progreso: RECUPERAR
               console.warn('[vault] local vacío: recuperando progreso desde la nube')
               useProgress.getState().hydrate(remote.progress)
-            } else if (!localEmpty || !remote?.progress) {
+            } else if (!localEmpty) {
               // el local manda (o el remoto no existe): asegurar que la nube se pinta
               schedulePush()
             }
@@ -104,4 +110,9 @@ export function initSync() {
   useProgress.subscribe((state, prev) => {
     if (state.updatedAt !== prev.updatedAt) schedulePush()
   })
+}
+
+/** Marca el próximo inicio de sesión como "recuperación de cuenta": la nube prioriza */
+export function preferCloudOnNextAuth() {
+  cloudPreferred = true
 }

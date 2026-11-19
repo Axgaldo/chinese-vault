@@ -9,6 +9,7 @@ import { ACHIEVEMENTS } from '../lib/achievements'
 import { speakHanzi } from '../lib/audio'
 import { sfx } from '../lib/sfx'
 import { firebaseEnabled, loadFirebase } from '../lib/firebase'
+import { preferCloudOnNextAuth } from '../lib/sync'
 import { APP_VERSION, GITHUB_URL, GITHUB_USER } from '../lib/version'
 import { useProgress } from '../stores/useProgress'
 import { useAuth } from '../stores/useAuth'
@@ -80,7 +81,8 @@ export function ProfilePage() {
     })
     .filter((s) => s.done > 0)
 
-  /** Errores de Google Sign-In traducidos al idioma del refugio */
+  /** Errores de Google Sign-In traducidos al idioma del refugio (el código va SIEMPRE
+   *  visible entre paréntesis para poder diagnosticar) */
   const googleError = (code: string): string => {
     switch (code) {
       case 'auth/popup-closed-by-user':
@@ -89,22 +91,26 @@ export function ProfilePage() {
       case 'auth/popup-blocked':
         return 'El navegador bloqueó la ventana emergente: permite pop-ups para esta web.'
       case 'auth/operation-not-allowed':
-        return 'Proveedor no activado: enciende Google en Authentication → Sign-in method (consola de Firebase).'
+      case 'auth/configuration-not-found':
+        return 'Proveedor Google no activo: enciéndelo en Authentication → Sign-in method (consola de Firebase).'
       case 'auth/unauthorized-domain':
         return 'Dominio no autorizado: añádelo en Authentication → Settings → Authorized domains.'
+      case 'auth/api-key-not-valid':
+        return 'Las claves del .env no son válidas: revisa la config de tu app web en Firebase.'
       case 'auth/network-request-failed':
         return 'Problema de red al hablar con Google. Revisa tu conexión.'
+      case 'auth/internal-error':
+        return 'Error interno de Firebase. Suele resolverse esperando un minuto y reintentando.'
       default:
-        return 'No se pudo completar la operación. Inténtalo de nuevo.'
+        return 'No se pudo completar la operación.'
     }
   }
 
   /**
    * ENTRAR CON GOOGLE:
+   * • si ya hay sesión de Google activa → no se re-autentica (evita errores de popup)
    * • si la sesión es anónima → linkWithPopup (mismo uid: el progreso local sube sin perder nada)
-   * • si no hay sesión → signInWithPopup (recupera el progreso de la nube en este dispositivo)
-   * Tras resolver, el estado de sesión se aplica EN CALIENTE (sin depender del listener,
-   * que a veces llega tarde: bug del "hay que refrescar a mano").
+   * • si no hay sesión → signInWithPopup (la NUBE PRIORIZA: recupera tu cuenta tal cual)
    */
   const googleSignIn = async () => {
     const fb = await loadFirebase()
@@ -113,9 +119,18 @@ export function ProfilePage() {
     const provider = new GoogleAuthProvider()
     try {
       const user = fb.auth.currentUser
+      if (user && !user.isAnonymous) {
+        // ya hay sesión activa: simplemente refrescar el estado de la UI
+        useAuth
+          .getState()
+          .set('account', user.uid, user.email, user.metadata.creationTime)
+        setAuthMsg(`Ya tienes sesión activa como ${user.email} ✓`)
+        return
+      }
       if (user?.isAnonymous) {
         await linkWithPopup(user, provider)
       } else {
+        preferCloudOnNextAuth()
         await signInWithPopup(fb.auth, provider)
       }
       // aplicar el estado de sesión inmediatamente
@@ -125,7 +140,8 @@ export function ProfilePage() {
       }
       setAuthMsg('Progreso sincronizado con Google ✓ ya te sigue en cualquier dispositivo')
     } catch (err) {
-      setAuthMsg(googleError((err as { code?: string })?.code ?? ''))
+      const code = (err as { code?: string })?.code ?? 'desconocido'
+      setAuthMsg(`${googleError(code)} (${code})`)
     }
   }
 

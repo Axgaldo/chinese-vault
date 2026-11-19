@@ -166,6 +166,11 @@ Sin `.env` la app es 100% local. Con `.env` (ver `.env.example`):
   `unauthorized-domain` (dominio no añadido en Authentication → Settings).
 - Sincronización **local-first**: debounce 3s tras cada cambio; si el remoto tiene `updatedAt` mayor,
   se adopta el remoto (gana el más reciente).
+- **Política de sesión**: la sesión ANÓNIMA automática es local-first; el inicio de sesión
+  EXPLÍCITO con Google (`preferCloudOnNextAuth`) prioriza LA NUBE (recuperas tu cuenta tal
+  cual estaba en la BBDD, aunque el dispositivo tuviera otro progreso local). Vincular por
+  primera vez (linkWithPopup) conserva el local. Nunca se sube un progreso vacío, y si el
+  local amanece vacío con nube con datos, se RECUPERA desde la nube (anti-reset).
 - Documento: `users/{uid} = { progress: <ProgressState>, updatedAt }`.
 - **Reglas de seguridad** a poner en la consola (la modalidad "prueba" caduca en 30 días):
 
