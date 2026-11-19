@@ -25,5 +25,11 @@
   </g>
   <!-- Pantalla del terminal -->
   <circle cx="32" cy="32" r="19" fill="#030804" stroke="#1d7a38" stroke-width="1.5"/>
-  <text x="32" y="40.5" font-size="24" text-anchor="middle" fill="#3dff70" font-family="'Noto Sans SC','Microsoft YaHei',sans-serif" font-weight="700">中</text>
+  <!-- 中 dibujado con geometría (sin fuentes: rasteriza igual en cualquier máquina) -->
+  <g stroke="#3dff70" stroke-width="4.6" stroke-linecap="square" fill="none">
+    <!-- caja 口 -->
+    <path d="M19 22.5 h26 M19 41.5 h26 M19 22.5 v19 M45 22.5 v19"/>
+    <!-- trazo vertical central -->
+    <path d="M32 14.5 v35"/>
+  </g>
 </svg>
