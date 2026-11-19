@@ -20,6 +20,7 @@ import { existsSync, mkdirSync, statSync } from 'node:fs'
 import { pipeline } from 'node:stream/promises'
 import { MsEdgeTTS, OUTPUT_FORMAT } from 'msedge-tts'
 import { allLessons, entriesById } from '../src/content'
+import { DIALOGUES } from '../src/lib/dialogues'
 import { pinyinSlug } from '../src/lib/pinyin'
 import type { Sentence } from '../src/types/content'
 
@@ -42,6 +43,10 @@ function sentenceTasks(): Task[] {
     for (const step of lesson.steps) {
       if (step.type === 'build') sentences.push(step.sentence)
     }
+  }
+  // diálogos de la Radio: cada línea es una frase más
+  for (const d of DIALOGUES) {
+    for (const line of d.lines) sentences.push(line)
   }
   const seen = new Set<string>()
   const tasks: Task[] = []

@@ -17,6 +17,7 @@ import { LessonPage } from './pages/LessonPage'
 import { PracticePage } from './pages/PracticePage'
 import { ProfilePage } from './pages/ProfilePage'
 import { RadioPage } from './pages/RadioPage'
+import { DialoguesPage } from './pages/DialoguesPage'
 import { ReviewPage } from './pages/ReviewPage'
 import { ShopPage } from './pages/ShopPage'
 
@@ -83,6 +84,7 @@ export default function App() {
               <Route path="/lesson/:lessonId" element={<LessonPage />} />
               <Route path="/review" element={<ReviewPage />} />
               <Route path="/radio" element={<RadioPage />} />
+              <Route path="/radio/dialogues" element={<DialoguesPage />} />
               <Route path="/practice/:mode/:entryId" element={<PracticePage />} />
               <Route path="/archive" element={<ArchivePage />} />
               <Route path="/shop" element={<ShopPage />} />

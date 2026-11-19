@@ -29,6 +29,28 @@ export interface Sentence {
   es: string
 }
 
+/** Línea de un diálogo de la Radio */
+export interface DialogueLine {
+  /** Hablante corto mostrado: "A" / "B" */
+  who: 'A' | 'B'
+  hanzi: string
+  pinyin: string
+  es: string
+}
+
+/**
+ * Diálogo de la Radio: situación real con 3-6 líneas A/B.
+ * `sector` = id del módulo que lo desbloquea (mismo vocabulario/nivel);
+ * `topic` = etiqueta temática corta para la parrilla.
+ */
+export interface Dialogue {
+  id: string
+  sector: string
+  topic: string
+  title: string
+  lines: DialogueLine[]
+}
+
 /** Apunte de gramática: se guarda en el Archivo del Vault al completar la lección */
 export interface GrammarNote {
   id: string

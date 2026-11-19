@@ -332,6 +332,16 @@ service cloud.firestore {
   comprueba al arrancar, al volver a la app y cada 5 min (main.tsx). Sin servidor: no
   avisa si la app está cerrada del todo (limitación PWA sin push).
 
+- **Diálogos de la Radio 🎭 (v2.7.0)**: `lib/dialogues.ts` (catálogo `DIALOGUES` anclado a
+  sectores: `unlockedDialogues` los desbloquea al completar TODAS las lecciones del sector —
+  cero vocabulario nuevo) + `pages/DialoguesPage.tsx` (ruta `/radio/dialogues`, botón en la
+  portada de la Radio). Flujo: escuchar/leer el diálogo (líneas A/B con audio por línea) →
+  retos por línea (3 tipos rotando por hash: qué significa / ordena la línea / palabra que
+  falta con hueco ＿＿) → resumen. +5 XP por línea (primer intento). Las líneas usan el mismo
+  slug de audio `s-{pinyin}` — `npm run audio` las genera (sentenceTasks las incluye).
+  AÑADIR diálogos = editar DIALOGUES con la MISMA disciplina de pinyin (sandhi en frases,
+  sílabas neutras sin marca) y correr `npm run audio`.
+
 ## Radio del Refugio 📻 y HSK 2 (v2.0.0)
 
 - **Radio** (`lib/radio.ts` + `pages/RadioPage.tsx`, ruta `/radio`, NavBar 6 pestañas):

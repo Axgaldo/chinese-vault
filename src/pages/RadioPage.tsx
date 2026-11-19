@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { modules } from '../content'
 import { speakSentence, speakEntry } from '../lib/audio'
+import { unlockedDialogues } from '../lib/dialogues'
 import {
   buildRadioSession,
   buildToneSession,
@@ -34,6 +35,7 @@ export function RadioPage() {
 
   const sentences = useMemo(() => unlockedSentences(completed), [completed])
   const toneEntries = useMemo(() => tonePool(completed), [completed])
+  const dialoguesReady = useMemo(() => unlockedDialogues(completed).length, [completed])
 
   const [phase, setPhase] = useState<Phase>('programs')
   const [title, setTitle] = useState('')
@@ -104,6 +106,9 @@ export function RadioPage() {
                 </Btn>
                 <Btn variant="amber" onClick={startTones}>
                   🎼 TONOS & MÚSICA ▸
+                </Btn>
+                <Btn onClick={() => navigate('/radio/dialogues')} disabled={dialoguesReady === 0}>
+                  🎭 DIÁLOGOS ({dialoguesReady}) ▸
                 </Btn>
               </div>
             </Panel>
