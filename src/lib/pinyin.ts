@@ -212,3 +212,49 @@ export const toneLabel = (tone: 1 | 2 | 3 | 4 | 5): string =>
     4: 'descendente',
     5: 'neutral',
   })[tone]
+
+/** Trozo coloreable de pinyin: una sílaba con su tono, o texto plano */
+export type PinyinSegment = { syl: string; tone: 1 | 2 | 3 | 4 | 5 } | { raw: string }
+
+/**
+ * Segmentación de pinyin para colorear por tono — el motor de <Pinyin/>.
+ * Cada trozo es una SÍLABA con su tono, o texto plano (espacios, puntuación).
+ * Acepta diacríticos PRECOMPUESTOS (ǐ ǎ ǖ literales del curso) y NFD:
+ * normaliza internamente y devuelve las sílabas en NFC.
+ * (Regresión histórica v2.9: sin el NFD previo, los caracteres precompuestos
+ * no casaban con "letra" y el pinyin perdía TODOS los colores.)
+ */
+export function pinyinSegments(text: string): PinyinSegment[] {
+  const out: PinyinSegment[] = []
+  // NFD primero: 'ǐ' llega como i + acento; abajo solo se reconocen ASCII + marcas
+  const nfd = text.normalize('NFD')
+  const isLetter = (ch: string) => /[a-zA-Z]/.test(ch)
+  const isMark = (ch: string) => /[\u0300-\u036F]/.test(ch)
+  let raw = ''
+  const flushRaw = () => {
+    if (raw) {
+      out.push({ raw })
+      raw = ''
+    }
+  }
+  let i = 0
+  while (i < nfd.length) {
+    if (isLetter(nfd[i]) || isMark(nfd[i])) {
+      let run = ''
+      while (i < nfd.length && (isLetter(nfd[i]) || isMark(nfd[i]))) {
+        run += nfd[i]
+        i++
+      }
+      flushRaw()
+      // recomponer a NFC: syllabify trabaja con las formas literales del curso
+      for (const syl of syllabify(run.normalize('NFC'))) {
+        out.push({ syl: syl.text.normalize('NFC'), tone: syl.tone })
+      }
+    } else {
+      raw += nfd[i]
+      i++
+    }
+  }
+  flushRaw()
+  return out
+}

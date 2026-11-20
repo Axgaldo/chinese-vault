@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   normalizePinyin,
   pinyinMatches,
+  pinyinSegments,
   pinyinSlug,
   stripTones,
   syllabify,
@@ -71,6 +72,56 @@ describe('pinyinSlug', () => {
 
   it('"nǚ" conserva la ü como v con su tono', () => {
     expect(pinyinSlug('nǚ')).toBe('nv3')
+  })
+})
+
+describe('pinyinSegments (coloreado por tono del <Pinyin/>)', () => {
+  it('multisílaba pegada: cada sílaba con SU tono (regresión BUG-06)', () => {
+    expect(pinyinSegments('zhōngwén')).toEqual([
+      { syl: 'zhōng', tone: 1 },
+      { syl: 'wén', tone: 2 },
+    ])
+  })
+
+  it('los diacríticos PREcompuestos del curso no caen sin color (regresión v2.9)', () => {
+    expect(pinyinSegments('nǐ hǎo ma')).toEqual([
+      { syl: 'nǐ', tone: 3 },
+      { raw: ' ' },
+      { syl: 'hǎo', tone: 3 },
+      { raw: ' ' },
+      { syl: 'ma', tone: 5 },
+    ])
+  })
+
+  it('las sílabas salen en NFC (comparables con los literales del curso)', () => {
+    for (const p of pinyinSegments('lǜsè ǚ')) {
+      if ('syl' in p) expect(p.syl).toBe(p.syl.normalize('NFC'))
+    }
+    expect(pinyinSegments('nǚ')).toEqual([{ syl: 'nǚ', tone: 3 }])
+  })
+
+  it('puntuación, espacios y huecos ＿＿ como texto plano', () => {
+    expect(pinyinSegments('mā! má? wǒ ＿＿ le')).toEqual([
+      { syl: 'mā', tone: 1 },
+      { raw: '! ' },
+      { syl: 'má', tone: 2 },
+      { raw: '? ' },
+      { syl: 'wǒ', tone: 3 },
+      { raw: ' ＿＿ ' },
+      { syl: 'le', tone: 5 },
+    ])
+  })
+
+  it('cuarteto del Sector 0: cuatro tonos distintos', () => {
+    expect(pinyinSegments('mā má mǎ mà').map((p) => ('syl' in p ? p.tone : null))).toEqual([
+      1,
+      null,
+      2,
+      null,
+      3,
+      null,
+      4,
+    ])
   })
 })
 
