@@ -13,7 +13,7 @@ import { newlyUnlocked } from '../lib/achievements'
 import { questsForDate, QUEST_POOL } from '../lib/quests'
 import { FONTS, THEMES, VFX } from '../lib/shop'
 import { gradeCard, newCard, type Grade } from '../lib/srs'
-import { toastAchievement, toastCaps, useToasts } from './useToasts'
+import { toastAchievement, toastCaps, toastPurchase, useToasts } from './useToasts'
 import type { BodyFont, DailyStats, ThemeId, VfxId } from '../types/progress'
 import {
   INITIAL_PROGRESS,
@@ -43,6 +43,8 @@ interface ProgressActions {
   gradeEntry(entryId: string, g: Grade): void
   /** Cierra una sesión de repaso: chapas + logros */
   finishReviewSession(): void
+  /** Rueda el día al abrir la app (racha/encargos) sin pagar bono */
+  syncDay(): void
   /** Reclama la recompensa de un encargo de la caravana */
   claimQuest(questId: string): void
   /** Compra un tema de la tienda (gasta chapas) */
@@ -96,17 +98,23 @@ function trimHistory(history: ProgressState['history']): ProgressState['history'
 
 /**
  * Refresco del día: racha, contadores diarios y misiones de la caravana.
- * Devuelve el estado con el día correcto aplicado.
+ * `payBonus`: true en acciones de estudio (paga el bono diario la PRIMERA vez
+ * que rueda el día — bug histórico: completeLesson nunca lo cobraba porque
+ * logActivity ya había rodado el día antes); false al abrir la app (syncDay),
+ * que solo actualiza racha/encargos sin premiar.
  */
-function refreshDay(s: ProgressState): ProgressState {
+function refreshDay(s: ProgressState, payBonus: boolean): ProgressState {
   const today = localISO()
   let next = s
 
-  // racha
+  // racha (si faltaron días, VUELVE A 1: no se conserva la racha rota)
   if (s.lastStudyDay !== today) {
-    const streakDays =
-      s.lastStudyDay === localISO(-1) ? s.streakDays + 1 : Math.max(1, s.streakDays)
+    const streakDays = s.lastStudyDay === localISO(-1) ? s.streakDays + 1 : 1
     next = { ...next, streakDays, lastStudyDay: today, bestStreak: Math.max(s.bestStreak, streakDays) }
+    if (payBonus) {
+      toastCaps(CAPS_DAILY_BONUS, 'bono diario')
+      next = { ...next, caps: next.caps + CAPS_DAILY_BONUS }
+    }
   }
 
   // contadores diarios
@@ -200,13 +208,18 @@ export const useProgress = create<ProgressStore>()(
 
       addXp(n) {
         set((s) => {
-          const withDay = bumpDaily(refreshDay(s), 'xp', n)
+          const withDay = bumpDaily(refreshDay(s, true), 'xp', n)
           return sealAchievements({ ...withDay, xp: s.xp + n, updatedAt: Date.now() })
         })
       },
 
       logActivity(metric, amount) {
-        set((s) => ({ ...bumpDaily(refreshDay(s), metric, amount), updatedAt: Date.now() }))
+        set((s) => ({ ...bumpDaily(refreshDay(s, true), metric, amount), updatedAt: Date.now() }))
+      },
+
+      /** Rueda el día al ABRIR la app (racha/encargos) sin pagar bono */
+      syncDay() {
+        set((s) => (s.lastStudyDay === localISO() && s.quests.date === localISO() ? s : refreshDay(s, false)))
       },
 
       completeLesson(lessonId, stars, accuracy) {
@@ -229,12 +242,10 @@ export const useProgress = create<ProgressStore>()(
             if (!srs[id]) srs[id] = newCard(1)
           }
 
-          // racha + chapas + contadores
-          const day = refreshDay(s)
-          const capsGain =
-            (day.lastStudyDay !== s.lastStudyDay ? CAPS_DAILY_BONUS : 0) +
-            (firstTime ? CAPS_LESSON_NEW : CAPS_LESSON_REPEAT)
-          if (capsGain > 0) toastCaps(capsGain, day.lastStudyDay !== s.lastStudyDay ? 'bono diario' : 'lección completada')
+          // racha + chapas (el bono diario ya lo paga refreshDay al rodar el día)
+          const day = refreshDay(s, true)
+          const capsGain = firstTime ? CAPS_LESSON_NEW : CAPS_LESSON_REPEAT
+          if (capsGain > 0) toastCaps(capsGain, 'lección completada')
 
           let withDay = bumpDaily(day, 'lessons', 1)
           if (stars >= 3) withDay = bumpDaily(withDay, 'perfect', 1)
@@ -244,7 +255,7 @@ export const useProgress = create<ProgressStore>()(
             ...withDay,
             completed,
             srs,
-            caps: s.caps + capsGain,
+            caps: withDay.caps + capsGain,
             updatedAt: Date.now(),
           })
           return sealAchievements(withQuests)
@@ -260,13 +271,14 @@ export const useProgress = create<ProgressStore>()(
 
       finishReviewSession() {
         set((s) => {
-          const day = refreshDay(s)
-          const capsGain = (day.lastStudyDay !== s.lastStudyDay ? CAPS_DAILY_BONUS : 0) + CAPS_REVIEW
-          toastCaps(capsGain, day.lastStudyDay !== s.lastStudyDay ? 'bono diario' : 'repaso completado')
+          // el bono diario ya lo paga refreshDay al rodar el día
+          const day = refreshDay(s, true)
+          const capsGain = CAPS_REVIEW
+          toastCaps(capsGain, 'repaso completado')
           const withQuests = autoClaimQuests({
             ...day,
             reviewsDone: s.reviewsDone + 1,
-            caps: s.caps + capsGain,
+            caps: day.caps + capsGain,
             updatedAt: Date.now(),
           })
           return sealAchievements(withQuests)
@@ -275,15 +287,17 @@ export const useProgress = create<ProgressStore>()(
 
       claimQuest(questId) {
         set((s) => {
-          const item = s.quests.items.find((q) => q.id === questId)
+          // rodar el día (por si la app quedó abierta) SIN pagar bono
+          const day = refreshDay(s, false)
+          const item = day.quests.items.find((q) => q.id === questId)
           const template = QUEST_POOL.find((t) => t.id === questId)
           if (!item || !template || item.claimed || item.progress < template.goal) return s
-          const items = s.quests.items.map((q) => (q.id === questId ? { ...q, claimed: true } : q))
+          const items = day.quests.items.map((q) => (q.id === questId ? { ...q, claimed: true } : q))
           toastCaps(template.caps, `caravana: ${template.title}`)
           return {
-            ...s,
-            quests: { ...s.quests, items },
-            caps: s.caps + template.caps,
+            ...day,
+            quests: { ...day.quests, items },
+            caps: day.caps + template.caps,
             updatedAt: Date.now(),
           }
         })
@@ -294,7 +308,7 @@ export const useProgress = create<ProgressStore>()(
           if (s.ownedThemes.includes(themeId)) return s
           const product = THEMES.find((t) => t.id === themeId)
           if (!product || s.caps < product.price) return s
-          toastCaps(0, `tema adquirido: ${product.name}`)
+          toastPurchase(`tema adquirido: ${product.name}`)
           return {
             ...s,
             caps: s.caps - product.price,
@@ -318,7 +332,7 @@ export const useProgress = create<ProgressStore>()(
           if (s.ownedFonts.includes(fontId)) return s
           const product = FONTS.find((f) => f.id === fontId)
           if (!product || s.caps < product.price) return s
-          toastCaps(0, `fuente adquirida: ${product.name}`)
+          toastPurchase(`fuente adquirida: ${product.name}`)
           return {
             ...s,
             caps: s.caps - product.price,
@@ -341,7 +355,7 @@ export const useProgress = create<ProgressStore>()(
           if (s.ownedVfx.includes(vfxId)) return s
           const product = VFX.find((v) => v.id === vfxId)
           if (!product || s.caps < product.price) return s
-          toastCaps(0, `VFX adquirido: ${product.name}`)
+          toastPurchase(`VFX adquirido: ${product.name}`)
           return {
             ...s,
             caps: s.caps - product.price,
@@ -377,7 +391,27 @@ export const useProgress = create<ProgressStore>()(
       },
 
       hydrate(p) {
-        set({ ...structuredClone(INITIAL_PROGRESS), ...p, updatedAt: Date.now() })
+        set(() => {
+          // MERGE PROFUNDO con los defaults (un documento de Firestore viejo no puede
+          // dejar settings/dailyStats con huecos → NaN/undefined en el modo de escritura)
+          const d = structuredClone(INITIAL_PROGRESS)
+          const merged: ProgressState = {
+            ...d,
+            ...p,
+            bestStreak: Math.max(d.bestStreak, p.bestStreak ?? 0),
+            dailyStats: { ...d.dailyStats, ...(p.dailyStats ?? {}) },
+            quests: p.quests ?? d.quests,
+            ownedThemes: p.ownedThemes ?? d.ownedThemes,
+            ownedFonts: p.ownedFonts ?? d.ownedFonts,
+            ownedVfx: p.ownedVfx ?? d.ownedVfx,
+            history: p.history ?? {},
+            achievements: p.achievements ?? {},
+            completed: p.completed ?? {},
+            srs: p.srs ?? {},
+            settings: { ...d.settings, ...(p.settings ?? {}) },
+          }
+          return { ...merged, updatedAt: Date.now() }
+        })
       },
 
       reset() {
@@ -415,7 +449,8 @@ export const useProgress = create<ProgressStore>()(
         delete (p.settings as Settings & { contrast?: boolean }).contrast
         delete (p.settings as Settings & { crt?: boolean }).crt
         p.bestStreak = Math.max(raw.bestStreak ?? 0, raw.streakDays ?? 0)
-        p.dailyStats = raw.dailyStats ?? emptyStats('')
+        // merge con defaults para que los objetos NUEVOS no lleguen con huecos
+        p.dailyStats = { ...emptyStats(raw.dailyStats?.date ?? ''), ...(raw.dailyStats ?? {}) }
         p.quests = raw.quests ?? { date: '', items: [] }
         p.ownedThemes = raw.ownedThemes ?? ['green']
         p.ownedFonts = raw.ownedFonts ?? ['mono', 'pixel', 'sans']

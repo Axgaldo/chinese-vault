@@ -214,6 +214,16 @@ html[data-theme='notebook'] body {
   color: #17110a;
 }
 
+/* Pinyin por tono: sobre papel claro los tonos claros no se leen →
+   variantes oscuras de los 5 tonos (solo en este tema) */
+html[data-theme='notebook'] {
+  --color-tone-1: #b3261e;
+  --color-tone-2: #8a5a00;
+  --color-tone-3: #00695c;
+  --color-tone-4: #6a2fa0;
+  --color-tone-5: #6e6656;
+}
+
 html[data-theme='notebook'] .glow,
 html[data-theme='notebook'] .glow-soft {
   text-shadow: none;

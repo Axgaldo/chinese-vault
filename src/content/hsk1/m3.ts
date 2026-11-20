@@ -18,7 +18,7 @@ export const m3: VaultModule = {
     // (四, 七, 八, 十 llegaron en el Sector 0: aquí solo se referencian)
     e('w-ling2', '零', 'líng', 'cero', '0️⃣'),
     e('w-yi1', '一', 'yī', 'uno', '1️⃣'),
-    e('w-er4', '二', 'èr', 'dos', '2️⃣', 'para contar se usa 两'),
+    e('w-er4', '二', 'èr', 'dos', '2️⃣', 'para contar cosas (con clasificador) se usa 两'),
     e('w-san1', '三', 'sān', 'tres', '3️⃣'),
     e('w-wu3', '五', 'wǔ', 'cinco', '5️⃣'),
     e('w-liu4', '六', 'liù', 'seis', '6️⃣'),
@@ -26,7 +26,7 @@ export const m3: VaultModule = {
     e('w-liang3', '两', 'liǎng', 'dos (para contar cosas)', '✌️'),
     e('w-ji3', '几', 'jǐ', 'cuántos', '🧮'),
     e('w-duo-shao', '多少', 'duōshao', 'cuánto (precio)', '💰'),
-    e('w-ge4', '个', 'gè', 'clasificador general', '📦', 'se escribe sin tono'),
+    e('w-ge4', '个', 'gè', 'clasificador general', '📦', 'tono neutro en 这个/一个'),
     e('w-sui4', '岁', 'suì', 'años de edad', '🎂'),
     e('w-dian-hua', '电话', 'diànhuà', 'teléfono', '☎️'),
     e('w-hao-ma', '号码', 'hàomǎ', 'número (de teléfono)', '🔢'),
@@ -107,7 +107,7 @@ export const m3: VaultModule = {
       [
         grammar('n-jisui', 'La edad con 岁 (suì)', [
           'La edad no lleva verbo: SUJETO + NÚMERO + 岁. 我二十一岁 es literalmente "yo, veintiún años". Nunca digas "yo SOY veintiún años": el 是 sobra.',
-          '¿Y para preguntar? A los niños: 你几岁？ (nǐ jǐ suì?). Con adultos se suele usar una versión más cortés — la verás más adelante; con 你几岁？ ya te entienden en el refugio.',
+          'Preguntar la edad: TÚ + NÚMERO + 岁. A niños: 你几岁？ A adultos: 你多大？ ("¿qué tan grande eres?") — 多大 es la forma normal entre adultos; 几岁 con niños.',
           '岁 va siempre pegado a su número: 二十一岁, "veintiún años".',
         ], [
           ['我二十一岁。', 'wǒ èrshíyī suì.', 'Tengo veintiún años.'],

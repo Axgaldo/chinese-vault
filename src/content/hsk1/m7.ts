@@ -99,15 +99,15 @@ export const m7: VaultModule = {
         build('我上午喝茶。', 'wǒ shàngwǔ hē chá.', 'Por la mañana tomo té.'),
       ],
       [
-        grammar('n-hora', 'La hora: 点, 半 y 分钟', [
+        grammar('n-hora', 'La hora: 点, 半 y 分', [
           'La hora se dice NÚMERO + 点 (diǎn): 三点 = "las tres en punto". El número delante y la hora detrás, sin "son las" ni relleno.',
           '半 (bàn) = "media": 两点半 = "las dos y media". Ojo, explorador: para la hora el "dos" es 两 (liǎng), nunca 二 — el reloj prefiere 两, como al contar cosas.',
-          'Los minutos van al final con 分钟 (fēnzhōng): 两点二十分钟 = "las dos y veinte". La hora primero, los minutos detrás, siempre.',
+          'Los minutos van al final con 分 (fēn): 两点二十分 = "las dos y veinte". La hora primero, los minutos detrás, siempre. Para el reloj se usa 分; 分钟 (fēnzhōng) es para duraciones.',
           'Y las franjas del día: 上午 (shàngwǔ) es la mañana y 下午 (xiàwǔ) la tarde. Van delante, como toda palabra de tiempo: 我上午喝茶 = "por la mañana tomo té".',
         ], [
           ['现在三点。', 'xiànzài sān diǎn.', 'Son las tres.'],
           ['现在两点半。', 'xiànzài liǎng diǎn bàn.', 'Son las dos y media.'],
-          ['现在两点二十分钟。', 'xiànzài liǎng diǎn èrshí fēnzhōng.', 'Son las dos y veinte.'],
+          ['现在两点二十分。', 'xiànzài liǎng diǎn èrshí fēn.', 'Son las dos y veinte.'],
           ['我上午喝茶。', 'wǒ shàngwǔ hē chá.', 'Por la mañana tomo té.'],
         ]),
       ],

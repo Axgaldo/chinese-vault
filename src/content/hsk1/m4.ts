@@ -46,7 +46,7 @@ export const m4: VaultModule = {
       [
         grammar('n-jia1', '家 (jiā): casa Y familia', [
           '家 significa "casa" y "hogar", pero también "familia": una sola palabra para el lugar y para la gente que vive en él.',
-          'Para decir "mi casa" NO se añade 的. Se dice 我家 (wǒ jiā), literalmente "yo casa": los tuyos y tu techo comparten palabra.',
+          '家 = casa Y familia; para "mi casa" lo normal es 我家 (sin 的), pero 我的家 también es correcto — solo un pelín más enfático.',
           'Tip de morador: pronto dirás "estoy en casa" con 我在家. El refugio siempre reutiliza sus piezas.',
         ], [
           ['我家', 'wǒ jiā', 'mi casa (se dice sin 的)'],

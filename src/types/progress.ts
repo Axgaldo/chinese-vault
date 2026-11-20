@@ -175,7 +175,8 @@ export const INITIAL_PROGRESS: ProgressState = {
   updatedAt: 0,
 }
 
-/** Rangos del refugio por XP (terminología Fallout ES) */
+/** Rangos del refugio por XP (terminología Fallout ES). Reescalados para cubrir
+ *  HSK 0-3 (~25.000 XP de recorrido), no solo el primer 15% del curso. */
 export interface Rank {
   xp: number
   name: string
@@ -183,12 +184,15 @@ export interface Rank {
 
 export const RANKS: Rank[] = [
   { xp: 0, name: 'Morador Errante' },
-  { xp: 120, name: 'Morador del Refugio' },
-  { xp: 300, name: 'Superviviente' },
-  { xp: 600, name: 'Explorador' },
-  { xp: 1000, name: 'Jefe de Caravana' },
-  { xp: 1500, name: 'Miembro de la Hermandad' },
-  { xp: 2200, name: 'Supervisor del Refugio' },
+  { xp: 250, name: 'Morador del Refugio' },
+  { xp: 700, name: 'Superviviente' },
+  { xp: 1500, name: 'Explorador' },
+  { xp: 2800, name: 'Guía de Supervivencia' },
+  { xp: 5000, name: 'Jefe de Caravana' },
+  { xp: 8000, name: 'Saqueador' },
+  { xp: 12000, name: 'Miembro de la Hermandad' },
+  { xp: 17000, name: 'Supervisor del Refugio' },
+  { xp: 23000, name: 'Leyenda del Refugio' },
 ]
 
 export function rankFor(xp: number): { current: Rank; next: Rank | null; progress: number } {

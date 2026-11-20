@@ -24,7 +24,7 @@ export const m5: VaultModule = {
     e('w-yi-yuan', '医院', 'yīyuàn', 'hospital', '🏥'),
     e('w-shang-dian', '商店', 'shāngdiàn', 'tienda', '🏪'),
     e('w-li3', '里', 'lǐ', 'dentro', '📥'),
-    e('w-qing-wen', '请问', 'qǐngwén', 'disculpe, ¿puede decirme?', '🙋', 'pedir + preguntar'),
+    e('w-qing-wen', '请问', 'qǐngwèn', 'disculpe, ¿puede decirme?', '🙋', 'pedir + preguntar'),
   ],
   lessons: [
     lesson(
@@ -45,7 +45,7 @@ export const m5: VaultModule = {
         grammar('n-zai4', '在 (zài): estar en un sitio', [
           'En chino "estar en" tiene verbo propio: SUJETO + 在 + LUGAR. 我在学校 = "yo estoy en la escuela".',
           '¿"Estoy en casa"? 我在家 (wǒ zài jiā), con el 家 del Sector 4 y sin 的.',
-          'En también localiza cosas, no solo a personas: 我的猫在家 = "mi gato está en casa". Una palabra y todo el refugio queda mapeado.',
+          '在 también localiza cosas, no solo a personas: 我的猫在家 = "mi gato está en casa". Una palabra y todo el refugio queda mapeado.',
         ], [
           ['我在家。', 'wǒ zài jiā.', 'Estoy en casa.'],
           ['我的猫和狗在家。', 'wǒ de māo hé gǒu zài jiā.', 'Mi gato y mi perro están en casa.'],
@@ -64,7 +64,7 @@ export const m5: VaultModule = {
         ...drill('w-li3'),
         ...drill('w-qing-wen'),
         noteStep('n-zhe-na'),
-        build('请问，商店在哪儿？', 'qǐngwén, shāngdiàn zài nǎr?', 'Disculpe, ¿dónde está la tienda?'),
+        build('请问，商店在哪儿？', 'qǐngwèn, shāngdiàn zài nǎr?', 'Disculpe, ¿dónde está la tienda?'),
         ...practice('w-peng-you'),
         build('我的朋友在医院里。', 'wǒ de péngyou zài yīyuàn lǐ.', 'Mi amigo está en el hospital.'),
         match('w-zhe4', 'w-na4', 'w-na-er', 'w-li3', 'w-qing-wen'),
@@ -95,7 +95,7 @@ export const m5: VaultModule = {
         { type: 'listen', entry: 'w-zhe4' },
         { type: 'listen', entry: 'w-na4' },
         build('我在学校。', 'wǒ zài xuéxiào.', 'Estoy en la escuela.'),
-        build('请问，商店在哪儿？', 'qǐngwén, shāngdiàn zài nǎr?', 'Disculpe, ¿dónde está la tienda?'),
+        build('请问，商店在哪儿？', 'qǐngwèn, shāngdiàn zài nǎr?', 'Disculpe, ¿dónde está la tienda?'),
         typeP('w-zai4'),
       ],
     ),

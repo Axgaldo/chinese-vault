@@ -29,7 +29,7 @@ export const hsk0: VaultModule = {
   entries: [
     // El cuarteto clásico de "ma"
     e('w-ma1', '妈', 'mā', 'mamá', '👩'),
-    e('w-ma2', '麻', 'má', 'cáñamo (soso)', '🌾'),
+    e('w-ma2', '麻', 'má', 'cáñamo (también: entumecido)', '🌾'),
     e('w-ma3', '马', 'mǎ', 'caballo', '🐴'),
     e('w-ma4', '骂', 'mà', 'regañar', '😤'),
     // Sonidos clave de la L0-2 (los números se consolidan en el Sector 3)
@@ -66,7 +66,7 @@ export const hsk0: VaultModule = {
         grammar('n-tonos', 'Los tonos: la melodía del chino', [
           'El chino es un idioma tonal: la misma sílaba significa cosas distintas según la "melodía" con la que la pronuncies. El tono afecta a toda la sílaba.',
           'Mira el cuarteto clásico con la sílaba "ma":',
-          '1 (alto y plano)   mā  妈  mamá\n2 (ascendente)      má  麻  cáñamo, soso\n3 (baja y sube)     mǎ  马  caballo\n4 (descendente)     mà  骂  regañar',
+          '1 (alto y plano)   mā  妈  mamá\n2 (ascendente)      má  麻  cáñamo\n3 (baja y sube)     mǎ  马  caballo\n4 (descendente)     mà  骂  regañar',
           'Tip de morador: el tono 3 en solitario suele pronunciarse bajo, sin subir demasiado. ¡Practica cantando cada tono!',
         ], [
           ['妈', 'mā', 'mamá (tono 1)'],
@@ -99,10 +99,10 @@ export const hsk0: VaultModule = {
         grammar('n-sonidos', 'Sonidos que no existen en español', [
           'El pinyin se lee casi como en español, pero hay trampas. Estas son las del refugio:',
           '• b/p, d/t, g/k: la b, d y g chinas NO son como las españolas. Suena parecido, pero la p, t y k chinas van con un soplo fuerte de aire (aspiración).',
-          '• q/x/j: la q no es "k". Suena como una "ch" suave y adelantada (qī = "chii").',
+          '• j/q/x: familia "palatal". j = una "ch" SIN soplo (jiā), q = la misma "ch" CON soplo fuerte (qǐ), x = una "sh" suave y adelantada (xī). Van seguidas SIEMPRE de i/ü: qi, ju, xu.',
           '• zh/ch/sh: parecidas a "ch/sh" españolas pero con la lengua más atrás (zhōng, shí).',
           '• z/c/s: más adelantadas y "silbantes" (sì).',
-          '• ü (qù, yú): como la "ü" alemana. Di "i" con labios de "u".',
+          '• ü: como la "ü" alemana. Di "i" con labios de "u". TRAS j/q/x/y la ü se escribe u (qu = qü, ju = jü, xu = xü, yu = yü) pero suena igual.',
           'No te obsesiones: el oído se entrena con exposición. ¡Escucha y repite!',
         ], [
           ['八', 'bā', 'ocho — b sin soplo'],

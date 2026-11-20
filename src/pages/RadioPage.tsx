@@ -6,8 +6,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { modules } from '../content'
-import { speakSentence, speakEntry } from '../lib/audio'
+import { speakSentence, speakHanzi } from '../lib/audio'
 import { unlockedDialogues } from '../lib/dialogues'
+import { sentenceAudioId } from '../lib/audio'
 import {
   buildRadioSession,
   buildToneSession,
@@ -21,6 +22,7 @@ import { sfx } from '../lib/sfx'
 import { useProgress } from '../stores/useProgress'
 import { Pinyin } from '../components/Pinyin'
 import { Btn, Chip, Meter, Panel, Prompt, SectionTitle, SpeakerBtn } from '../components/ui'
+import type { Sentence } from '../types/content'
 
 const XP_RADIO = 5
 
@@ -184,7 +186,7 @@ export function RadioPage() {
   }
 
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="flex min-h-0 flex-1 flex-col">
       <header className="sticky top-0 z-10 border-b border-vault-800 bg-vault-950/95 px-3 py-2 backdrop-blur">
         <div className="flex items-center gap-3">
           <span className="font-display text-lg text-vault-500">{title}</span>
@@ -223,22 +225,26 @@ function RadioMeaning({ item, onResult }: { item: Extract<RadioItem, { kind: 'me
     return () => clearTimeout(t)
   }, [sentence])
 
+  // keys por id de audio (el texto español puede repetirse entre frases →
+  // dos botones marcados a la vez / keys React duplicadas)
+  const optId = (s: Sentence) => sentenceAudioId(s)
+
   return (
     <div className="flex flex-col items-center gap-4">
       <Prompt>¿QUÉ OYES?</Prompt>
       <SpeakerBtn big onClick={() => speakSentence(sentence)} />
       <div className={`grid w-full gap-2 ${answered ? (correct ? 'flash-correct' : 'shake flash-wrong') : ''}`}>
         {item.options.map((opt) => {
-          const cls = answered && opt.es === target ? 'choice-correct' : picked === opt.es ? 'choice-wrong' : ''
+          const cls = answered && optId(opt) === optId(sentence) ? 'choice-correct' : picked === optId(opt) ? 'choice-wrong' : ''
           return (
             <button
-              key={opt.es}
+              key={optId(opt)}
               type="button"
               disabled={answered}
               className={`choice rounded px-4 py-3 text-center text-base ${cls}`}
               onClick={() => {
-                setPicked(opt.es)
-                if (opt.es === target) sfx.correct()
+                setPicked(optId(opt))
+                if (optId(opt) === optId(sentence)) sfx.correct()
                 else sfx.wrong()
               }}
             >
@@ -328,15 +334,22 @@ function RadioTone({ item, onResult }: { item: Extract<RadioItem, { kind: 'tone'
   const answered = picked !== null
   const correct = picked === item.tone
 
+  // suena SOLO la sílaba (su carácter), no la palabra entera
+  const play = () => speakHanzi(item.char ?? item.entry.hanzi)
+
   useEffect(() => {
-    const t = setTimeout(() => speakEntry(item.entry), 400)
+    const t = setTimeout(play, 400)
     return () => clearTimeout(t)
-  }, [item.entry])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [item.char, item.entry.id])
 
   return (
     <div className="flex flex-col items-center gap-4">
       <Prompt>IDENTIFICA EL TONO</Prompt>
-      <SpeakerBtn big onClick={() => speakEntry(item.entry)} />
+      <SpeakerBtn big onClick={play} />
+      <p className="text-xs text-vault-600">
+        sílaba suelta{item.char && item.char !== item.entry.hanzi ? ` de ${item.entry.hanzi}` : ''}
+      </p>
       <div className={`grid w-full grid-cols-2 gap-2 ${answered ? (correct ? 'flash-correct' : 'shake flash-wrong') : ''}`}>
         {([1, 2, 3, 4] as const).map((t) => {
           const cls = answered && t === item.tone ? 'choice-correct' : picked === t ? 'choice-wrong' : ''

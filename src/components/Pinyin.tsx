@@ -1,43 +1,53 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   <Pinyin /> — pinyin con cada sílaba coloreada según su tono:
+   <Pinyin /> — pinyin con cada SÍLABA coloreada según su tono:
    1 rojo · 2 ámbar · 3 turquesa · 4 violeta · 5 gris
+   Las palabras multislaba (zhōngwén, xièxie…) se trocean con syllabify()
+   para que cada sílaba reciba SU tono (bug histórico: la primera pintaba todo).
    ───────────────────────────────────────────────────────────────────────────── */
 
 import type { ReactNode } from 'react'
-import { toneColor, toneOfSyllable } from '../lib/pinyin'
-
-const LETTER = /[a-zA-Z]/
-const TONE_MARKS = new Set(['\u0300', '\u0301', '\u0304', '\u030C', '\u0308'])
-
-/** Divide el string original en [sílabas y separadores] conservando el texto */
-function tokenize(text: string): { syllable: boolean; text: string }[] {
-  const out: { syllable: boolean; text: string }[] = []
-  let syl = ''
-  for (const ch of text.normalize('NFD')) {
-    if (LETTER.test(ch) || TONE_MARKS.has(ch)) {
-      syl += ch
-    } else {
-      if (syl) {
-        out.push({ syllable: true, text: syl })
-        syl = ''
-      }
-      out.push({ syllable: false, text: ch })
-    }
-  }
-  if (syl) out.push({ syllable: true, text: syl })
-  return out
-}
+import { syllabify, toneColor } from '../lib/pinyin'
 
 export function Pinyin({ text, className = '' }: { text: string; className?: string }) {
-  const parts: ReactNode[] = tokenize(text).map((p, i) =>
-    p.syllable ? (
-      <span key={i} className={toneColor(toneOfSyllable(p.text))}>
-        {p.text}
-      </span>
-    ) : (
-      <span key={i}>{p.text}</span>
-    ),
-  )
+  const parts: ReactNode[] = []
+  let buffer = ''
+  let key = 0
+
+  const flushBuffer = () => {
+    if (buffer) {
+      parts.push(<span key={key++}>{buffer}</span>)
+      buffer = ''
+    }
+  }
+
+  // recorre por runs de letras+marcas; cada run se trocea en sílabas
+  const isLetter = (ch: string) => /[a-zA-ZüÜ]/.test(ch)
+  const isMark = (ch: string) => /[\u0300-\u030F]/.test(ch)
+
+  let i = 0
+  while (i < text.length) {
+    const ch = text[i]
+    if (isLetter(ch) || isMark(ch)) {
+      let run = ''
+      while (i < text.length && (isLetter(text[i]) || isMark(text[i]))) {
+        run += text[i]
+        i++
+      }
+      flushBuffer()
+      for (const syl of syllabify(run)) {
+        parts.push(
+          <span key={key++} className={toneColor(syl.tone)}>
+            {syl.text}
+          </span>,
+        )
+      }
+      continue
+    }
+    buffer += ch
+    i++
+  }
+  flushBuffer()
+
   return <span className={`font-pinyin ${className}`}>{parts}</span>
 }
 
@@ -48,12 +58,12 @@ export function ToneLegend() {
     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
       {tones.map((t) => (
         <span key={t} className={toneColor(t)}>
-          {t} {toneOf(t)}
+          {t} {toneMark(t)}
         </span>
       ))}
     </div>
   )
 }
 
-const toneOf = (t: 1 | 2 | 3 | 4 | 5) =>
+const toneMark = (t: 1 | 2 | 3 | 4 | 5) =>
   ({ 1: '▁̄', 2: '↗', 3: '∨', 4: '↘', 5: '·' })[t]

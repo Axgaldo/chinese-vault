@@ -77,7 +77,7 @@ export const DIALOGUES: Dialogue[] = [
     lines: [
       { who: 'A', hanzi: '你的电话号码是多少？', pinyin: 'nǐ de diànhuà hàomǎ shì duōshao?', es: '¿Cuál es tu número de teléfono?' },
       { who: 'B', hanzi: '一三七九，八二五零。', pinyin: 'yī sān qī jiǔ, bā èr wǔ líng.', es: 'Uno-tres-siete-nueve, ocho-dos-cinco-cero.' },
-      { who: 'A', hanzi: '谢谢。你几岁？', pinyin: 'xièxie. nǐ jǐ suì?', es: 'Gracias. ¿Cuántos años tienes?' },
+      { who: 'A', hanzi: '谢谢。你多大？', pinyin: 'xièxie. nǐ duō dà?', es: 'Gracias. ¿Cuántos años tienes?' },
       { who: 'B', hanzi: '我二十一岁。你呢？', pinyin: 'wǒ èrshíyī suì. nǐ ne?', es: 'Tengo veintiún años. ¿Y tú?' },
       { who: 'A', hanzi: '我三十岁。', pinyin: 'wǒ sānshí suì.', es: 'Tengo treinta años.' },
     ],
@@ -103,7 +103,7 @@ export const DIALOGUES: Dialogue[] = [
     title: '¿Tienes hijos?',
     lines: [
       { who: 'A', hanzi: '你有孩子吗？', pinyin: 'nǐ yǒu háizi ma?', es: '¿Tienes hijos?' },
-      { who: 'B', hanzi: '有，一个女儿。', pinyin: 'yǒu, yì ge nǚ’ér.', es: 'Sí, una hija.' },
+      { who: 'B', hanzi: '有，一个女儿。', pinyin: "yǒu, yí ge nǚ'ér.", es: 'Sí, una hija.' },
       { who: 'A', hanzi: '她几岁？', pinyin: 'tā jǐ suì?', es: '¿Cuántos años tiene?' },
       { who: 'B', hanzi: '她六岁。', pinyin: 'tā liù suì.', es: 'Tiene seis años.' },
       { who: 'A', hanzi: '我的儿子七岁。', pinyin: 'wǒ de érzi qī suì.', es: 'Mi hijo tiene siete años.' },
@@ -117,7 +117,7 @@ export const DIALOGUES: Dialogue[] = [
     topic: 'Lugares',
     title: '¿Dónde está la escuela?',
     lines: [
-      { who: 'A', hanzi: '请问，学校在哪儿？', pinyin: 'qǐngwén, xuéxiào zài nǎr?', es: 'Disculpe, ¿dónde está la escuela?' },
+      { who: 'A', hanzi: '请问，学校在哪儿？', pinyin: 'qǐngwèn, xuéxiào zài nǎr?', es: 'Disculpe, ¿dónde está la escuela?' },
       { who: 'B', hanzi: '在那儿。', pinyin: 'zài nàr.', es: 'Está allí.' },
       { who: 'A', hanzi: '医院呢？', pinyin: 'yīyuàn ne?', es: '¿Y el hospital?' },
       { who: 'B', hanzi: '不在这儿。在那儿。', pinyin: 'bú zài zhèr. zài nàr.', es: 'No está aquí. Está allí.' },
@@ -192,7 +192,7 @@ export const DIALOGUES: Dialogue[] = [
     lines: [
       { who: 'A', hanzi: '你喜欢吃什么？', pinyin: 'nǐ xǐhuan chī shénme?', es: '¿Qué te gusta comer?' },
       { who: 'B', hanzi: '我喜欢吃水果。你呢？', pinyin: 'wǒ xǐhuan chī shuǐguǒ. nǐ ne?', es: 'Me gusta comer fruta. ¿Y a ti?' },
-      { who: 'A', hanzi: '我很累。我想睡觉。', pinyin: 'wǒ hěn lèi. wǒ xiǎng shuìjiào.', es: 'Estoy muy cansado. Quiero dormir.' },
+      { who: 'A', hanzi: '我也很喜欢吃水果。', pinyin: 'wǒ yě hěn xǐhuan chī shuǐguǒ.', es: 'A mí también me gusta mucho comer fruta.' },
       { who: 'B', hanzi: '好，再见！', pinyin: 'hǎo, zàijiàn!', es: 'Bueno, ¡adiós!' },
     ],
   },
@@ -204,7 +204,7 @@ export const DIALOGUES: Dialogue[] = [
     topic: 'Direcciones',
     title: 'Camino a la biblioteca',
     lines: [
-      { who: 'A', hanzi: '请问，图书馆在哪儿？', pinyin: 'qǐngwén, túshūguǎn zài nǎr?', es: 'Disculpe, ¿dónde está la biblioteca?' },
+      { who: 'A', hanzi: '请问，图书馆在哪儿？', pinyin: 'qǐngwèn, túshūguǎn zài nǎr?', es: 'Disculpe, ¿dónde está la biblioteca?' },
       { who: 'B', hanzi: '一直走，然后右拐。', pinyin: 'yìzhí zǒu, ránhòu yòu guǎi.', es: 'Sigue todo recto y luego gira a la derecha.' },
       { who: 'A', hanzi: '一直走，然后右拐？', pinyin: 'yìzhí zǒu, ránhòu yòu guǎi?', es: '¿Todo recto y luego giro a la derecha?' },
       { who: 'B', hanzi: '对！图书馆在学校前面。', pinyin: 'duì! túshūguǎn zài xuéxiào qiánmiàn.', es: '¡Exacto! La biblioteca está delante de la escuela.' },
@@ -236,7 +236,7 @@ export const DIALOGUES: Dialogue[] = [
     topic: 'Comparar',
     title: 'Coche o bicicleta',
     lines: [
-      { who: 'A', hanzi: '汽车和自行车，你喜欢什么？', pinyin: 'qìchē hé zìxíngchē, nǐ xǐhuan shénme?', es: 'El coche y la bici, ¿cuál te gusta?' },
+      { who: 'A', hanzi: '汽车和自行车，你喜欢哪个？', pinyin: 'qìchē hé zìxíngchē, nǐ xǐhuan nǎ ge?', es: 'El coche y la bici, ¿cuál te gusta?' },
       { who: 'B', hanzi: '我喜欢自行车。', pinyin: 'wǒ xǐhuan zìxíngchē.', es: 'Me gusta la bici.' },
       { who: 'A', hanzi: '汽车比自行车快。', pinyin: 'qìchē bǐ zìxíngchē kuài.', es: 'El coche es más rápido que la bici.' },
       { who: 'B', hanzi: '对，但是自行车很便宜。', pinyin: 'duì, dànshì zìxíngchē hěn piányi.', es: 'Exacto, pero la bici es muy barata.' },
@@ -251,10 +251,10 @@ export const DIALOGUES: Dialogue[] = [
     topic: 'Compras',
     title: 'En el mercado del refugio',
     lines: [
-      { who: 'A', hanzi: '请问，这个多少钱？', pinyin: 'qǐngwén, zhè ge duōshao qián?', es: 'Disculpe, ¿cuánto cuesta esto?' },
-      { who: 'B', hanzi: '两块钱。', pinyin: 'liǎng kuài qián.', es: 'Dos kuais.' },
+      { who: 'A', hanzi: '请问，这个多少钱？', pinyin: 'qǐngwèn, zhè ge duōshao qián?', es: 'Disculpe, ¿cuánto cuesta esto?' },
+      { who: 'B', hanzi: '两块钱。', pinyin: 'liǎng kuài qián.', es: 'Dos kuai.' },
       { who: 'A', hanzi: '请给我两个。', pinyin: 'qǐng gěi wǒ liǎng ge.', es: 'Dame dos, por favor.' },
-      { who: 'B', hanzi: '好，四块钱。', pinyin: 'hǎo, sì kuài qián.', es: 'Bien, cuatro kuais.' },
+      { who: 'B', hanzi: '好，四块钱。', pinyin: 'hǎo, sì kuài qián.', es: 'Bien, cuatro kuai.' },
       { who: 'A', hanzi: '给你五块。', pinyin: 'gěi nǐ wǔ kuài.', es: 'Te doy cinco.' },
       { who: 'B', hanzi: '谢谢！再见！', pinyin: 'xièxie! zàijiàn!', es: '¡Gracias! ¡Adiós!' },
     ],

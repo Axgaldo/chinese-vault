@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   PERFIL DEL HABITANTE — rango, estadísticas, cuenta de nube y ajustes
+   PERFIL DEL MORADOR — rango, estadísticas, cuenta de nube y ajustes
    ───────────────────────────────────────────────────────────────────────────── */
 
 import { useState } from 'react'

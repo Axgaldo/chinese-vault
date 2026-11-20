@@ -26,6 +26,8 @@ useProgress.subscribe((s, prev) => {
 
 // Sella logros merecidos por estados previos (migraciones) sin toasts múltiples
 useProgress.getState().checkAchievements()
+// Rueda el día al abrir (racha/encargos de HOY en el Perfil, sin pagar bono)
+useProgress.getState().syncDay()
 
 // Desbloqueo del audio del navegador al primer gesto
 window.addEventListener('pointerdown', () => initSfx(), { once: true, capture: true })

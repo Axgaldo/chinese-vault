@@ -71,8 +71,10 @@ interface SpeechRecognitionEventLike {
 interface SpeechRecognitionInstance {
   lang: string
   interimResults: boolean
+  continuous: boolean
   maxAlternatives: number
   start(): void
+  stop(): void
   abort(): void
   onresult: ((e: SpeechRecognitionEventLike) => void) | null
   onerror: ((e: { error?: string }) => void) | null
@@ -104,6 +106,8 @@ function Feedback({
   onContinue: () => void
   children?: ReactNode
 }) {
+  // latch: el doble toque no debe disparar el avance dos veces
+  const [done, setDone] = useState(false)
   return (
     <div className="pop-in mt-5">
       <p
@@ -112,7 +116,15 @@ function Feedback({
         {correct ? '▓ ACCESO CONCEDIDO ▓' : '✗ ERROR DE PROTOCOLO'}
       </p>
       {children}
-      <Btn className="mt-4 w-full" onClick={onContinue}>
+      <Btn
+        className="mt-4 w-full"
+        disabled={done}
+        onClick={() => {
+          if (done) return
+          setDone(true)
+          onContinue()
+        }}
+      >
         CONTINUAR ▸
       </Btn>
     </div>
@@ -305,7 +317,14 @@ function ChooseEs({ step, awardXp, onResult }: CProps<'choose-es'>) {
   const entry = entriesById.get(step.entry)
   const completedKey = useCompletedKey()
   const options = useMemo(
-    () => optionsFor(step.entry, completedKey ? completedKey.split(',') : []),
+    () =>
+      optionsFor(
+        step.entry,
+        completedKey ? completedKey.split(',') : [],
+        4,
+        // deduplicar por la etiqueta que el jugador VE (español)
+        (id) => entriesById.get(id)?.es ?? id,
+      ),
     [step.entry, completedKey],
   )
   const [picked, setPicked] = useState<string | null>(null)
@@ -357,8 +376,18 @@ function ChooseHanzi({ step, awardXp, onResult }: CProps<'choose-hanzi'>) {
   const mode = useScriptMode()
   const completedKey = useCompletedKey()
   const options = useMemo(
-    () => optionsFor(step.entry, completedKey ? completedKey.split(',') : []),
-    [step.entry, completedKey],
+    () =>
+      optionsFor(
+        step.entry,
+        completedKey ? completedKey.split(',') : [],
+        4,
+        (id) => {
+          const e = entriesById.get(id)
+          if (!e) return id
+          return mode === 'pinyin' ? stripTones(e.pinyin).toLowerCase() : e.hanzi
+        },
+      ),
+    [step.entry, completedKey, mode],
   )
   const [picked, setPicked] = useState<string | null>(null)
 
@@ -418,8 +447,18 @@ function ListenView({ step, awardXp, onResult }: CProps<'listen'>) {
   const mode = useScriptMode()
   const completedKey = useCompletedKey()
   const options = useMemo(
-    () => optionsFor(step.entry, completedKey ? completedKey.split(',') : []),
-    [step.entry, completedKey],
+    () =>
+      optionsFor(
+        step.entry,
+        completedKey ? completedKey.split(',') : [],
+        4,
+        (id) => {
+          const e = entriesById.get(id)
+          if (!e) return id
+          return mode === 'pinyin' ? stripTones(e.pinyin).toLowerCase() : e.hanzi
+        },
+      ),
+    [step.entry, completedKey, mode],
   )
   const [picked, setPicked] = useState<string | null>(null)
 
@@ -573,7 +612,7 @@ function TypePinyin({ step, awardXp, onResult }: CProps<'type-pinyin'>) {
         <EntryHanzi entry={entry} />
         <SpeakerBtn onClick={() => speakEntry(entry)} />
       </div>
-      <p className="text-sm text-vault-500">sin tonos y sin mayúsculas — p. ej. «{plain.toLowerCase().normalize('NFD').replace(/[\u0300-\u030F]/g, '')}»</p>
+      <p className="text-sm text-vault-500">sin tonos y sin mayúsculas — p. ej. «ni hao»</p>
       <form
         className={`w-full space-y-3 ${state === 'ok' ? 'flash-correct' : state === 'ko' ? 'shake flash-wrong' : ''}`}
         onSubmit={(ev) => {
@@ -806,12 +845,20 @@ function BuildView({ step, awardXp, onResult }: CProps<'build'>) {
 
 /* ── Desafío oral (pronunciación) ─────────────────────────────────────────── */
 
+/** Tiempo mínimo de escucha (ms): sílabas cortas ("mā") necesitan margen o el
+ *  reconocedor corta antes de capturarlas; con escucha CONTINUA se acumulan
+ *  varios intentos hasta que pase el mínimo (o el máximo). */
+const SPEAK_MIN_MS = 2000
+const SPEAK_MAX_MS = 6000
+
 function SpeakView({ step, awardXp, onResult }: CProps<'speak'>) {
   const entry = entriesById.get(step.entry)
   const [state, setState] = useState<'idle' | 'listening' | 'done'>('idle')
   const [alts, setAlts] = useState<string[]>([])
   const [errMsg, setErrMsg] = useState<string | null>(null)
   const recRef = useRef<SpeechRecognitionInstance | null>(null)
+  const collectedRef = useRef<string[]>([])
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([])
   const hasSR = Boolean(getSpeechRecognition())
 
   useEffect(() => {
@@ -821,7 +868,27 @@ function SpeakView({ step, awardXp, onResult }: CProps<'speak'>) {
     }
   }, [entry])
 
+  // limpieza al desmontar: cortar micro y temporizadores
+  useEffect(() => {
+    const timers = timersRef.current
+    return () => {
+      try {
+        recRef.current?.abort()
+      } catch {
+        /* ya muerto */
+      }
+      timers.forEach(clearTimeout)
+    }
+  }, [])
+
   if (!entry) return null
+
+  const evaluate = () => {
+    const heard = collectedRef.current
+    setAlts(heard.length ? heard : ['…'])
+    setState('done')
+    sfx.blip()
+  }
 
   const start = () => {
     const SR = getSpeechRecognition()
@@ -832,38 +899,111 @@ function SpeakView({ step, awardXp, onResult }: CProps<'speak'>) {
     } catch {
       /* rec ya muerto */
     }
+    collectedRef.current = []
     const rec = new SR()
     recRef.current = rec
     rec.lang = 'zh-CN'
     rec.interimResults = false
     rec.maxAlternatives = 3
+    rec.continuous = true
+
+    const startedAt = Date.now()
+    let stopped = false
+
+    const stopAndEvaluate = () => {
+      if (stopped) return
+      stopped = true
+      timersRef.current.forEach(clearTimeout)
+      try {
+        rec.stop()
+      } catch {
+        /* ya parado */
+      }
+      // margen para el último onresult en llegar
+      timersRef.current.push(setTimeout(evaluate, 250))
+    }
+
     rec.onresult = (e) => {
-      const list = e.results[0]
-      const found: string[] = []
-      for (let i = 0; i < list.length; i++) found.push(list[i].transcript.trim())
-      setAlts(found)
-      setState('done')
-      sfx.blip()
+      // CONTINUO: acumula los resultados de todos los eventos del turno
+      const results = e.results as unknown as ArrayLike<ArrayLike<{ transcript: string }>>
+      for (let r = 0; r < results.length; r++) {
+        const list = results[r]
+        for (let i = 0; i < list.length; i++) {
+          const t = list[i].transcript.trim()
+          if (t && !collectedRef.current.includes(t)) collectedRef.current.push(t)
+        }
+      }
+      // si ya pasó el mínimo y tenemos algo, cerramos con un pequeño colchón
+      if (Date.now() - startedAt >= SPEAK_MIN_MS && collectedRef.current.length) {
+        stopAndEvaluate()
+      }
     }
     rec.onerror = (e) => {
-      setErrMsg(
-        e?.error === 'not-allowed' || e?.error === 'service-not-allowed'
-          ? 'El micrófono está bloqueado: permítele el acceso al navegador.'
-          : 'No te he oído bien. Habla más alto y prueba otra vez.',
-      )
-      setState('idle')
+      if (stopped) return
+      if (e?.error === 'not-allowed' || e?.error === 'service-not-allowed') {
+        setErrMsg('El micrófono está bloqueado: permítele el acceso al navegador.')
+        setState('idle')
+        stopped = true
+      }
+      // 'no-speech' / 'aborted' se toleran: seguirá escuchando hasta el mínimo
     }
-    rec.onend = () => setState((s) => (s === 'listening' ? 'idle' : s))
+    rec.onend = () => {
+      if (stopped) return
+      // el motor cortó solo (silencio): si aún no llegó al mínimo, reintenta
+      if (Date.now() - startedAt < SPEAK_MIN_MS) {
+        try {
+          rec.start()
+        } catch {
+          stopAndEvaluate()
+        }
+      } else {
+        stopAndEvaluate()
+      }
+    }
+
+    // tope duro: pase lo que pase, evaluamos
+    timersRef.current.push(setTimeout(stopAndEvaluate, SPEAK_MAX_MS))
+
     setErrMsg(null)
     setAlts([])
     setState('listening')
     rec.start()
   }
 
-  /** Puntuación por sílabas: cada carácter del objetivo (≈ sílaba) */
+  /** Mapa carácter → pinyin sin tonos (del propio curso) para tolerar homófonos:
+   *  decir "tā" y que el ASR escriba 他/她 debe contar como ella/el éxito fonético. */
+  const homophonesOf = (ch: string): Set<string> => {
+    const out = new Set<string>()
+    for (const e of entriesById.values()) {
+      const chars = [...e.hanzi]
+      const syls = syllabify(e.pinyin)
+      const idx = chars.indexOf(ch)
+      if (idx >= 0 && syls[idx]) {
+        out.add(stripTones(syls[idx].text).toLowerCase())
+      }
+    }
+    return out
+  }
+
+  /** Puntuación por sílabas con tolerancia de homófonos */
   const targetChars = [...entry.hanzi]
   const sylls = syllabify(entry.pinyin)
-  const charOk = targetChars.map((ch) => alts.some((a) => a.includes(ch)))
+  const heardText = alts.join(' ')
+  const heardChars = new Set([...heardText])
+  const charOk = targetChars.map((ch) => {
+    if (heardChars.has(ch)) return true
+    // homófonos: algún carácter oído con el mismo pinyin (sin tonos)
+    const pron = homophonesOf(ch)
+    for (const h of heardChars) {
+      const hPron = [...entriesById.values()].find((e) => e.hanzi.includes(h))
+      const hSyls = hPron ? syllabify(hPron.pinyin) : []
+      const hIdx = hPron ? [...hPron.hanzi].indexOf(h) : -1
+      if (hPron && hIdx >= 0 && hSyls[hIdx] && pron.has(stripTones(hSyls[hIdx].text).toLowerCase())) {
+        return true
+      }
+    }
+    return false
+  })
   const ratio = targetChars.length ? charOk.filter(Boolean).length / targetChars.length : 0
   const green = state === 'done' && ratio === 1
   const yellow = state === 'done' && ratio >= 0.5 && ratio < 1
@@ -902,6 +1042,9 @@ function SpeakView({ step, awardXp, onResult }: CProps<'speak'>) {
               ▂▃▅ ▁▂▄ ▃▅▂ <span className="blink">▍</span>
             </p>
           )}
+          {state === 'listening' && (
+            <p className="text-xs text-vault-600">di la palabra; puedes repetirla hasta {SPEAK_MAX_MS / 1000} s</p>
+          )}
           {errMsg && state !== 'done' && <p className="text-sm text-vault-amber">{errMsg}</p>}
 
           {state === 'done' && (
@@ -935,7 +1078,7 @@ function SpeakView({ step, awardXp, onResult }: CProps<'speak'>) {
                   green ? 'text-vault-400 glow' : yellow ? 'text-vault-amber glow' : 'text-vault-red'
                 }`}
               >
-                {green ? '▓ PRONUNCIAción PERFECTA ▓' : yellow ? '◐ CASI: alguna sílaba se te escapó' : '✗ NO TE ENTENDIDO'}
+                {green ? '▓ PRONUNCIACIÓN PERFECTA ▓' : yellow ? '◐ CASI: alguna sílaba se te escapó' : '✗ NO TE HE ENTENDIDO'}
               </p>
 
               <div className="flex w-full gap-2">
@@ -1252,8 +1395,11 @@ function MatchView({ step, awardXp, onResult }: CProps<'match'>) {
       </div>
       <p className="text-sm text-vault-500">fallos: {errors}</p>
       {done && (
-        <Feedback correct={errors === 0} onContinue={() => onResult(true, awardXp ? (errors === 0 ? 10 : 5) : 0)}>
-          {errors > 0 && <p className="text-center text-sm text-vault-500">+5 XP · registrados {errors} fallo(s)</p>}
+        <Feedback
+          correct={errors === 0}
+          onContinue={() => onResult(errors === 0, awardXp && errors === 0 ? 10 : 0)}
+        >
+          {errors > 0 && <p className="text-center text-sm text-vault-500">+0 XP · registrados {errors} fallo(s) — vuelve a intentarlo</p>}
         </Feedback>
       )}
     </div>

@@ -7,6 +7,9 @@
 import type { Sentence, VocabEntry } from '../types/content'
 import { pinyinSlug } from './pinyin'
 
+/** Base de despliegue: '/' en local, '/chinese-vault/' en GitHub Pages */
+const BASE = import.meta.env.BASE_URL
+
 /** Ids cuyo MP3 no existe (para no reintentar 404 en cada reproducción) */
 const missingFiles = new Set<string>()
 
@@ -89,7 +92,7 @@ export function stopAudio() {
 
 /** Reproduce una palabra/frase del curso (MP3 si existe, si no TTS) */
 export function speakEntry(entry: VocabEntry, rate?: number) {
-  const url = `/audio/${entry.id}.mp3`
+  const url = `${BASE}audio/${entry.id}.mp3`
   if (missingFiles.has(url)) return tts(entry.hanzi, rate)
   tryPlayFile(url, () => tts(entry.hanzi, rate))
 }
@@ -101,9 +104,49 @@ export function sentenceAudioId(s: Sentence): string {
 
 /** Reproduce una frase ejemplo */
 export function speakSentence(s: Sentence, rate?: number) {
-  const url = `/audio/${sentenceAudioId(s)}.mp3`
+  const url = `${BASE}audio/${sentenceAudioId(s)}.mp3`
   if (missingFiles.has(url)) return tts(s.hanzi, rate)
   tryPlayFile(url, () => tts(s.hanzi, rate))
+}
+
+/** Reproduce varias frases EN SECUENCIA (diálogos completos, sin solapar) */
+export async function speakSentencesSequentially(list: Sentence[], rate?: number) {
+  stopAudio()
+  for (const s of list) {
+    const url = `${BASE}audio/${sentenceAudioId(s)}.mp3`
+    const hasFile = !missingFiles.has(url)
+    if (hasFile) {
+      const ok: boolean = await new Promise((resolve) => {
+        const el = new Audio(url)
+        el.playbackRate = audioRate
+        currentEl = el
+        el.onerror = () => {
+          missingFiles.add(url)
+          resolve(false)
+        }
+        el.onended = () => resolve(true)
+        void el.play().catch(() => {
+          missingFiles.add(url)
+          resolve(false)
+        })
+      })
+      if (ok) continue
+    }
+    // TTS por línea (el navegador encola las utterances si no hacemos cancel)
+    await new Promise<void>((resolve) => {
+      if (typeof speechSynthesis === 'undefined') return resolve()
+      const u = new SpeechSynthesisUtterance(s.hanzi)
+      const voice = pickVoice()
+      if (voice) u.voice = voice
+      u.lang = voice?.lang ?? 'zh-CN'
+      u.rate = rate ?? audioRate
+      u.onend = () => resolve()
+      u.onerror = () => resolve()
+      speechSynthesis.speak(u)
+      // salvaguarda: si el motor no dispara onend
+      setTimeout(resolve, 4000)
+    })
+  }
 }
 
 /** Reproduce texto chino arbitrario con TTS del navegador */

@@ -155,12 +155,23 @@ export function stripTones(pinyin: string): string {
     .normalize('NFC')
 }
 
-/** Slug de archivo para el audio de frases: "nǐ hǎo ma" → "ni-hao-ma" */
+/** Slug de archivo para el audio de frases, CON TONOS para que sea único:
+ *  "nǐ hǎo ma?" → "ni3-hao3-ma" · 妈 mā→ma1 ≠ 马 mǎ→ma3 ≠ 骂 mà→ma4.
+ *  (Sin tonos, las tres compartían "s-ma" y el apunte de tonos sonaba siempre mā.)
+ *  La ü sale como v: nǚ→nv3 (en NFD llega como u+diéresis, no ü precompuesta). */
 export function pinyinSlug(pinyin: string): string {
-  return stripTones(pinyin)
-    .toLowerCase()
-    .replace(/ü/g, 'v')
-    .replace(/[^a-z0-9]+/g, '-')
+  return syllabify(pinyin)
+    .map((s) => {
+      // stripTones elimina TODAS las marcas NFD (incluida la diéresis): la ü
+      // llega aquí como "u" simple → nǚ → "nu3". La sustitución por 'v' debe
+      // hacerse ANTES de stripTones, sobre el texto NFD original.
+      const nfd = s.text.normalize('NFD')
+      const withV = nfd.replace(/u\u0308/g, 'v').replace(/ü/g, 'v')
+      const base = stripTones(withV).toLowerCase()
+      return s.tone === 5 ? base : base + String(s.tone)
+    })
+    .join('-')
+    .replace(/-+/g, '-')
     .replace(/^-+|-+$/g, '')
 }
 

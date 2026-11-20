@@ -60,7 +60,7 @@ export const m10: VaultModule = {
       [
         build('你叫什么名字？', 'nǐ jiào shénme míngzi?', '¿Cómo te llamas?'),
         build('我的名字是安东。', 'wǒ de míngzi shì Āndōng.', 'Me llamo Antonio.'),
-        build('我会写中文字。', 'wǒ huì xiě zhōngwén zì.', 'Sé escribir caracteres chinos.'),
+        build('我会写中文。', 'wǒ huì xiě zhōngwén.', 'Sé escribir caracteres chinos.'),
         build('我的朋友明天来我家。', 'wǒ de péngyou míngtiān lái wǒ jiā.', 'Mi amigo viene mañana a mi casa.'),
         match('w-gao-xing', 'w-piao-liang', 'w-lei4', 'w-mang2'),
         { type: 'listen', entry: 'w-xiang3' },

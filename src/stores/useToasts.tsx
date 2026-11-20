@@ -43,3 +43,9 @@ export function toastCaps(amount: number, reason: string) {
   sfx.blip()
   useToasts.getState().push(<CapsIcon />, `+${amount} chapas — ${reason}`)
 }
+
+/** Toast de compra (sin importe de chapas) */
+export function toastPurchase(text: string) {
+  sfx.log()
+  useToasts.getState().push('🛒', text)
+}

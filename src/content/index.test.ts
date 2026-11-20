@@ -137,4 +137,59 @@ describe('integridad del curso', () => {
     }
     expect(problems).toEqual([])
   })
+
+  it('fichas: pinyin y hanzi alineados 1:1 (cuenta de sílabas)', () => {
+    const problems: string[] = []
+    for (const entry of entriesById.values()) {
+      const chars = [...entry.hanzi].length
+      const syls = syllabify(entry.pinyin).length
+      if (chars !== syls) {
+        problems.push(`${entry.id}: "${entry.hanzi}" ${syls} syl ≠ ${chars} caracteres`)
+      }
+    }
+    expect(problems).toEqual([])
+  })
+
+  it('slugs de audio: dos frases solo comparten slug si es el mismo hanzi', () => {
+    const bySlug = new Map<string, string>()
+    const problems: string[] = []
+    const record = (s: { hanzi: string; pinyin: string }, where: string) => {
+      const slug = pinyinSlug(s.pinyin)
+      const hanzi = s.hanzi.replace(/[。，？！、\s]/g, '')
+      const prev = bySlug.get(slug)
+      if (prev !== undefined && prev !== hanzi) {
+        problems.push(`${where}: slug "${slug}" compartido por ${prev} y ${hanzi}`)
+      } else {
+        bySlug.set(slug, hanzi)
+      }
+    }
+    for (const lesson of allLessons) {
+      for (const note of lesson.notes) {
+        for (const ex of note.examples) record(ex, `${lesson.id}/${note.id}`)
+      }
+      for (const step of lesson.steps) {
+        if (step.type === 'build') record(step.sentence, lesson.id)
+      }
+    }
+    expect(problems).toEqual([])
+  })
+
+  it('diálogos: líneas alineadas 1:1 y ancladas a módulos reales', async () => {
+    const { DIALOGUES } = await import('../lib/dialogues')
+    const problems: string[] = []
+    for (const d of DIALOGUES) {
+      if (!modules.some((m) => m.id === d.sector)) {
+        problems.push(`${d.id}: sector "${d.sector}" no existe`)
+      }
+      for (let i = 0; i < d.lines.length; i++) {
+        const l = d.lines[i]
+        const chars = [...l.hanzi.replace(/[。，？！、\s]/g, '')].length
+        const syls = syllabify(l.pinyin).length
+        if (chars !== syls) {
+          problems.push(`${d.id} línea ${i + 1}: "${l.hanzi}" ${syls} syl ≠ ${chars} caracteres`)
+        }
+      }
+    }
+    expect(problems).toEqual([])
+  })
 })

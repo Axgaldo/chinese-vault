@@ -14,6 +14,8 @@ import { Btn, Chip, Meter, Panel, Prompt } from '../components/ui'
 import type { Step } from '../types/content'
 
 const XP_REVIEW = 5
+/** Máximo de tarjetas por sesión de repaso (el resto queda para la próxima) */
+const REVIEW_SESSION_CAP = 30
 
 interface ReviewItem {
   entry: string
@@ -31,6 +33,8 @@ export function ReviewPage() {
   const [queue, setQueue] = useState<ReviewItem[]>(() => {
     return dueCardIds(srs)
       .filter((id) => entriesById.has(id))
+      // tope por sesión: sin él, con todo el curso visto serían 200+ tarjetas seguidas
+      .slice(0, REVIEW_SESSION_CAP)
       .map((id) => ({
         entry: id,
         step: reviewStepFor(id, srs[id]?.reps ?? 0),
@@ -96,6 +100,7 @@ export function ReviewPage() {
   /* ── Resumen ────────────────────────────────────────────────────────────── */
   if (done) {
     const reviewed = new Set(queue.map((q) => q.entry)).size
+    const remaining = dueCardIds(useProgress.getState().srs).filter((id) => entriesById.has(id)).length
     return (
       <div className="pop-in flex flex-col items-center gap-4 p-4 pt-10 text-center">
         <Prompt>▓ REPASO COMPLETADO ▓</Prompt>
@@ -106,6 +111,11 @@ export function ReviewPage() {
             {reviewed} palabras repasadas · las falladas volverán a la cola en minutos y el resto
             dentro de días (repetición espaciada)
           </p>
+          {remaining > 0 && (
+            <p className="mt-2 text-sm text-vault-400">
+              quedan {remaining} en la cola — te esperan en la próxima sesión (tope de {REVIEW_SESSION_CAP} por sesión)
+            </p>
+          )}
         </Panel>
         <div className="flex w-full gap-2">
           <Btn className="flex-1" onClick={() => navigate('/')}>
@@ -118,7 +128,7 @@ export function ReviewPage() {
 
   /* ── Sesión en curso ────────────────────────────────────────────────────── */
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="flex min-h-0 flex-1 flex-col">
       <header className="sticky top-0 z-10 border-b border-vault-800 bg-vault-950/95 px-3 py-2 backdrop-blur">
         <div className="flex items-center gap-3">
           <span className="font-display text-lg text-vault-500">REPASO</span>

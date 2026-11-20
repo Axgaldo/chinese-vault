@@ -92,9 +92,9 @@ export function LessonRunner({
     setConfirmExit(false)
   }
 
-  const finish = () => {
+  const finish = (finalFirst: Record<number, boolean>, finalXp: number) => {
     const graded = steps.map((s, i) => (isGraded(s) ? i : -1)).filter((i) => i >= 0)
-    const correct = graded.filter((i) => firstTry[i]).length
+    const correct = graded.filter((i) => finalFirst[i]).length
     const accuracy = graded.length ? correct / graded.length : 1
     const stars = accuracy >= 0.9 ? 3 : accuracy >= 0.65 ? 2 : 1
     const firstTime = !useProgress.getState().completed[lesson.id]
@@ -107,7 +107,7 @@ export function LessonRunner({
 
     completeLesson(lesson.id, stars, accuracy)
     // el XP de los pasos acertados TAMBIÉN se persiste (no solo el bonus)
-    addXp(xpGain + bonus)
+    addXp(finalXp + bonus)
     sfx.complete()
 
     // encargos auto-canjeados con ESTA lección (para el popup de la caravana)
@@ -120,24 +120,30 @@ export function LessonRunner({
     }, 0)
     setCaravanGain(capsGained)
 
-    setResult({ stars, accuracy, xp: xpGain + bonus })
+    setResult({ stars, accuracy, xp: finalXp + bonus })
   }
 
   const handleResult = (correct: boolean, xp: number) => {
     if (current === undefined || !step) return
     const idx = current
-    setFirstTry((m) => (idx in m ? m : { ...m, [idx]: correct }))
 
     if (correct) {
-      setXpGain((x) => x + xp)
+      // estado NUEVO calculado aquí (finish necesita los valores ya actualizados:
+      // leer firstTry/xpGain del cierre devolvería el estado PREVIO y perdería
+      // el último paso — bug histórico de precisión/3★/+20)
+      const nextFirst = idx in firstTry ? firstTry : { ...firstTry, [idx]: true }
+      const nextXp = xpGain + xp
+      setFirstTry(nextFirst)
+      setXpGain(nextXp)
       setPassed((p) => (p.includes(idx) ? p : [...p, idx]))
       // contadores para la caravana
       logActivity('steps', 1)
       if (step.type === 'dictate') logActivity('dictations', 1)
       if (step.type === 'tone') logActivity('tones', 1)
-      if (pos + 1 >= queue.length) finish()
+      if (pos + 1 >= queue.length) finish(nextFirst, nextXp)
       else setPos(pos + 1)
     } else {
+      setFirstTry((m) => (idx in m ? m : { ...m, [idx]: false }))
       // reintento un poco más adelante en la cola
       setQueue((q) => {
         if (q.slice(pos + 1).includes(idx)) return q

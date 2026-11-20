@@ -40,7 +40,7 @@ export function ArchivePage() {
           className={`choice rounded py-2 font-display text-xl ${tab === 'palabras' ? 'choice-selected text-vault-300' : 'text-vault-600'}`}
           onClick={() => setTab('palabras')}
         >
-          PALABRAS ({words.length})
+          PALABRAS ({seen.length})
         </button>
         <button
           type="button"

@@ -1,7 +1,7 @@
 {
   "name": "chinese-vault",
   "private": true,
-  "version": "2.8.0",
+  "version": "2.9.0",
   "type": "module",
   "description": "Aprende chino mandarín desde 0 — refugio post-apocalíptico estilo Pip-Boy. Pinyin primero, hanzi de propina, UI en español. HSK 0-1.",
   "license": "MIT",
@@ -16,6 +16,7 @@
     "preview": "vite preview",
     "audio": "tsx scripts/generate-audio.ts",
     "audio:force": "tsx scripts/generate-audio.ts --force",
+    "audio:clean": "tsx scripts/clean-audio.ts",
     "icons": "tsx scripts/generate-icons.ts"
   },
   "dependencies": {

@@ -28,8 +28,16 @@ export type RadioItem =
   | { kind: 'meaning'; sentence: Sentence; options: Sentence[]; retry?: boolean }
   /** suena una frase → escribir el pinyin completo (sin tonos) */
   | { kind: 'dictate'; sentence: Sentence; retry?: boolean }
-  /** suena una palabra → identificar su tono */
-  | { kind: 'tone'; entry: VocabEntry; syllable: string; tone: Tone; retry?: boolean }
+  /** suena UNA SÍLABA (solo su carácter) → identificar su tono */
+  | {
+      kind: 'tone'
+      entry: VocabEntry
+      syllable: string
+      tone: Tone
+      /** carácter hanzi de la sílaba (para reproducirla sola) */
+      char?: string
+      retry?: boolean
+    }
 
 /** Todas las frases de las lecciones completadas (dedupe por audio) */
 export function unlockedSentences(completedLessonIds: string[]): RadioSentence[] {
@@ -89,10 +97,15 @@ export function buildToneSession(pool: VocabEntry[], size = 8): RadioItem[] {
   const items: RadioItem[] = []
   const picked = shuffle(pool).slice(0, size)
   for (const entry of picked) {
-    const syl = syllabify(entry.pinyin).find((s) => s.tone !== 5)
-    if (!syl) continue
+    const syls = syllabify(entry.pinyin)
+    const idx = syls.findIndex((s) => s.tone !== 5)
+    if (idx < 0) continue
+    const syl = syls[idx]
     const display = syl.text.normalize('NFC')
-    items.push({ kind: 'tone', entry, syllable: display, tone: syl.tone as Tone })
+    // el CARÁCTER de esa sílaba: la radio lo reproduce SOLO (antes sonaba la
+    // palabra entera y "identifica el tono" era ambiguio en polisílabas)
+    const char = [...entry.hanzi][idx] ?? entry.hanzi
+    items.push({ kind: 'tone', entry, syllable: display, tone: syl.tone as Tone, char })
   }
   return items
 }

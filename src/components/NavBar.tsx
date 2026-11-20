@@ -2,6 +2,7 @@
    Barra de navegación inferior del refugio
    ───────────────────────────────────────────────────────────────────────────── */
 
+import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { sfx } from '../lib/sfx'
 import { useProgress } from '../stores/useProgress'
@@ -12,6 +13,13 @@ const linkCls = ({ isActive }: { isActive: boolean }) =>
   }`
 
 export function NavBar({ className = '' }: { className?: string }) {
+  // el selector solo re-evalúa al cambiar el store: tick cada minuto para que
+  // las tarjetas que vencen con la app abierta enciendan el badge a tiempo
+  const [, setTick] = useState(0)
+  useEffect(() => {
+    const t = setInterval(() => setTick((n) => n + 1), 60_000)
+    return () => clearInterval(t)
+  }, [])
   const due = useProgress((s) => Object.values(s.srs).filter((c) => c.due <= Date.now()).length)
 
   return (

@@ -31,7 +31,7 @@ export function PracticePage() {  const { mode, entryId } = useParams()
   const title = mode === 'speak' ? 'DESAFÍO ORAL' : 'DESAFÍO DE ESCRITURA'
 
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="flex min-h-0 flex-1 flex-col">
       <header className="sticky top-0 z-10 border-b border-vault-800 bg-vault-950/95 px-3 py-2 backdrop-blur">
         <div className="flex items-center gap-3">
           <span className="font-display text-lg text-vault-500">{title}</span>

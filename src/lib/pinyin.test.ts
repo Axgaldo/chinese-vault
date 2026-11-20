@@ -60,12 +60,17 @@ describe('stripTones', () => {
 })
 
 describe('pinyinSlug', () => {
-  it('frase → slug de audio', () => {
-    expect(pinyinSlug('nǐ hǎo ma?')).toBe('ni-hao-ma')
+  it('frase → slug de audio CON tonos (únicos: ma1 ≠ ma3 ≠ ma4)', () => {
+    expect(pinyinSlug('nǐ hǎo ma?')).toBe('ni3-hao3-ma')
+    expect(pinyinSlug('mā')).toBe('ma1')
+    expect(pinyinSlug('mǎ')).toBe('ma3')
+    expect(pinyinSlug('mà')).toBe('ma4')
+    // sílabas neutras sin dígito
+    expect(pinyinSlug('míngzi')).toBe('ming2-zi')
   })
 
-  it('"nǚ" → "nu" (la ü ya se perdió en stripTones)', () => {
-    expect(pinyinSlug('nǚ')).toBe('nu')
+  it('"nǚ" conserva la ü como v con su tono', () => {
+    expect(pinyinSlug('nǚ')).toBe('nv3')
   })
 })
 

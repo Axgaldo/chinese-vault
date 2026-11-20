@@ -49,7 +49,7 @@ export const m9: VaultModule = {
       [
         grammar('n-suj-adj', 'El adjetivo ES el verbo (nada de 是)', [
           'En chino los adjetivos funcionan como VERBO: 她很漂亮 = "ella muy-guapa". No se dice "ella ES guapa": el 是 del Sector 1 aquí no trabaja.',
-          'La palabra 很 conecta sujeto y adjetivo: 我的猫很小 = "mi gato es pequeño". Sin 很, 她漂亮 suena a exclamación: "¡qué guapa es!".',
+          'La palabra 很 conecta sujeto y adjetivo: 我的猫很小 = "mi gato es pequeño". Sin 很, 她漂亮 suena a LECTURA CONTRASTIVA (comparando: "ella, guapa...") — la exclamación de verdad se hace con 真/太…了: 她真漂亮！',
           'Para negar, 不 va delante del adjetivo: 今天不热 = "hoy no hace calor". Con el sandhi de siempre: bú rè, porque 热 es tono 4.',
         ], [
           ['她很漂亮。', 'tā hěn piàoliang.', 'Ella es muy guapa.'],
@@ -106,7 +106,7 @@ export const m9: VaultModule = {
         grammar('n-xihuan-ai', '喜欢 y 爱: del gusto al amor', [
           '喜欢 (xǐhuan) + cosa o + verbo = "gustar": 我喜欢喝茶 = "me gusta tomar té", 我喜欢学习 = "me gusta estudiar". Sin conjugación, como siempre.',
           '爱 (ài) es más fuerte que en español para las cosas: con personas y mascotas funciona igual, 我爱我的狗. Para objetos suena muy intenso: resérvalo para lo que de verdad amas.',
-          'Para precios llega 便宜 (piányi), con la segunda sílaba sin tono: 这个很便宜 = "esto es barato". ¿Lo contrario? "Caro" te espera en el HSK 2.',
+          'Para precios llega 便宜 (piányi), con la segunda sílaba sin tono: 这个很便宜 = "esto es barato". ¿Lo contrario? 贵 (guì, "caro") llega en el Sector 16.',
         ], [
           ['我喜欢喝茶。', 'wǒ xǐhuan hē chá.', 'Me gusta tomar té.'],
           ['我爱我的狗。', 'wǒ ài wǒ de gǒu.', 'Amo a mi perro.'],

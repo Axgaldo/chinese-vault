@@ -103,7 +103,7 @@ export const m17: VaultModule = {
         ], [
           ['请发照片给我。', 'qǐng fā zhàopiàn gěi wǒ.', 'Mándame una foto, por favor.'],
           ['我发短信给妈妈。', 'wǒ fā duǎnxìn gěi māma.', 'Le mando un mensaje a mamá.'],
-          ['请给我一杯水。', 'qǐng gěi wǒ yí bēi shuǐ.', 'Por favor, dame un vaso de agua. (mano a mano)'],
+          ['请给我一杯水。', 'qǐng gěi wǒ yì bēi shuǐ.', 'Por favor, dame un vaso de agua. (mano a mano)'],
         ]),
       ],
     ),

@@ -7,7 +7,7 @@
    ───────────────────────────────────────────────────────────────────────────── */
 
 import type { VaultModule } from '../../types/content'
-import { build, drill, e, grammar, lesson, match, noteStep, practice, typeP } from '../builders'
+import { build, drill, e, grammar, introLite, lesson, match, noteStep, practice, typeP } from '../builders'
 
 export const m1: VaultModule = {
   id: 'm1',
@@ -26,6 +26,8 @@ export const m1: VaultModule = {
     e('w-bu4', '不', 'bù', 'no', '❌', 'bú delante de tono 4: bú shì'),
     e('w-ma5', '吗', 'ma', 'partícula de pregunta', '❓', 'se escribe sin tono'),
     e('w-qing3', '请', 'qǐng', 'por favor', '🙇'),
+    e('w-ye3', '也', 'yě', 'también', '➕'),
+    e('w-bu-keqi', '不客气', 'bú kèqi', 'de nada', '😊'),
   ],
   lessons: [
     lesson(
@@ -48,6 +50,7 @@ export const m1: VaultModule = {
         ...drill('w-ta1'),
         ...drill('w-ta1-she'),
         ...drill('w-ni-men'),
+        ...drill('w-ye3'),
         ...drill('w-hen3'),
         noteStep('n-dai-ci'),
         build('我很好。', 'wǒ hěn hǎo.', 'Estoy muy bien.'),
@@ -60,6 +63,7 @@ export const m1: VaultModule = {
           '他 y 她 suenan EXACTAMENTE igual (tā): el oído nunca distingue el género — solo el ojo. Más adelante veremos que también existe 您 (nín, usted): la caja tiene un estante de cortesía.',
           '¿Y los plurales? 们 (men) convierte PERSONAS en plural, como un sello que se estampa detrás: 你 → 你们 (nǐmen, vosotros). Aprende el sello 们 una sola vez y te servirá para siempre: 我们 (wǒmen, nosotros) y 他们 (tāmen, ellos) llegan en el Sector 4, pero el mecanismo ya es tuyo.',
           'Tip del Overseer: 很 (hěn, "muy") es el pegamento entre pronombre y estado: 我很好 = "yo muy-bien". Sin 很, 我好 suena raro o a exclamación. Guárdalo junto a los pronombres: van siempre juntos.',
+          'Coloquial del día: 呢 (ne) — la partícula del ¿y tú/¿y eso?: 你呢？ = "¿y tú?", 你妈妈呢？ = "¿y tu madre?". No tiene tono propio y no cuenta como palabra nueva: es un eco que devuelve la pregunta.',
         ], [
           ['你们好！', 'nǐmen hǎo!', '¡Hola (a varios)!'],
           ['我很好。', 'wǒ hěn hǎo.', 'Estoy muy bien.'],
@@ -107,6 +111,7 @@ export const m1: VaultModule = {
         ...practice('w-xie-xie'),
         ...practice('w-zai-jian'),
         ...practice('w-dui-bu-qi'),
+        ...introLite('w-bu-keqi'),
         ...drill('w-qing3'),
         build('请喝茶。', 'qǐng hē chá.', 'Por favor, bebe té.'),
         match('w-xie-xie', 'w-zai-jian', 'w-dui-bu-qi', 'w-qing3'),

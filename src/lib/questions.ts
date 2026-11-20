@@ -15,17 +15,42 @@ export function shuffle<T>(arr: readonly T[]): T[] {
   return a
 }
 
-/** Pool de distractores: palabras vistas y, si no alcanzan, todo el curso */
-function distractorPool(entryId: string, completedLessonIds: string[]): string[] {
-  const seen = seenEntries(completedLessonIds).filter((id) => id !== entryId)
-  if (seen.length >= 3) return seen
-  const rest = [...entriesById.keys()].filter((id) => id !== entryId && !seen.includes(id))
-  return [...seen, ...rest]
+/**
+ * Pool de distractores: palabras vistas y, si no alcanzan, todo el curso.
+ * `sameLabel` decide si dos fichas son INDISTINGUIBLES para el jugador
+ * (evita retos irresolubles: 他/她 en pinyin, 妈/妈妈 en español).
+ */
+function distractorPool(
+  entryId: string,
+  completedLessonIds: string[],
+  sameLabel: (id: string) => string,
+): string[] {
+  const seen = new Set<string>([sameLabel(entryId)])
+  const take = (ids: string[]) => {
+    const out: string[] = []
+    for (const id of ids) {
+      if (id === entryId) continue
+      const label = sameLabel(id)
+      if (seen.has(label)) continue
+      seen.add(label)
+      out.push(id)
+    }
+    return out
+  }
+  const seenIds = seenEntries(completedLessonIds).filter((id) => id !== entryId)
+  if (seenIds.length >= 3) return take(seenIds)
+  const rest = [...entriesById.keys()].filter((id) => id !== entryId && !seenIds.includes(id))
+  return [...take(seenIds), ...take(rest)]
 }
 
-/** Opciones de respuesta: [correcta + 3 distractores] barajadas */
-export function optionsFor(entryId: string, completedLessonIds: string[], total = 4): string[] {
-  const pool = shuffle(distractorPool(entryId, completedLessonIds)).slice(0, total - 1)
+/** Opciones de respuesta: [correcta + 3 distractores] barajadas, sin duplicados visibles */
+export function optionsFor(
+  entryId: string,
+  completedLessonIds: string[],
+  total = 4,
+  sameLabel: (id: string) => string = (id) => id,
+): string[] {
+  const pool = shuffle(distractorPool(entryId, completedLessonIds, sameLabel)).slice(0, total - 1)
   return shuffle([entryId, ...pool])
 }
 

@@ -42,9 +42,11 @@ export default defineConfig({
           { src: `${base}icon-512-maskable.png`, sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
-      workbox: {
+      workbox: undefined as never, // (injectManifest usa la clave 'injectManifest' — ver abajo)
+      injectManifest: {
         // App shell + fuentes + TODO el audio del curso (offline total).
-        // (El runtime caching de fuentes vive en src/sw.ts)
+        // OJO: en modo injectManifest las opciones van AQUÍ, no bajo 'workbox'
+        // (bajo 'workbox' se IGNORAN silenciosamente — bug histórico).
         globPatterns: ['**/*.{js,css,html,svg,woff2,woff,ttf}', 'audio/*.mp3'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
       },

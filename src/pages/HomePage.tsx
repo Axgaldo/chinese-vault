@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────────────────── */
 
 import { useNavigate } from 'react-router-dom'
-import { lessonById, moduleOfLesson, modules, nextLessonId } from '../content'
+import { isLessonUnlocked, lessonById, moduleOfLesson, modules, nextLessonId } from '../content'
 import { sfx } from '../lib/sfx'
 import { APP_VERSION, GITHUB_URL, GITHUB_USER } from '../lib/version'
 import { useProgress } from '../stores/useProgress'
@@ -98,7 +98,15 @@ export function HomePage() {
       <SectionTitle>SECTORES DEL REFUGIO</SectionTitle>
       <div className="flex flex-col gap-3">
         {modules.map((m) => (
-          <ModuleCard key={m.id} m={m} records={records} adminMode={adminMode} onPlay={(lessonId) => navigate(`/lesson/${lessonId}`)} />
+          <ModuleCard
+            key={m.id}
+            m={m}
+            records={records}
+            completed={completed}
+            adminMode={adminMode}
+            nextLessonId={nextId}
+            onPlay={(lessonId) => navigate(`/lesson/${lessonId}`)}
+          />
         ))}
       </div>
 
@@ -122,12 +130,16 @@ export function HomePage() {
 function ModuleCard({
   m,
   records,
+  completed,
   adminMode,
+  nextLessonId,
   onPlay,
 }: {
   m: VaultModule
   records: Record<string, LessonRecord>
+  completed: string[]
   adminMode: boolean
+  nextLessonId: string
   onPlay(lessonId: string): void
 }) {
   const doneCount = m.lessons.filter((l) => l.id in records).length
@@ -146,10 +158,13 @@ function ModuleCard({
       </div>
       <p className="mt-0.5 text-xs text-vault-600">{m.subtitle}</p>
       <div className="mt-3 flex flex-wrap gap-2">
-        {m.lessons.map((l, i) => {
+        {m.lessons.map((l) => {
           const isDone = l.id in records
-          const unlocked = adminMode || i === 0 || m.lessons[i - 1].id in records
-          const isNext = !isDone && unlocked
+          // MISMA regla global que LessonPage (antes: cada módulo "abría" su
+          // lección 1 aunque la página la rechazara → 20 botones muertos)
+          const unlocked = adminMode || isLessonUnlocked(l.id, completed)
+          // un solo nodo "actual": la siguiente lección global pendiente
+          const isNext = !isDone && unlocked && l.id === nextLessonId
           return (
             <button
               key={l.id}
@@ -171,7 +186,7 @@ function ModuleCard({
               {isDone ? (
                 <span className="text-vault-amber">{'★'.repeat(records[l.id]?.stars ?? 1)}</span>
               ) : unlocked ? (
-                <span className="font-display text-lg">{i + 1}</span>
+                <span className="font-display text-lg">{m.lessons.indexOf(l) + 1}</span>
               ) : (
                 <span>🔒</span>
               )}

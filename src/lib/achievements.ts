@@ -80,7 +80,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   },
   {
     id: 'a-chapero',
-    emoji: '⛓️',
+    emoji: '🥤',
     title: 'El Rey de las Chapas',
     desc: 'Acumula 100 chapas',
     check: (s) => s.caps >= 100,

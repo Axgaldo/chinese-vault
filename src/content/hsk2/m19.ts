@@ -74,7 +74,7 @@ export const m19: VaultModule = {
       [
         grammar('n-haishi', '还是: la "o" que solo pregunta', [
           '还是 (háishì) es la "o" de las preguntas de elección cerrada: presentas un menú y obligas a elegir — 咖啡还是茶？ = "¿café o té?". Quien responde escoge UNA casilla del menú, no las dos: 茶，谢谢.',
-          'La señal para no fallar: si puedes insertar "¿cuál?" en la frase → 还是. ¿Quieres tomar té o café? → 你想喝茶还是咖啡？ Si la frase NO espera respuesta, 还是 no es tu palabra: para "o" informativo el chino usa 或者 (huòzhě), que rondará más adelante. Usar 还是 en una frase normal suena a pregunta cuando no lo es: ✗我喝茶还是咖啡 (te oirán responder).',
+          'La señal para no fallar: si puedes insertar "¿cuál?" en la frase → 还是. ¿Quieres tomar té o café? → 你想喝茶还是咖啡？ Si la frase NO espera respuesta, 还是 no es tu palabra: en frases afirmativas normales el "o" va por otro camino — lo verás a su tiempo. Usar 还是 en una frase normal suena a pregunta cuando no lo es: ✗我喝茶还是咖啡 (te oirán responder).',
           'El menú puede crecer con verbos completos: 你去还是我去？ = "¿vas tú o voy yo?". Es la frase del que delega la misión, y en el refugio funciona igual que en la superficie.',
           'Tip del Overseer: 还是 convierte cualquier lista en un menú. Si tu frase no espera respuesta, no es tu "o".',
         ], [

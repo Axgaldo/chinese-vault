@@ -78,6 +78,7 @@ export const m6: VaultModule = {
           '想 + verbo = "querer hacer algo": 想吃 "querer comer", 想喝 "querer beber". Sin conjugación, como todo en el refugio.',
           '想 también significa "pensar" o "extrañar" a alguien, pero en HSK 1 casi siempre es "querer".',
           'Para insistir añade 很: 我很想吃 = "tengo muchísimas ganas de comer". Y para precios y cantidades rescata tu 多少 (duōshao).',
+          'Otra cara de 还 (hái): "además/también". 我还想吃水果 = "quiero comer fruta ADEMÁS". Mismo carácter que 还是, otro papel.',
         ], [
           ['你想喝茶吗？', 'nǐ xiǎng hē chá ma?', '¿Quieres tomar té?'],
           ['我想吃一个苹果。', 'wǒ xiǎng chī yí gè píngguǒ.', 'Quiero comer una manzana.'],

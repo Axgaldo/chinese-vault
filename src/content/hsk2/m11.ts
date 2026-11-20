@@ -46,9 +46,9 @@ export const m11: VaultModule = {
         build('刚才我在学校。', 'gāngcái wǒ zài xuéxiào.', 'Hace un momento estaba en la escuela.'),
       ],
       [
-        grammar('n-shijian-relativo', '以前 y 以后: los anclas del tiempo', [
+        grammar('n-shijian-relativo', '以前 y 以后: las anclas del tiempo', [
           'El chino tiene un truco elegante para hablar del tiempo: 以前 ("antes") y 以后 ("después") funcionan como ADORNOS que se colocan justo después de lo que anclan.',
-          '1) Solos, abren la frase: 以前，我不喝茶 = "antes, yo no tomaba té" (habla de un pasado vago). 以后再说 = "luego lo hablamos"... (再说 se aprende más adelante).',
+          '1) Solos, abren la frase: 以前，我不喝茶 = "antes, yo no tomaba té" (habla de un pasado vago).',
           '2) Tras una acción, la convierten en punto de referencia: 吃饭以后 = "después de comer", literalmente "comer-después". Fíjate: en español decimos "DESPUÉS DE comer" (la preposición delante); en chino el marcador va DETRÁS: 吃饭以后. Piensa en ello como una foto con etiqueta: [foto]以后.',
           '3) 刚才 es distinto: es "hace un momento", un pasado inmediato y concreto. El hermano pequeño de 以前.',
           'Contraste para entenderlo bien: 我以前学习中文 (empecé en algún momento del pasado) ≠ 我刚才学习中文 (¡hace nada, acabo de levantarme de la mesa!).',
@@ -116,7 +116,7 @@ export const m11: VaultModule = {
           'Para decir "voy a..." el chino te da tres gasolineras de intención, de suave a firme:',
           '• 想 + verbo: "me apetece/apetecería" (un deseo, sin plan) — 我想去公园 (me gustaría ir al parque).',
           '• 打算 + verbo: "tengo pensado" (hay plan mental, sin compromiso) — 我打算明天学习 (mi idea es estudiar mañana, ya veremos).',
-          '• 准备 + verbo: "me dispongo a" (el plan está en marcha) — 我准备明年去中国? aún suena a preparación seria: 我准备明天开始 = "mañana empiezo (en serio)".',
+          '• Para planes ya firmes, 准备 + verbo ("me dispongo a"): 我准备明天开始 = "mañana empiezo (en serio)".',
           'Contraste: 我想吃米饭 (me apetece arroz) → 我打算吃米饭 (he decidido que hoy, arroz) → 我准备了米饭 (lo tengo ya preparado: 准备 también es "preparar" literal).',
           'El verbo 开始 (empezar) y 结束 (terminar) encajan en cualquier plan: 八点开始 = "empieza a las ocho"; 工作结束了 = "el trabajo HA terminado" (fíjate en el 了: cambio de estado).',
         ], [

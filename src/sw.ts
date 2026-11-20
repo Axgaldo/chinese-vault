@@ -20,6 +20,7 @@ interface SWSelf {
   __WB_MANIFEST: { url: string; revision: string | null }[]
   skipWaiting(): Promise<void>
   clients: {
+    claim?(): Promise<unknown>
     matchAll(opts?: { type?: string }): Promise<SWClient[]>
     openWindow(url: string): Promise<SWClient | undefined>
   }
@@ -51,6 +52,17 @@ registerRoute(
 )
 
 /* Activación de la nueva versión cuando toque */
+self.addEventListener('install', () => {
+  // autoUpdate real: el SW nuevo se activa al instalar (antes solo actuaba con
+  // un mensaje SKIP_WAITING que nadie enviaba → PWA congelada en versión vieja)
+  void self.skipWaiting()
+})
+
+self.addEventListener('activate', (event) => {
+  const e = event as unknown as { waitUntil(p: Promise<unknown>): void }
+  e.waitUntil(Promise.resolve(self.clients.claim?.()))
+})
+
 self.addEventListener('message', (event) => {
   if ((event.data as { type?: string } | undefined)?.type === 'SKIP_WAITING') {
     void self.skipWaiting()
@@ -66,12 +78,13 @@ self.addEventListener('notificationclick', (event) => {
       if (action === 'snooze') {
         // posponer: la app abierta guarda el aplazamiento; si no hay, se abre
         clients.forEach((c) => c.postMessage({ type: 'snooze-streak' }))
-        if (!clients.length) return self.clients.openWindow('/')
+        if (!clients.length) return self.clients.openWindow('./')
         return undefined
       }
       const focusable = clients.find((c) => typeof c.focus === 'function')
       if (focusable?.focus) return focusable.focus()
-      return self.clients.openWindow('/')
+      // './' relativo al SCOPE del SW (antes '/' abría la raíz del dominio: 404)
+      return self.clients.openWindow('./')
     }),
   )
 })

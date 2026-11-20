@@ -13,6 +13,7 @@ export function Btn({
 }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'amber' }) {
   return (
     <button
+      type={rest.type ?? 'button'}
       className={`btn-vault ${variant === 'amber' ? 'btn-vault-amber' : ''} px-4 py-2.5 text-2xl ${className}`}
       {...rest}
     >
@@ -42,7 +43,13 @@ export function Chip({ className = '', children }: { className?: string; childre
 export function Meter({ value, className = '' }: { value: number; className?: string }) {
   const pct = Math.round(Math.min(1, Math.max(0, value)) * 100)
   return (
-    <div className={`meter h-3 w-full ${className}`} role="progressbar" aria-valuenow={pct}>
+    <div
+      className={`meter h-3 w-full ${className}`}
+      role="progressbar"
+      aria-valuenow={pct}
+      aria-valuemin={0}
+      aria-valuemax={100}
+    >
       <div className="meter-fill h-full transition-all duration-500" style={{ width: `${pct}%` }} />
     </div>
   )

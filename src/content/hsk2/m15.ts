@@ -108,11 +108,11 @@ export const m15: VaultModule = {
       [
         grammar('n-bi', '比: la báscula de dos platos', [
           'La comparación china es una báscula: A + 比 (bǐ) + B + ADJETIVO. 汽车比自行车快 = "el coche es más rápido que la bici". 比 es la palanca que inclina el fiel hacia A; lo que se coloca detrás de 比 (el plato B) pierde la comparación.',
-          'A) EL ERROR NÚMERO UNO: pagar el "más" dos veces. El "más" YA ESTÁ dentro de 比, así que el adjetivo final va PELADO: ✗汽车比自行车更快 (el 更 de "más-más" desequilibra la frase) / ✓汽车比自行车快. Ni 很, ni 更, ni adorno: la báscula compara y el adjetivo solo declara la cualidad.',
+          'A) EL ERROR NÚMERO UNO: pagar el "más" dos veces con 很. El "más" YA ESTÁ dentro de 比, así que el adjetivo final va PELADO: ✗汽车比自行车很快 / ✓汽车比自行车快. ¿Y 更? BIEN VENIDO: 更 (gèng, "aún más") y 还 (hái) son CORRECTOS con 比 y muy frecuentes cuando refuerzas: 今天比昨天更冷 ("hace más frío que ayer"). Lo que nunca entra es 很/非常/太.',
           'B) ¿CUÁNTO MÁS? El grado se cuelga AL FINAL: 汽车比自行车快很多 (kuài hěn duō) = "mucho más rápido"; 快一点儿 (yìdiǎnr) = "un poco más rápido". La medida siempre cierra la frase, tras el adjetivo — nunca junto a 比.',
           'C) LA NEGATIVA SE MANEJA CON PINZAS: "A no es más X que B" se dice A + 不比 + B + X: 我不比你高 = "no soy más alto que tú". Atención: NO significa "soy más bajo", solo que la báscula no demuestra nada. Negar la comparación no es ganar la contraria.',
           'D) 离 PARA LAS DISTANCIAS: cuando lo que se mide es un MAPA y no una cualidad, la pieza se llama 离 (lí, "a distancia de"): A + 离 + B + 近/远. 图书馆离我家很近 = "la biblioteca está muy cerca de mi casa" — puntos y regla, sin 比. Cerca y lejos se miden con 离; rápido y lento se comparan con 比.',
-          'Tip del Overseer: canta el molde al fabricar la frase: GANADOR → 比 → RIVAL → adjetivo pelado. Si te sale un "más" extra (gèng), has pagado el peaje dos veces: el Overseer no devuelve fichas.',
+          'Tip del Overseer: canta el molde al fabricar la frase: GANADOR → 比 → RIVAL → adjetivo pelado. ¿Quieres enfatizarlo? 更 o 还 entran sin peaje: refuerzan, no pagan dos veces.',
         ], [
           ['汽车比自行车快。', 'qìchē bǐ zìxíngchē kuài.', 'El coche es más rápido que la bici.'],
           ['图书馆离我家很近。', 'túshūguǎn lí wǒ jiā hěn jìn.', 'La biblioteca está muy cerca de mi casa.'],
