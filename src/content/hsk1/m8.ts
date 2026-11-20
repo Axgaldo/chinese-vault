@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   SECTOR 8 · HSK 1 — RUTINA (módulo 8/10)
+   SECTOR 8 · HSK 1 — RUTINA (módulo 8/12)
 
    La vida diaria del refugio: 看/听/说/写 para la acción, 学习 y 工作
    para el deber de cada día, 会 para lo que sabes y 能 para lo que puedes.

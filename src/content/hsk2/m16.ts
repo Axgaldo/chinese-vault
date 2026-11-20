@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   SECTOR 16 · HSK 2 — DAR Y TOMAR (módulo 6/10)
+   SECTOR 18 · HSK 2 — DAR Y TOMAR (módulo 6/15)
 
    El mercado del refugio: 给 con la persona en el hueco de oro, V+到 como
    complemento de resultado ("conseguí + verbo") y la pareja cultural 借/还.
@@ -12,7 +12,7 @@ import { build, dictate, drill, e, grammar, lesson, match, noteStep, practice, t
 export const m16: VaultModule = {
   id: 'm16',
   hsk: 2,
-  code: 'S-16',
+  code: 'S-18',
   title: 'Dar y Tomar',
   subtitle: 'El mercado del refugio: dar, prestar, buscar y llegar',
   entries: [
@@ -118,7 +118,7 @@ export const m16: VaultModule = {
     ),
     lesson(
       'm16-l4',
-      'Auditoría del Sector 16',
+      'Auditoría del Sector 18',
       'review',
       [
         match('w-gei3', 'w-song4', 'w-jie4', 'w-huan2'),

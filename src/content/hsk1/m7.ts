@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   SECTOR 7 · HSK 1 — TIEMPO (módulo 7/10)
+   SECTOR 7 · HSK 1 — TIEMPO (módulo 7/12)
 
    Hoy, mañana y ayer en el calendario del refugio: 年/月/日 para las
    fechas (de grande a pequeño) y 点/半/分钟 para no llegar tarde.

@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   SECTOR 20 · HSK 2 — EL IDIOMA Y LA AUDITORÍA FINAL (módulo 10/10)
+   SECTOR 27 · HSK 2 — EL IDIOMA Y LA AUDITORÍA FINAL (módulo 15/15)
 
    El sector del meta-aprendizaje: por fin tienes NOMBRES para las piezas del
    chino (声调, 拼音, 汉字, 语法), la partícula de la biografía 过 y la
@@ -12,7 +12,7 @@ import { build, dictate, drill, e, grammar, introLite, lesson, match, noteStep, 
 export const m20: VaultModule = {
   id: 'm20',
   hsk: 2,
-  code: 'S-20',
+  code: 'S-27',
   title: 'El Idioma y la Auditoría Final',
   subtitle: '声调, 拼音, 汉字: anatomía del chino + protocolo HSK 2 completo',
   entries: [
@@ -120,7 +120,7 @@ export const m20: VaultModule = {
       ],
       [
         grammar('n-finale-hsk2', 'CERTIFICADO DEL OVERSEER: protocolo HSK 2 completo', [
-          'Auditoría final superada, morador. Has sellado los sectores S-11 a S-20: unas ~300 palabras en el registro del refugio y — lo que de verdad importa — la CAJA DE HERRAMIENTAS completa. La partícula 了 ya no te asusta (cambio, no pasado), comparas con 比, cuentas experiencias con 过, piensas con 因为...所以..., eliges con 还是 y exclamas con 太...了.',
+          'Auditoría final superada, morador. Has sellado los sectores S-13 a S-27: TODAS las palabras oficiales del HSK 2 en el registro del refugio (las ~130 de los sectores fundacionales más las de refuerzo de la segunda pasada) y — lo que de verdad importa — la CAJA DE HERRAMIENTAS completa. La partícula 了 ya no te asusta (cambio, no pasado), comparas con 比, cuentas experiencias con 过, piensas con 因为...所以..., eliges con 还是 y exclamas con 太...了.',
           'Los últimos cinco sectores en una línea: S-16 te enseñó a dar (给, persona primero) y a lograr (V+到, misión cumplida); S-17 a navegar la era digital (上网, 发短信); S-18 a moverte sin perderte (来/去, 一直走, 左拐); S-19 a opinar como el Overseer (但是, 最, 越来越); S-20 a nombrar el propio idioma (声调, 拼音, 汉字, 语法).',
           'Consejo de despedida: la memoria es un músculo de refugio — los repasos del SRS y la Radio del Refugio mantienen las compuertas abiertas. Cinco minutos al día valen más que una hora al mes: 我每天练习, dice el cartel de tu propio sector.',
           'La siguiente puerta lleva a HSK 3: más conectores, más matices y las primeras historias largas. El Overseer firma aquí tu certificado, de su puño y letra: ACCESO CONCEDIDO.',

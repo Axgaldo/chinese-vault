@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   SECTOR 14 · HSK 2 — GENTE DEL REFUGIO (módulo 4/10)
+   SECTOR 16 · HSK 2 — GENTE DEL REFUGIO (módulo 4/15)
 
    男/女 como etiquetas prefijables, oficios sin género gramatical y el kit de
    meta-lenguaje (说话, 声音, 单词, 意思, 问题) para preguntar por el chino
@@ -12,7 +12,7 @@ import { build, dictate, drill, e, grammar, lesson, match, noteStep, practice, t
 export const m14: VaultModule = {
   id: 'm14',
   hsk: 2,
-  code: 'S-14',
+  code: 'S-16',
   title: 'Gente del Refugio',
   subtitle: 'Personas, oficios y las palabras del idioma',
   entries: [
@@ -114,7 +114,7 @@ export const m14: VaultModule = {
     ),
     lesson(
       'm14-l4',
-      'Auditoría del Sector 14',
+      'Auditoría del Sector 16',
       'review',
       [
         match('w-nan2', 'w-nv3', 'w-hai-zi', 'w-lin-ju'),

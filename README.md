@@ -18,20 +18,26 @@ CALIBRANDO TONOS (4/4).............. OK
 ABRIENDO LA PUERTA DEL REFUGIO 101..
 ```
 
-## Qué tiene hoy (v0.3) — HSK 1 COMPLETO
+## Qué tiene hoy (v3.0) — HSK 0–3 COMPLETO
 
 - **Sector 0 (HSK 0):** tonos, fonética y pinyin antes de hablar.
-- **Sectores 1–10 (HSK 1 completo):** saludos, identidad, números, familia, lugares, comida,
-  tiempo, rutina, cualidades y la Auditoría Final — **~150 palabras y 25 apuntes de gramática**.
-- **Sectores 11–20 (HSK 2 completo):** la gran partícula **了** (explicada como cambio de estado,
+- **Sectores 1–12 (HSK 1 completo):** saludos, identidad, números, familia, lugares, comida,
+  tiempo, rutina, cualidades, ciudad y preguntas — **las 150 palabras oficiales del HSK 1**
+  (verificado por test contra la lista oficial).
+- **Sectores 13–27 (HSK 2 completo):** la gran partícula **了** (explicada como cambio de estado,
   no como "pasado"), posiciones, comida, gente, comparaciones con **比**, dar/tomar con **V+到**,
-  tecnología, direcciones con deixis **V+来/V+去**, conectores **因为...所以** y la experiencia
-  con **V+过** — ~130 palabras nuevas y 16 apunes con profundidad de profesor (contrastes bien/mal).
+  tecnología, direcciones con deixis **V+来/V+去**, conectores **因为...所以**, la experiencia
+  con **V+过**… y los sectores de refuerzo que cierran **todas las palabras oficiales del HSK 2**:
+  familia ampliada, tiempo y cifras, salud, viajes y los modales (会/可以/可能/要, 着, 让).
+- **Sectores 28+ (HSK 3):** el complemento de resultado y la partícula **把**, el cuerpo y las
+  sensaciones, las estaciones — y el resto del nivel 3 en camino.
 - **📻 Radio del Refugio:** escucha pura con las frases que ya has aprendido — boletines por
-  sector, transcripción de emisiones (dictado de frase completa) y el programa de tonos.
-- **10 tipos de reto:** tarjetas de vocabulario, traducción, dictado por oído, entrenador de tonos,
+  sector, transcripción de emisiones (dictado de frase completa), el programa de tonos y
+  **🎭 diálogos** con retos por línea.
+- **12 tipos de reto:** tarjetas de vocabulario, traducción, dictado por oído, entrenador de tonos,
   escribir pinyin, **dictado de oído puro** (quiz de escucha sin texto), construir frases,
-  emparejar, apuntes de gramática y auditorías de repaso.
+  emparejar, apuntes de gramática, **desafío oral con micro** (reconocimiento de voz), **escritura
+  de hanzi a mano** (canvas con puntuación por superposición) y auditorías de repaso.
 - **Repetición espaciada (SRS):** cada palabra vista entra en tu cola de repaso con intervalos
   crecientes (SM-2 simplificado).
 - **3 modos de escritura (estilo HelloChinese):** botón 拼 → 拼+漢 → 漢 en plena lección —
@@ -55,8 +61,9 @@ ABRIENDO LA PUERTA DEL REFUGIO 101..
   (manuscrita y redonda) y **VFX** (Glitch y Neón, además del CRT de serie).
 - **Estadísticas del morador:** registro con XP, racha (con récord), precisión media y por
   sector, calor de actividad de 14 días y contadores varios.
-- **50 tests automatizados** (Vitest) de pinyin, SRS, retos y la integridad completa del
-  curso, corriendo en CI en cada push.
+- **Tests automatizados** (Vitest) de pinyin, SRS, retos, la integridad completa del curso
+  y la **cobertura de las listas oficiales HSK 1–3** (ninguna palabra oficial puede quedarse
+  fuera), corriendo en CI en cada push.
 - Cero backend, cero binarios en el repo, licencia **MIT**.
 
 ## Arranque rápido

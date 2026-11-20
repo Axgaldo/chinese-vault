@@ -15,6 +15,10 @@ export function ArchivePage() {
   const [tab, setTab] = useState<'palabras' | 'gramatica'>('palabras')
   const [filter, setFilter] = useState('all')
   const [mode, setMode] = useState<'listen' | 'speak' | 'write'>('listen')
+  // paginación progresiva: con todo el curso visto son 800+ fichas y 100+
+  // apuntes — volcarlos de golpe congela el navegador móvil
+  const [wordPage, setWordPage] = useState(0)
+  const [notePage, setNotePage] = useState(0)
   const completedKey = useProgress((s) => Object.keys(s.completed).join(','))
   const completed = completedKey ? completedKey.split(',') : []
 
@@ -29,6 +33,15 @@ export function ArchivePage() {
       const mod = modules.find((m) => m.entries.some((en) => en.id === e.id))
       return mod?.id === filter
     })
+
+  const WORDS_PER_PAGE = 60
+  const NOTES_PER_PAGE = 12
+  const shownWords = words.slice(0, (wordPage + 1) * WORDS_PER_PAGE)
+  const shownNotes = notes.slice(0, (notePage + 1) * NOTES_PER_PAGE)
+  const pickFilter = (f: string) => {
+    setFilter(f)
+    setWordPage(0)
+  }
 
   return (
     <div className="flex flex-col gap-3 p-4 pb-8">
@@ -62,13 +75,13 @@ export function ArchivePage() {
       {tab === 'palabras' && completed.length > 0 && (
         <>
           <div className="flex flex-wrap gap-1.5">
-            <button type="button" onClick={() => setFilter('all')} className={filterChip(filter === 'all')}>
+            <button type="button" onClick={() => pickFilter('all')} className={filterChip(filter === 'all')}>
               TODOS
             </button>
             {modules
               .filter((m) => m.entries.some((e) => seen.includes(e.id)))
               .map((m) => (
-                <button key={m.id} type="button" onClick={() => setFilter(m.id)} className={filterChip(filter === m.id)}>
+                <button key={m.id} type="button" onClick={() => pickFilter(m.id)} className={filterChip(filter === m.id)}>
                   {m.code}
                 </button>
               ))}
@@ -93,7 +106,7 @@ export function ArchivePage() {
             ))}
           </div>
           <div className="grid grid-cols-2 gap-2">
-            {words.map((e) => (
+            {shownWords.map((e) => (
               <button
                 key={e.id}
                 type="button"
@@ -112,12 +125,21 @@ export function ArchivePage() {
               </button>
             ))}
           </div>
+          {shownWords.length < words.length && (
+            <button
+              type="button"
+              className="btn-vault px-4 py-2 text-xl"
+              onClick={() => setWordPage((p) => p + 1)}
+            >
+              CARGAR MÁS ({words.length - shownWords.length} restantes)
+            </button>
+          )}
         </>
       )}
 
       {tab === 'gramatica' && (
         <div className="flex flex-col gap-3">
-          {notes.map((n) => (
+          {shownNotes.map((n) => (
             <Panel key={n.id} className="p-4">
               <SectionTitle className="text-xl">{n.title}</SectionTitle>
               <div className="mt-2 space-y-2 text-sm leading-relaxed">
@@ -136,6 +158,15 @@ export function ArchivePage() {
               </div>
             </Panel>
           ))}
+          {shownNotes.length < notes.length && (
+            <button
+              type="button"
+              className="btn-vault px-4 py-2 text-xl"
+              onClick={() => setNotePage((p) => p + 1)}
+            >
+              CARGAR MÁS APUNTES ({notes.length - shownNotes.length} restantes)
+            </button>
+          )}
         </div>
       )}
     </div>

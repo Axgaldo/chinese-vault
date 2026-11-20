@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   SECTOR 5 · HSK 1 — LUGARES (módulo 5/10)
+   SECTOR 5 · HSK 1 — LUGARES (módulo 5/12)
 
    Dónde está cada cosa y dónde estás tú: 在 para localizar, 这/那 para
    señalar y 哪儿 para no perderse por los pasillos del refugio.

@@ -395,6 +395,7 @@ export function ProfilePage() {
               step={0.05}
               value={settings.audioRate}
               className="flex-1 accent-vault-400"
+              aria-label="velocidad del audio"
               onChange={(e) => setSettings({ audioRate: Number(e.target.value) })}
             />
             <Btn onClick={() => speakHanzi('你好，中文')} className="px-2 py-1 text-lg">

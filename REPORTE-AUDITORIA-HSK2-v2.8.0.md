@@ -749,18 +749,31 @@ for (const e of entriesById.values()) (byEs.get(e.es) ?? byEs.set(e.es, []).get(
 
 | Hallazgo | Motivo / plan |
 |---|---|
-| **COV-01** 76 palabras HSK 2 + 19 HSK 1 sin aparecer | Es la brecha de contenido real. **Decisión de owner pendiente**: cerrarlas antes de HSK 3 (recomendado: añadir 2-3 sectores "relleno" con las que faltan) o aceptar el syllabus propio. La nota del certificado m10/m20 debería ajustarse si se elige lo segundo. |
-| **COV-02** recuentos exagerados en m10/m20/README | Se corrige junto con COV-01 cuando se decida el recuento final. |
-| **SYNC-01** BORRAR TODO no borra la nube | Requiere diseño de UX (confirmación + tombstone). Antes de HSK 3. |
-| **SYNC-03** push sin transacción | Riesgo bajo con un solo usuario real; requires `runTransaction`. Junto con SYNC-01. |
+| **COV-01** 76 palabras HSK 2 + 19 HSK 1 sin aparecer | ✅ **CORREGIDO EN v3.0.0**: sectores de refuerzo m9b/m9c (HSK 1, S-10/11) y m19a-e (HSK 2, S-22..26) + HSK 3 completo (m21-m31, S-28..38). El test `coverage.test.ts` contra las listas oficiales HSK 2.0 lo verifica en cada push: **ninguna palabra de los niveles 1-3 puede quedarse fuera** (59/59 verdes). |
+| **COV-02** recuentos exagerados en m10/m20/README | ✅ Corregidos: "las 150 palabras oficiales" (m10), "TODAS las palabras oficiales del HSK 2" (m20), README v3.0.0. Headers de módulo renumerados (X/12 y X/15). |
+| **SYNC-01** BORRAR TODO no borra la nube | **OMITIDO por decisión del owner** (2026-11-20). Requiere diseño de UX (confirmación + tombstone) si algún día se retoma. |
+| **SYNC-03** push sin transacción | **OMITIDO por decisión del owner** (2026-11-20). Riesgo bajo con un solo usuario real; requiere `runTransaction` si se retoma. |
 | **BUG-17** write obligatorio en auditorías | Se acepta el reencolado; el umbral IoU 0.5 es razonable. Si molesta en uso real, añadir SALTAR tras 2 fallos. |
-| **UX-07** restante | Canvas con aria-label + labels de inputs: con la pasada de accesibilidad completa. |
-| **UX-09** escalado (mapa 31 sectores, 852 fichas) | Se hace CON HSK 3 (cabeceras por nivel + paginación de Archivo en esa misma tanda). |
-| **§9 documentación** (HSK 0-1→0-2, 50→54 tests) | Pendiente; se hace en la tanda de HSK 3 junto con los contadores. |
-| Plan HSK 3 con "~600 nuevas" | **Corregido en AGENTS.md**: son ~300 nuevas (600 acumuladas); la Checklist §8.3 se mantiene vigente y añade: slugs con tono ya lo resuelven; cachear audio por hash en CI si el TTS se vuelve lento. |
+| **UX-07** restante | ✅ **Corregido en v3.0.0**: aria-labels en todos los inputs de pinyin/dictado, canvas de escritura con `role="img"` descriptivo, `Meter` con `aria-valuemin/max`, `Btn` con `type="button"` por defecto. |
+| **UX-09** escalado (mapa 31 sectores, 852 fichas) | ✅ **Corregido en v3.0.0**: mapa con 4 niveles HSK plegables (los niveles cerrados se pliegan solos), Archivo paginado (60 palabras/12 apuntes por página con CARGAR MÁS), NavBar con tick de 60 s. Verificado en navegador. |
+| **§9 documentación** (HSK 0-1→0-2, 50→54 tests) | ✅ **Corregido en v3.0.0**: README reescrito (HSK 0-3, 12 retos, tests de cobertura), AGENTS.md con estructura nueva, numeración definitiva S-00..S-38 y las reglas de la iteración (cobertura oficial, ids homófonos, UTF-8 seguro). |
+| Plan HSK 3 con "~600 nuevas" | ✅ **Hecho en v3.0.0**: HSK 3 completo (S-28..S-38, las 298 oficiales), diálogos HSK3 en la radio, ~120 lecciones nuevas en total entre refuerzos y HSK 3. |
 
 ### 12.3 Nota sobre el audio tras el cambio de slugs
 
 `npm run audio` ahora genera nombres con tonos (`s-ni3-hao3-ma.mp3`). El despliegue de Pages regenera los MP3 en CI, así que producción se auto-corrige al hacer push. La primera visita tras v2.9.0 puede tardar un poco más (descarga de los MP3 nuevos al precache), luego todo vuelve a ser offline.
 
 *Actualizado el 2026-11-20 tras la ola de corrección v2.9.0 (commit `a4c6ced`).*
+
+---
+
+## 13. Cierre definitivo (v3.0.0)
+
+La iteración pactada con el owner — *COV-01 + UX-09 + accesibilidad + docs + HSK 3 completo con diálogos, SYNC-01/03 omitidos* — quedó **terminada y verificada**:
+
+- **COV-01 cerrado para siempre**: `src/content/official-hsk.ts` (listas HSK 2.0 oficiales, fuente MIT `complete-hsk-vocabulary`) alimenta `src/content/coverage.test.ts`. Las palabras de los niveles 1, 2 y 3 tienen que aparecer sí o sí en el corpus (fichas, frases, ejemplos o diálogos). 59/59 tests verdes.
+- **Estructura definitiva de 40 sectores** (S-00..S-38 + auditorías): HSK 1 con refuerzos S-10/11 (m9b/m9c), HSK 2 con refuerzos S-22..26 (m19a-e), HSK 3 completo S-28..38 (m21-m31: 把 y resultados, cuerpo, estaciones, ciudad, grados 得/地, mente, escuela/oficina con 被, conectores, clasificadores/ropa/colores, mesa/familia extendida, ideas abstractas).
+- **Radio**: +30 diálogos nuevos (refuerzos + HSK3), todos con disciplina de vocabulario verificada línea a línea.
+- **Audio**: 945 MP3 regenerados (esquema con tonos), incluidas todas las frases nuevas.
+- **UX-09**: mapa por niveles plegable + Archivo paginado. **UX-07**: accesibilidad de inputs/canvas/completada. **Docs**: README y AGENTS.md al día.
+- Verificación en navegador: mapa con 4 niveles, lección HSK3 jugable de punta a punta, diálogos nuevos accesibles y con retos funcionando.

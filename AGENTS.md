@@ -57,7 +57,7 @@ y arreglos. Se muestra en inicio, barra lateral, arranque y perfil: SIEMPRE impo
 | Audio           | msedge-tts + Web Speech API | MP3 pre-generados en `public/audio` (gitignored) con fallback TTS navegador |
 | PWA             | vite-plugin-pwa 2 · **injectManifest** (SW propio `src/sw.ts`): precache + clic de notificaciones |
 | Lint            | ESLint 10 flat config       | `npm run lint`                              |
-| Tests           | Vitest 5 (`npm run test`)   | 50 tests de libs puras + integridad del curso; gate en CI y deploy |
+| Tests           | Vitest 5 (`npm run test`)   | libs puras + integridad del curso + COBERTURA OFICIAL HSK 1-3; gate en CI y deploy |
 | SFX             | WebAudio procedural         | pitidos retro, sin archivos de sonido       |
 
 Node >= 20 (desarrollado con Node 26). npm como gestor.
@@ -69,7 +69,7 @@ npm install          # dependencias
 npm run dev          # http://localhost:5173
 npm run build        # tsc -b && vite build (debe pasar sin errores)
 npm run lint         # ESLint
-npm run test         # Vitest (50 tests: pinyin, SRS, retos, logros, integridad del curso)
+npm run test         # Vitest (pinyin, SRS, retos, logros, integridad del curso, cobertura oficial HSK)
 npm run audio        # genera los MP3 que falten (usa src/content como fuente de verdad)
 npm run audio:force  # regenera TODOS los mp3
 npm run icons        # rasteriza favicon.svg → PNGs (icon-192/512, maskable, apple-touch)
@@ -90,14 +90,17 @@ src/
 │   ├── builders.ts      # helpers: e(), grammar(), lesson(), drill(), build(), match()…
 │   ├── hsk0.ts          # SECTOR 0: tonos y fonética
 │   ├── index.ts         # registro: modules, lessonById, entriesById, seenEntries…
-│   ├── hsk1/m1…m10.ts  # SECTORES 1-10 (HSK 1: saludos→…→auditoría final)
-│   └── hsk2/m11…m20.ts # SECTORES 11-20 (HSK 2: 了→posiciones→comida→gente→比→dar/tomar→tecnología→movimiento→conectores→idioma+final)
+│   ├── official-hsk.ts  # listas oficiales HSK 1-3 (generadas; alimentan coverage.test.ts)
+│   ├── coverage.test.ts # EL GUARDIÁN: TODAS las palabras oficiales HSK 1-3 deben estar
+│   ├── hsk1/m1…m10.ts  # SECTORES S-01 a S-09 + m9b/m9c (S-10/11 refuerzo) + m10 (S-12 auditoría)
+│   ├── hsk2/m11…m20.ts # SECTORES S-13 a S-21 + m19a-e (S-22..26 refuerzo) + m20 (S-27 auditoría)
+│   └── hsk3/m21….ts    # SECTORES S-28 en adelante (HSK 3)
 ├── types/               # content.ts (curso) y progress.ts (progreso/SRS/rangos)
 ├── lib/
 │   ├── audio.ts         # speakEntry/speakSentence: MP3 → fallback TTS
 │   ├── pinyin.ts        # sílabas, tonos, colores, normalización (ü/v/u:, sin tonos)
 │   ├── srs.ts           # SM-2 simplificado (again/hard/good/easy)
-│   ├── questions.ts     # distractores en runtime + reviewStepFor
+│   ├── questions.ts     # distractores en runtime + reviewStepFor (dedup por etiqueta visible)
 │   ├── achievements.ts  # catálogo de logros + newlyUnlocked (se sellan en el store)
 │   ├── sfx.ts           # WebAudio bleeps retro
 │   ├── firebase.ts      # loadFirebase() perezoso (chunk aparte)
@@ -105,20 +108,25 @@ src/
 ├── stores/
 │   ├── useProgress.ts   # zustand persist: xp, chapas, racha, completadas, srs, logros, ajustes
 │   ├── useAuth.ts       # modo local/anon/account (no persistido)
-│   └── useToasts.ts     # avisos flotantes (logros/chapas) con autodesaparición
+│   └── useToasts.tsx    # avisos flotantes (logros/chapas) con autodesaparición
 ├── components/
-│   ├── challenges.tsx   # LOS 10 RETOS (intro, note, choose-es, choose-hanzi, listen,
-│   │                    #   tone, type-pinyin, dictate=quiz de escucha, build, match)
+│   ├── challenges.tsx   # LOS RETOS (intro, note, choose-es, choose-hanzi, listen,
+│   │                    #   tone, type-pinyin, dictate=quiz de escucha, build, match,
+│   │                    #   speak=oral con ventana mínima 2s, write=canvas 田字格)
 │   │                    #   + ChallengeView dispatcher
 │   ├── LessonRunner.tsx # cola de pasos, reintentos (pos+4), XP, estrellas, completado
-│   ├── Pinyin.tsx       # pinyin coloreado por tono
+│   ├── Pinyin.tsx       # pinyin coloreado por tono (POR SÍLABA, syllabify)
 │   ├── BootScreen.tsx   # arranque VAULT-OS (una vez, localStorage 'cv-boot-v1')
-│   ├── NavBar.tsx       # 4 tabs + badge de repasos pendientes
+│   ├── NavBar.tsx       # 6 tabs + badge de repasos pendientes (tick 60s)
 │   └── ui.tsx           # Btn, Panel, Chip, Meter, SectionTitle, Prompt, SpeakerBtn
-├── pages/               # Home (mapa), Lesson, Review (SRS), Archive, Profile
+├── pages/               # Home (mapa por niveles plegable), Lesson, Review (SRS, tope 30),
+│   │                    # Archive (paginado), Radio, Dialogues, Practice, Profile, Shop
 ├── App.tsx              # rutas + carcasa (max-w-460px) + overlays CRT
-└── main.tsx             # initSfx/initSync/settings + HashRouter
-scripts/generate-audio.ts  # msedge-tts → public/audio (NO tocar sin rerun)
+└── main.tsx             # initSfx/initSync/syncDay/settings + HashRouter
+scripts/generate-audio.ts  # msedge-tts → public/audio (slugs CON tonos desde v2.9)
+scripts/clean-audio.ts     # borra MP3 del esquema antiguo (sin tonos)
+scripts/hsk-coverage.ts    # informe: qué palabras oficiales faltan
+scripts/gen-official-hsk.ts# regenera official-hsk.ts desde scripts/hsk-data
 public/audio/              # MP3 GENERADOS, gitignored. Regenerables siempre.
 ```
 
@@ -347,18 +355,30 @@ service cloud.firestore {
   (gapPinyin undefined → hueco imposible). Las líneas usan el slug `s-{pinyin}` —
   `npm run audio` las genera.
 
-## Preparado para HSK 3 (próxima iteración)
+## HSK 3 (v3.0.0 — en curso)
 
-Checklist para añadir HSK 3 (se repite el patrón de HSK 2, todo ya probado):
+La numeración DEFINITIVA de sectores (40 en total, se pegó al hueco de los refuerzos):
 
-1. `VaultModule.hsk` → `0 | 1 | 2 | 3` (types/content.ts) + test de integridad (index.test.ts
-   acepta hsk 3).
-2. Sectores `src/content/hsk3/m21…m30.ts` (S-21 a S-30): primero un sector fundacional escrito
-   A MANO con la nota pedagógica "profesor" (estilo m11), luego subagentes con tablas
-   autoritativas de pinyin. El test "builds: alineación 1:1" valida TODAS las frases.
-3. Diálogos HSK 3: añadir a `lib/dialogues.ts` anclados a los sectores nuevos + `npm run audio`.
-4. Vocabulario HSK 3 canónico: ~600 palabras nuevas (el doble que HSK 2) — repartir en 10
-   sectores de ~40-50 palabras con 4-5 lecciones cada uno.
+- **S-00** hsk0 · **S-01..S-09** m1-m9 · **S-10/S-11** m9b/m9c (refuerzo HSK 1) · **S-12** m10 (auditoría HSK 1)
+- **S-13..S-21** m11-m19 · **S-22..S-26** m19a-m19e (refuerzo HSK 2) · **S-27** m20 (auditoría HSK 2)
+- **S-28..S-30** m21-m23 (HSK 3 oleada 1) · **S-31..S-38** m24-m31 (HSK 3 oleada 2)
+
+Reglas nuevas que surgieron en esta iteración (ya aplicadas, no romperlas):
+
+1. **COBERTURA OFICIAL**: `src/content/official-hsk.ts` (generado de la fuente MIT
+   `scripts/hsk-data/old-{1,2,3}.json`) alimenta `src/content/coverage.test.ts` — TODAS las
+   palabras oficiales HSK 1-3 deben aparecer en el corpus (fichas, builds, ejemplos o diálogos).
+   Al añadir palabras: `npx tsx scripts/hsk-coverage.ts` dice qué faltan.
+2. **Referencias de sector en prosa**: al renumerar, los apuntes citan "S-XX" — si se mueve un
+   módulo, actualizar las citas (busca `S-1\d` en el contenido).
+3. **Ids homófonos**: cuando dos palabras comparten pinyin, el id se desambigua con sufijo
+   (`w-jiu4-then` 就 vs `w-jiu4` 旧, `w-xia4-summer` 夏, `w-zhu4-wish` 祝, `w-jiao3-corner` 角,
+   `w-nan2-south` 南, `w-nan2-hard` 难…). El audio por entrada usa el id: sin desambiguación,
+   homófonos perfectos compartirían MP3.
+4. **Renumeración/archivos con hanzi**: NUNCA `Set-Content -Encoding UTF8` de PowerShell 5.1
+   (mojibake doble). Usar Node/tsx (`scripts/renumber-sectors.ts` como patrón) o el edit tool.
+5. Los sectores HSK 3 restantes m24-m31 están pautados en `scripts/check-hsk3-buckets.ts`
+   (reparto palabra↔sector verificado contra la lista oficial).
 
 ## Radio del Refugio 📻 y HSK 2 (v2.0.0)
 
@@ -376,17 +396,19 @@ Checklist para añadir HSK 3 (se repite el patrón de HSK 2, todo ya probado):
 
 ## Roadmap (siguientes sesiones)
 
-**HSK 1 COMPLETO** (S-00 → S-10, ~150 palabras, 32 lecciones).
-**HSK 2 COMPLETO** (S-11 → S-20, ~130 palabras nuevas, 46 lecciones HSK2, radio del refugio,
-caravana, tienda y estadísticas — todo verificado con 50 tests + integridad del curso).
+**HSK 1 COMPLETO** (S-00 → S-12, las 150 palabras oficiales, 40 lecciones).
+**HSK 2 COMPLETO** (S-13 → S-27, TODAS las palabras oficiales del nivel, 62 lecciones).
+**HSK 3 COMPLETO** (S-28 → S-38, las 298 palabras oficiales, ~60 lecciones) — verificado por
+`coverage.test.ts` contra la lista oficial HSK 2.0: ninguna palabra de los niveles 1-3 puede
+quedarse fuera del curso.
 
-Hecho en v2.0.0: Radio del Refugio (escucha pura por programas), HSK 2 completo con
-gramática explicada a fondo (了 cambio, 正在, V+到, V+来/V+去, 比, 有点儿,
-因为...所以, 还是, 太...了, 越来越, V+过), certificado final del Overseer.
+Hecho en v3.0.0: refuerzos HSK1 (ciudad, preguntas) y HSK2 (familia ampliada, cifras, salud,
+viajes, modales) que cierran las listas oficiales; HSK 3 completo con 把, complementos de
+resultado, 被, 得/地, conectores (虽然/如果/又/一边), clasificadores finos y las ideas abstractas.
 
 Features candidatas: misión diaria de caravana mejorada, tienda con más temas,
-exportar/importar progreso (JSON), HSK 3 (ampliar `hsk` union + tests), modo
-escritura de caracteres (trazos), estadísticas con gráficas, PWA iOS pulida.
+exportar/importar progreso (JSON), HSK 4, modo escritura de caracteres (trazos),
+estadísticas con gráficas, PWA iOS pulida.
 
 ## Notas de entorno conocidas
 

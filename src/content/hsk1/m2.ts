@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   SECTOR 2 · HSK 1 — IDENTIDAD (módulo 2/10)
+   SECTOR 2 · HSK 1 — IDENTIDAD (módulo 2/12)
 
    Presentarte, decir tu nombre y de dónde eres: los pronombres 您/他/她,
    el verbo 叫 ("llamarse") y la partícula posesiva 的.

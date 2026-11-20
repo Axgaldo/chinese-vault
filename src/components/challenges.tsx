@@ -631,6 +631,7 @@ function TypePinyin({ step, awardXp, onResult }: CProps<'type-pinyin'>) {
           autoCorrect="off"
           spellCheck={false}
           inputMode="text"
+          aria-label="escribe el pinyin sin tonos"
         />
         {state === 'typing' && (
           <Btn type="submit" className="w-full" disabled={!value.trim()}>
@@ -701,6 +702,7 @@ function Dictation({ step, awardXp, onResult }: CProps<'dictate'>) {
           autoComplete="off"
           autoCorrect="off"
           spellCheck={false}
+          aria-label="escribe lo que oigas en pinyin sin tonos"
           inputMode="text"
         />
         {state === 'typing' && (
@@ -1245,12 +1247,20 @@ function WriteView({ step, awardXp, onResult }: CProps<'write'>) {
       </div>
 
       <div className={`relative ${score !== null && !green && !yellow ? 'shake' : ''}`}>
-        <canvas ref={guideRef} width={GRID} height={GRID} className="rounded border border-vault-700" />
+        <canvas
+          ref={guideRef}
+          width={GRID}
+          height={GRID}
+          className="rounded border border-vault-700"
+          aria-hidden="true"
+        />
         <canvas
           ref={drawRef}
           width={GRID}
           height={GRID}
           className="absolute inset-0 cursor-crosshair touch-none rounded"
+          role="img"
+          aria-label={`área de escritura del carácter ${entry.hanzi}: trázalo con el dedo o el ratón`}
           onPointerDown={startStroke}
           onPointerMove={moveStroke}
           onPointerUp={endStroke}

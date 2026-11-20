@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   SECTOR 1 · HSK 1 — PRIMER CONTACTO (módulo 1/10)
+   SECTOR 1 · HSK 1 — PRIMER CONTACTO (módulo 1/12)
 
    Saludos, el sistema completo de pronombres (我你他她 + 们), estado y
    negación. Inspirado en "El saludo", "Pronombres I/II" y "Usos de shì 是"

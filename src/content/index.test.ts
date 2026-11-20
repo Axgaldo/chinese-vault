@@ -37,7 +37,7 @@ describe('integridad del curso', () => {
     const problems: string[] = []
     for (const m of modules) {
       if (!m.id || !m.code || !m.title || !m.subtitle) problems.push(`módulo incompleto: ${m.id}`)
-      if (m.hsk !== 0 && m.hsk !== 1 && m.hsk !== 2) problems.push(`hsk inválido: ${m.id}`)
+      if (m.hsk !== 0 && m.hsk !== 1 && m.hsk !== 2 && m.hsk !== 3) problems.push(`hsk inválido: ${m.id}`)
       if (m.lessons.length < 1) problems.push(`${m.id}: sin lecciones`)
       for (const l of m.lessons) {
         if (!l.id || !l.title) problems.push(`lección sin id/título en ${m.id}`)
@@ -188,6 +188,22 @@ describe('integridad del curso', () => {
         if (chars !== syls) {
           problems.push(`${d.id} línea ${i + 1}: "${l.hanzi}" ${syls} syl ≠ ${chars} caracteres`)
         }
+      }
+    }
+    expect(problems).toEqual([])
+  })
+
+  it('fichas huérfanas: toda entrada del módulo aparece en algún paso de sus lecciones', () => {
+    const problems: string[] = []
+    for (const m of modules) {
+      const used = new Set<string>()
+      for (const l of m.lessons) {
+        for (const step of l.steps) {
+          for (const id of entryIdsInStep(step)) used.add(id)
+        }
+      }
+      for (const e of m.entries) {
+        if (!used.has(e.id)) problems.push(`${m.id}: ficha huérfana ${e.id} (${e.hanzi})`)
       }
     }
     expect(problems).toEqual([])

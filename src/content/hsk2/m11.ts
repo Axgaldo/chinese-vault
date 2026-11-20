@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   SECTOR 11 · HSK 2 — EL TIEMPO Y 了 (módulo 1/10)
+   SECTOR 13 · HSK 2 — EL TIEMPO Y 了 (módulo 1/15)
 
    El corazón del HSK 2: la partícula 了 y el contraste temporal. Los apuntes
    de este sector van más allá del "cómo se dice": explican el MECANISMO,
@@ -12,7 +12,7 @@ import { build, dictate, drill, e, grammar, introLite, lesson, match, noteStep, 
 export const m11: VaultModule = {
   id: 'm11',
   hsk: 2,
-  code: 'S-11',
+  code: 'S-13',
   title: 'El Tiempo y 了',
   subtitle: 'La gran partícula del cambio: 了, 正在, planes y el tiempo relativo',
   entries: [
@@ -127,7 +127,7 @@ export const m11: VaultModule = {
     ),
     lesson(
       'm11-l4',
-      'Auditoría del Sector 11',
+      'Auditoría del Sector 13',
       'review',
       [
         match('w-yi-qian', 'w-yi-hou', 'w-gang-cai', 'w-zui-hou'),

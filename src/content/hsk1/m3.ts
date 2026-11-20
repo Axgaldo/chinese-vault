@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   SECTOR 3 · HSK 1 — NÚMEROS (módulo 3/10)
+   SECTOR 3 · HSK 1 — NÚMEROS (módulo 3/12)
 
    Contar, precios y edad — el registro del refugio: del cero al diez,
    números compuestos, teléfonos y cuántos años tienes.

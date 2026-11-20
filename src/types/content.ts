@@ -102,7 +102,7 @@ export interface Lesson {
 export interface VaultModule {
   id: string
   /** Nivel HSK del sector */
-  hsk: 0 | 1 | 2
+  hsk: 0 | 1 | 2 | 3
   /** Código corto mostrado en la UI, p. ej. "S-00" */
   code: string
   title: string

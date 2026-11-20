@@ -1,7 +1,7 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   SECTOR 10 · HSK 1 — AUDITORÍA FINAL (módulo 10/10)
+   SECTOR 12 · HSK 1 — AUDITORÍA FINAL (módulo 12/12)
 
-   El dictado del Overseer: dieciséis palabras al oído puro, una última
+   El dictado del Overseer: palabras al oído puro, una última
    conversación con todo lo aprendido y el certificado del Vault.
    ───────────────────────────────────────────────────────────────────────────── */
 
@@ -11,10 +11,10 @@ import { build, dictate, grammar, lesson, match, noteStep, typeP } from '../buil
 export const m10: VaultModule = {
   id: 'm10',
   hsk: 1,
-  code: 'S-10',
+  code: 'S-12',
   title: 'Auditoría Final',
   subtitle: 'El dictado del Overseer: todo el HSK 1 en un último protocolo',
-  // Sector de auditoría: SIN palabras nuevas. Todo lo que suena aquí viene de los sectores 1-9.
+  // Sector de auditoría: SIN palabras nuevas. Todo lo que suena aquí viene de los sectores S-01 a S-11.
   entries: [],
   lessons: [
     lesson(
@@ -69,7 +69,7 @@ export const m10: VaultModule = {
       ],
       [
         grammar('n-finale', 'CERTIFICADO DEL VAULT', [
-          'PROTOCOLO HSK 1 COMPLETADO: ~150 palabras, los 5 pilares de gramática y un refugio en pie. Esto ya no es supervivencia, morador: es dominio.',
+          'PROTOCOLO HSK 1 COMPLETADO: las 150 palabras oficiales del nivel, los 5 pilares de gramática y un refugio en pie. Esto ya no es supervivencia, morador: es dominio.',
           'El Overseer está orgulloso de ti. La siguiente puerta lleva al HSK 2: más palabras, más frases y el mundo de fuera esperando a que lo saludes en chino.',
           'Hasta entonces, mantén la racha: el SRS nunca duerme y el refugio tampoco.',
         ], [

@@ -305,6 +305,7 @@ function RadioDictate({ item, onResult }: { item: Extract<RadioItem, { kind: 'di
           autoComplete="off"
           spellCheck={false}
           inputMode="text"
+          aria-label="escribe la frase completa en pinyin, sin tonos"
         />
         {state === 'typing' && (
           <Btn type="submit" className="w-full" disabled={!value.trim()}>

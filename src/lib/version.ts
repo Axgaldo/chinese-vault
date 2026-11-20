@@ -9,7 +9,7 @@
  *  Z — bugs y arreglos
  * Actualizar aquí y en package.json (deben coincidir siempre).
  */
-export const APP_VERSION = 'v2.9.0'
+export const APP_VERSION = 'v3.0.0'
 
 export const GITHUB_USER = 'Axgaldo'
 export const GITHUB_URL = 'https://github.com/Axgaldo/chinese-vault'

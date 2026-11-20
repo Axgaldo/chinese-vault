@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   SECTOR 15 · HSK 2 — COMPARAR Y DESCRIBIR (módulo 5/10)
+   SECTOR 17 · HSK 2 — COMPARAR Y DESCRIBIR (módulo 5/15)
 
    El sector de la báscula: adjetivos en parejas canónicas, colores fabricados
    con 色 y la estructura A + 比 + B + ADJETIVO (sin "más" extra: el comparativo
@@ -13,7 +13,7 @@ import { build, dictate, drill, e, grammar, lesson, match, noteStep, practice, t
 export const m15: VaultModule = {
   id: 'm15',
   hsk: 2,
-  code: 'S-15',
+  code: 'S-17',
   title: 'Comparar y Describir',
   subtitle: 'Adjetivos enfrentados, colores y la estructura 比',
   entries: [
@@ -133,7 +133,7 @@ export const m15: VaultModule = {
     ),
     lesson(
       'm15-l4',
-      'Auditoría del Sector 15',
+      'Auditoría del Sector 17',
       'review',
       [
         match('w-chang2', 'w-duan3', 'w-xin1', 'w-jiu4'),

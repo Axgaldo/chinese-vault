@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   SECTOR 13 · HSK 2 — MESA DEL COMEDOR (módulo 3/10)
+   SECTOR 15 · HSK 2 — MESA DEL COMEDOR (módulo 3/15)
 
    Comida ampliada con el mecanismo estrella del sector: el chino COMPOSICIONA
    significados (牛+肉, 鸡+蛋, 蛋+糕). Las tres comidas del día actúan como
@@ -13,7 +13,7 @@ import { build, dictate, drill, e, grammar, lesson, match, noteStep, practice, t
 export const m13: VaultModule = {
   id: 'm13',
   hsk: 2,
-  code: 'S-13',
+  code: 'S-15',
   title: 'Mesa del Comedor',
   subtitle: 'Comida ampliada: del huevo a la tarta, y el sabor de todo',
   entries: [
@@ -77,8 +77,8 @@ export const m13: VaultModule = {
           '早饭, 午饭 y 晚饭 son los tres turnos del comedor del refugio: 早 (zǎo, la mañana), 午 (wǔ, el mediodía) y 晚 (wǎn, la tarde-noche), cada uno rematado con 饭 (fàn, la comida). Cambia la hora, no el molde: las tres son "la comida de X".',
           'A) LA PALABRA DE TIEMPO VA DESNUDA: 早饭 puede entrar en la frase SIN preposición y convertirse en adorno: 早饭我吃鸡蛋 (zǎofàn wǒ chī jīdàn) = "para desayunar, yo como huevos". También vale pegada al sujeto: 我早饭吃鸡蛋. El inglés necesita chapa: "FOR breakfast". El chino, no: la palabra de tiempo se coloca y ya manda.',
           'B) LA POSICIÓN PREFERIDA: el chino ordena la frase de lo conocido a lo nuevo: el tiempo (más viejo que la noticia) abre o se pega al sujeto, el verbo remata. ✗吃鸡蛋我早饭 no existe: el tiempo no se cuelga al final como un abrigo suelto.',
-          'C) 饭 NO ES SOLO "ARROZ": 饭 nació significando "arroz cocido" y de ahí pasó a "comida" en general. Por eso 吃饭 (chīfàn, del Sector 11) es "comer" a secas, y 早饭 es "la comida de la mañana". El arroz es tan central en el refugio que acabó nombrando el acto entero de comer.',
-          'D) EL MOLDE SE REPITE CON 以后: como cualquier palabra de tiempo, las comidas enganchan con 以后 (yǐhòu): 午饭以后，我工作 = "después de almorzar, trabajo". Ancla + etiqueta temporal, sin preposición: el mecanismo del Sector 11 aplicado a tu estómago.',
+          'C) 饭 NO ES SOLO "ARROZ": 饭 nació significando "arroz cocido" y de ahí pasó a "comida" en general. Por eso 吃饭 (chīfàn, del Sector 13) es "comer" a secas, y 早饭 es "la comida de la mañana". El arroz es tan central en el refugio que acabó nombrando el acto entero de comer.',
+          'D) EL MOLDE SE REPITE CON 以后: como cualquier palabra de tiempo, las comidas enganchan con 以后 (yǐhòu): 午饭以后，我工作 = "después de almorzar, trabajo". Ancla + etiqueta temporal, sin preposición: el mecanismo del Sector 13 aplicado a tu estómago.',
           'Tip del Overseer: planifica el día como el supervisor del comedor: primero anuncia el TURNO (早饭 / 午饭 / 晚饭), luego quién hace qué. El chino siempre paga con tiempo y cobra con noticias.',
         ], [
           ['早饭我吃鸡蛋。', 'zǎofàn wǒ chī jīdàn.', 'Para desayunar, como huevos.'],
@@ -106,7 +106,7 @@ export const m13: VaultModule = {
           'Para hablar del sabor no necesitas gramática nueva: necesitas el molde que ya traes — SUJETO + 很 + ADJETIVO, con el adjetivo haciendo de verbo ("el adjetivo ES el verbo", Sector 9). 这个蛋糕很甜 = "esta tarta está muy dulce". Sin ser, sin estar: el adjetivo plantado como una antena.',
           'A) EL ERROR NÚMERO UNO: meter 是. El español grita "ESTÁ dulce" y las manos escriben 是. Pero 是 solo une dos NOMBRES (A es B: 我是学生). Con un adjetivo, la frase queda rota: ✗这个蛋糕是甜 / ✓这个蛋糕很甜. Y el 很 no es decoración: un adjetivo pelado al final suena a comparación ("dulce... ¿respecto a qué?"), así que 很 va pegado por costumbre.',
           'B) 味道 ES EL PARAGUAS: 味道 (wèidao) es "el sabor" como concepto: 汤的味道很好 = "el sabor de la sopa es buenísimo" — literalmente "la sopa su-sabor es bueno", el mismo 的 posesivo de siempre. Pregunta por él y el cocinero del refugio responde con un adjetivo: 甜 (dulce), 酸 (ácido) o la palabra mágica 很好 ("rico").',
-          'C) Y SI ES OPINIÓN, SE DECLARA: 觉得 (juéde, "me parece") marca que la frase es TU lectura del mundo: 我觉得汤有点儿酸 = "la sopa está un pelín ácida... para mí". 有点儿 (yǒudiǎnr, "un pelín") llega a fondo en el Sector 15; quédate con que la sopa ácida sale con cara de sospecha. El sabor es del plato; el juicio es tuyo.',
+          'C) Y SI ES OPINIÓN, SE DECLARA: 觉得 (juéde, "me parece") marca que la frase es TU lectura del mundo: 我觉得汤有点儿酸 = "la sopa está un pelín ácida... para mí". 有点儿 (yǒudiǎnr, "un pelín") llega a fondo en el Sector 17; quédate con que la sopa ácida sale con cara de sospecha. El sabor es del plato; el juicio es tuyo.',
           'Tip del Overseer: para elogiar comida en cualquier refugio de China: 味道很好 ("qué sabor más bueno"). Dos palabras, cero gramática y amistad instantánea con el cocinero.',
         ], [
           ['这个蛋糕很甜。', 'zhè ge dàngāo hěn tián.', 'Esta tarta está muy dulce.'],
@@ -117,7 +117,7 @@ export const m13: VaultModule = {
     ),
     lesson(
       'm13-l4',
-      'Auditoría del Sector 13',
+      'Auditoría del Sector 15',
       'review',
       [
         match('w-ji-dan', 'w-dan-gao', 'w-niu-rou', 'w-yang-rou'),

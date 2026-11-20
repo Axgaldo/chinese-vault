@@ -2,6 +2,7 @@
    MAPA — sectores del refugio, progreso y continuación
    ───────────────────────────────────────────────────────────────────────────── */
 
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { isLessonUnlocked, lessonById, moduleOfLesson, modules, nextLessonId } from '../content'
 import { sfx } from '../lib/sfx'
@@ -10,6 +11,14 @@ import { useProgress } from '../stores/useProgress'
 import { rankFor, type LessonRecord } from '../types/progress'
 import { CapsIcon, Chip, GithubMark, Meter, Panel, SectionTitle, VaultDoorMark } from '../components/ui'
 import type { VaultModule } from '../types/content'
+
+/** Cabeceras por nivel HSK (el mapa creció: 40 sectores necesitan mojones) */
+const LEVELS: Array<{ hsk: VaultModule['hsk']; name: string; desc: string }> = [
+  { hsk: 0, name: 'PROTOCOLO DE INICIACIÓN', desc: 'tonos y fonética' },
+  { hsk: 1, name: 'HSK 1', desc: 'supervivencia básica' },
+  { hsk: 2, name: 'HSK 2', desc: 'conversación del morador' },
+  { hsk: 3, name: 'HSK 3', desc: 'independencia total' },
+]
 
 export function HomePage() {
   const navigate = useNavigate()
@@ -96,19 +105,7 @@ export function HomePage() {
       )}
 
       <SectionTitle>SECTORES DEL REFUGIO</SectionTitle>
-      <div className="flex flex-col gap-3">
-        {modules.map((m) => (
-          <ModuleCard
-            key={m.id}
-            m={m}
-            records={records}
-            completed={completed}
-            adminMode={adminMode}
-            nextLessonId={nextId}
-            onPlay={(lessonId) => navigate(`/lesson/${lessonId}`)}
-          />
-        ))}
-      </div>
+      <LevelMap records={records} completed={completed} adminMode={adminMode} nextLessonId={nextId} onPlay={(lessonId) => navigate(`/lesson/${lessonId}`)} />
 
       <footer className="flex flex-col items-center gap-1 text-center">
         <p className="text-xs text-vault-500">中文 · aprende chino desde cero, en español</p>
@@ -123,6 +120,86 @@ export function HomePage() {
           {GITHUB_USER}
         </a>
       </footer>
+    </div>
+  )
+}
+
+/** Mapa por niveles: cada nivel HSK es una sección plegable con su progreso */
+function LevelMap({
+  records,
+  completed,
+  adminMode,
+  nextLessonId,
+  onPlay,
+}: {
+  records: Record<string, LessonRecord>
+  completed: string[]
+  adminMode: boolean
+  nextLessonId: string
+  onPlay(lessonId: string): void
+}) {
+  const groups = useMemo(
+    () => LEVELS.map((lvl) => ({ ...lvl, mods: modules.filter((m) => m.hsk === lvl.hsk) })),
+    [],
+  )
+
+  // un nivel está "abierto" si su primera lección está desbloqueada (o supervisor)
+  const isOpenLevel = (mods: VaultModule[]) =>
+    adminMode || mods.some((m) => m.lessons.some((l) => isLessonUnlocked(l.id, completed)))
+
+  const [collapsed, setCollapsed] = useState<Record<number, boolean>>({})
+  // por defecto: plegados los niveles aún cerrados (se descubren al llegar)
+  const effectiveCollapsed = (hsk: number, mods: VaultModule[]) =>
+    collapsed[hsk] ?? !isOpenLevel(mods)
+
+  return (
+    <div className="flex flex-col gap-4">
+      {groups.map(({ hsk, name, desc, mods }) => {
+        const totalLessons = mods.reduce((n, m) => n + m.lessons.length, 0)
+        const doneLessons = mods.reduce(
+          (n, m) => n + m.lessons.filter((l) => l.id in records).length,
+          0,
+        )
+        const hidden = effectiveCollapsed(hsk, mods)
+        return (
+          <section key={hsk} className="flex flex-col gap-2">
+            <button
+              type="button"
+              className="choice flex items-center justify-between gap-2 rounded px-3 py-2 text-left"
+              onClick={() => {
+                sfx.tap()
+                setCollapsed((c) => ({ ...c, [hsk]: !hidden }))
+              }}
+            >
+              <span className="min-w-0">
+                <span className="block font-display text-lg leading-tight text-vault-300">{name}</span>
+                <span className="block text-[10px] leading-tight text-vault-600">{desc}</span>
+              </span>
+              <span className="flex shrink-0 items-center gap-2">
+                <Chip className="px-1.5 py-0 text-xs">
+                  {doneLessons}/{totalLessons}
+                </Chip>
+                <span className="font-display text-vault-500">{hidden ? '▸' : '▾'}</span>
+              </span>
+            </button>
+            {!hidden && (
+              <div className="flex flex-col gap-3">
+                {mods.map((m) => (
+                  <ModuleCard
+                    key={m.id}
+                    m={m}
+                    records={records}
+                    completed={completed}
+                    adminMode={adminMode}
+                    nextLessonId={nextLessonId}
+                    onPlay={onPlay}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+        )
+      })}
     </div>
   )
 }

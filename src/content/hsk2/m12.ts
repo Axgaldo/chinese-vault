@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   SECTOR 12 · HSK 2 — CASA Y POSICIONES (módulo 2/10)
+   SECTOR 14 · HSK 2 — CASA Y POSICIONES (módulo 2/15)
 
    Las habitaciones del refugio y el molde espacial: X + 在 + referencia +
    旁边/前面/后面. La nota central explica el 的 como "posesivo del espacio"
@@ -13,7 +13,7 @@ import { build, dictate, drill, e, grammar, lesson, match, noteStep, practice, t
 export const m12: VaultModule = {
   id: 'm12',
   hsk: 2,
-  code: 'S-12',
+  code: 'S-14',
   title: 'Casa y Posiciones',
   subtitle: 'Las habitaciones del refugio y dónde está cada cosa',
   entries: [
@@ -116,7 +116,7 @@ export const m12: VaultModule = {
     ),
     lesson(
       'm12-l4',
-      'Auditoría del Sector 12',
+      'Auditoría del Sector 14',
       'review',
       [
         match('w-fang-jian', 'w-zhuo-zi', 'w-yi-zi', 'w-chuang-hu'),

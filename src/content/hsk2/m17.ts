@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   SECTOR 17 · HSK 2 — MUNDO Y TECNOLOGÍA (módulo 7/10)
+   SECTOR 19 · HSK 2 — MUNDO Y TECNOLOGÍA (módulo 7/15)
 
    La vida digital del refugio: 用 como verbo de instrumento-primero, los
    bloques verbo+objeto de la era digital (发短信, 上网) y el reparto de
@@ -12,7 +12,7 @@ import { build, dictate, drill, e, grammar, lesson, match, noteStep, practice, t
 export const m17: VaultModule = {
   id: 'm17',
   hsk: 2,
-  code: 'S-17',
+  code: 'S-19',
   title: 'Mundo y Tecnología',
   subtitle: 'Móviles, fotos, noticias y la vida digital del refugio',
   entries: [
@@ -109,7 +109,7 @@ export const m17: VaultModule = {
     ),
     lesson(
       'm17-l4',
-      'Auditoría del Sector 17',
+      'Auditoría del Sector 19',
       'review',
       [
         match('w-shou-ji', 'w-shang-wang', 'w-xin-wen', 'w-you-xi'),

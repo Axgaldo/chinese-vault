@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   SECTOR 6 · HSK 1 — COMIDA Y BEBIDA (módulo 6/10)
+   SECTOR 6 · HSK 1 — COMIDA Y BEBIDA (módulo 6/12)
 
    Pedir, querer y sobrevivir en el comedor del refugio: 吃 y 喝 para la
    acción, 想 para los antojos y la bandeja llena de 水, 茶 y 米饭.

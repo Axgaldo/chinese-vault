@@ -18,6 +18,8 @@ import { m6 } from './hsk1/m6'
 import { m7 } from './hsk1/m7'
 import { m8 } from './hsk1/m8'
 import { m9 } from './hsk1/m9'
+import { m9b } from './hsk1/m9b'
+import { m9c } from './hsk1/m9c'
 import { m10 } from './hsk1/m10'
 import { m11 } from './hsk2/m11'
 import { m12 } from './hsk2/m12'
@@ -28,11 +30,32 @@ import { m16 } from './hsk2/m16'
 import { m17 } from './hsk2/m17'
 import { m18 } from './hsk2/m18'
 import { m19 } from './hsk2/m19'
+import { m19a } from './hsk2/m19a'
+import { m19b } from './hsk2/m19b'
+import { m19c } from './hsk2/m19c'
+import { m19d } from './hsk2/m19d'
+import { m19e } from './hsk2/m19e'
 import { m20 } from './hsk2/m20'
+import { m21 } from './hsk3/m21'
+import { m22 } from './hsk3/m22'
+import { m23 } from './hsk3/m23'
+import { m24 } from './hsk3/m24'
+import { m25 } from './hsk3/m25'
+import { m26 } from './hsk3/m26'
+import { m27 } from './hsk3/m27'
+import { m28 } from './hsk3/m28'
+import { m29 } from './hsk3/m29'
+import { m30 } from './hsk3/m30'
+import { m31 } from './hsk3/m31'
 
 export const modules: VaultModule[] = [
-  hsk0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10,
-  m11, m12, m13, m14, m15, m16, m17, m18, m19, m20,
+  hsk0,
+  // HSK 1 — S-00 a S-12 (12 sectores: el 10 y el 11 cierran las palabras oficiales)
+  m1, m2, m3, m4, m5, m6, m7, m8, m9, m9b, m9c, m10,
+  // HSK 2 — S-13 a S-27 (15 sectores: el 22-26 cierran las palabras oficiales)
+  m11, m12, m13, m14, m15, m16, m17, m18, m19, m19a, m19b, m19c, m19d, m19e, m20,
+  // HSK 3 — S-28 a S-38 (las 298 palabras oficiales del nivel, completas)
+  m21, m22, m23, m24, m25, m26, m27, m28, m29, m30, m31,
 ]
 
 export const moduleById = new Map(modules.map((m) => [m.id, m]))

@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   SECTOR 4 · HSK 1 — FAMILIA (módulo 4/10)
+   SECTOR 4 · HSK 1 — FAMILIA (módulo 4/12)
 
    Los tuyos dentro del refugio: 爸爸, 妈妈, 儿子 y 女儿, más 有 para decir
    "tener" y 们 para los plurales. Aquí nadie se queda fuera del búnker.

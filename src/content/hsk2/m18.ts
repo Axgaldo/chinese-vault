@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   SECTOR 18 · HSK 2 — RUTAS Y MOVIMIENTO (módulo 8/10)
+   SECTOR 20 · HSK 2 — RUTAS Y MOVIMIENTO (módulo 8/15)
 
    El compás del refugio: 每天 y las palabras de tiempo delante del verbo,
    la deixis V+来/V+去 (la brújula eres tú) y la ruta de oro 一直 → 拐 → 到.
@@ -11,7 +11,7 @@ import { build, dictate, drill, e, grammar, lesson, match, noteStep, practice, t
 export const m18: VaultModule = {
   id: 'm18',
   hsk: 2,
-  code: 'S-18',
+  code: 'S-20',
   title: 'Rutas y Movimiento',
   subtitle: 'Levantarse, salir, volver: direcciones para no perderse',
   entries: [
@@ -116,7 +116,7 @@ export const m18: VaultModule = {
     ),
     lesson(
       'm18-l4',
-      'Auditoría del Sector 18',
+      'Auditoría del Sector 20',
       'review',
       [
         match('w-zou3', 'w-pao3', 'w-pao-bu', 'w-qi-chuang'),

@@ -470,6 +470,7 @@ function DialogueQuiz({
             autoComplete="off"
             spellCheck={false}
             inputMode="text"
+            aria-label="escribe el pinyin de la palabra que falta, sin tonos"
           />
           {state === 'typing' && (
             <Btn type="submit" className="w-full" disabled={!gapValue.trim()}>

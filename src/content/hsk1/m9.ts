@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   SECTOR 9 · HSK 1 — CUALIDADES (módulo 9/10)
+   SECTOR 9 · HSK 1 — CUALIDADES (módulo 9/12)
 
    Cómo es y cómo está el morador: 大/小/高 para el tamaño, 高兴/累/忙 para
    el ánimo, 便宜 para los precios y los gustos con 喜欢 y 爱.
@@ -106,7 +106,7 @@ export const m9: VaultModule = {
         grammar('n-xihuan-ai', '喜欢 y 爱: del gusto al amor', [
           '喜欢 (xǐhuan) + cosa o + verbo = "gustar": 我喜欢喝茶 = "me gusta tomar té", 我喜欢学习 = "me gusta estudiar". Sin conjugación, como siempre.',
           '爱 (ài) es más fuerte que en español para las cosas: con personas y mascotas funciona igual, 我爱我的狗. Para objetos suena muy intenso: resérvalo para lo que de verdad amas.',
-          'Para precios llega 便宜 (piányi), con la segunda sílaba sin tono: 这个很便宜 = "esto es barato". ¿Lo contrario? 贵 (guì, "caro") llega en el Sector 16.',
+          'Para precios llega 便宜 (piányi), con la segunda sílaba sin tono: 这个很便宜 = "esto es barato". ¿Lo contrario? 贵 (guì, "caro") llega en el Sector 18.',
         ], [
           ['我喜欢喝茶。', 'wǒ xǐhuan hē chá.', 'Me gusta tomar té.'],
           ['我爱我的狗。', 'wǒ ài wǒ de gǒu.', 'Amo a mi perro.'],

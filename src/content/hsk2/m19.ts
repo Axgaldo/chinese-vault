@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   SECTOR 19 · HSK 2 — OPINIONES DEL OVERSEER (módulo 9/10)
+   SECTOR 21 · HSK 2 — OPINIONES DEL OVERSEER (módulo 9/15)
 
    El sector del pensamiento: 因为...所以... como paréntesis de la lógica,
    还是 para menús cerrados, el laboratorio de extremos (太...了, 真, 最,
@@ -12,7 +12,7 @@ import { build, dictate, drill, e, grammar, lesson, match, noteStep, practice, t
 export const m19: VaultModule = {
   id: 'm19',
   hsk: 2,
-  code: 'S-19',
+  code: 'S-21',
   title: 'Opiniones del Overseer',
   subtitle: 'Porque, pero, o...: conectores para pensar en chino',
   entries: [
@@ -112,7 +112,7 @@ export const m19: VaultModule = {
     ),
     lesson(
       'm19-l4',
-      'Auditoría del Sector 19',
+      'Auditoría del Sector 21',
       'review',
       [
         match('w-yin-wei', 'w-suo-yi', 'w-dan-shi', 'w-hai-shi'),
