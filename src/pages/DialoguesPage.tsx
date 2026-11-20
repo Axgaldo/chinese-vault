@@ -1,31 +1,35 @@
 /* ─────────────────────────────────────────────────────────────────────────────
    DIÁLOGOS DE LA RADIO 🎭 — conversaciones reales por temas.
-   Flujo: se escucha/lee el diálogo → retos por línea (qué significa /
-   ordenar la frase / palabra que falta) → resumen con XP.
+
+   Flujo: retos por línea (la conversación NO se revela entera hasta el final;
+   cada línea suena opcionalmente con su botón 🔊) → al completar, la
+   conversación entera se revela y se puede escuchar seguida.
+   5 tipos de reto por línea: qué oyes · quién lo dice · ordena la línea ·
+   qué palabra falta · qué responde.
    ───────────────────────────────────────────────────────────────────────────── */
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import type { Dialogue, DialogueLine } from '../types/content'
 import { DIALOGUES, dialoguesByTopic, unlockedDialogues } from '../lib/dialogues'
 import { speakSentence } from '../lib/audio'
 import { sfx } from '../lib/sfx'
 import { useProgress } from '../stores/useProgress'
 import { Pinyin } from '../components/Pinyin'
-import { Btn, CapsIcon, Chip, Meter, Panel, Prompt, SectionTitle, SpeakerBtn } from '../components/ui'
+import { Btn, Chip, Meter, Panel, Prompt, SectionTitle, SpeakerBtn } from '../components/ui'
+import type { Dialogue, DialogueLine } from '../types/content'
 
 const XP_LINE = 5
 
-type Phase = 'list' | 'listen' | 'quiz' | 'done'
+type Phase = 'list' | 'quiz' | 'done'
+type QuizKind = 'meaning' | 'who' | 'order' | 'gap' | 'reply'
 
-/** Reto generado para una línea del diálogo */
 interface LineQuiz {
   lineIdx: number
-  kind: 'meaning' | 'order' | 'gap'
-  /** opciones para meaning / la palabra oculta para gap */
+  kind: QuizKind
+  /** meaning: traducciones · reply: hanzi de posibles respuestas */
   options?: string[]
-  gapHanzi?: string
   gapPinyin?: string
+  retry?: boolean
 }
 
 export function DialoguesPage() {
@@ -43,7 +47,6 @@ export function DialoguesPage() {
   const [dialogue, setDialogue] = useState<Dialogue | null>(null)
   const [quiz, setQuiz] = useState<LineQuiz[]>([])
   const [pos, setPos] = useState(0)
-  const [firstTry, setFirstTry] = useState(true)
   const [xp, setXp] = useState(0)
 
   const start = (d: Dialogue) => {
@@ -51,9 +54,8 @@ export function DialoguesPage() {
     setDialogue(d)
     setQuiz(buildQuiz(d))
     setPos(0)
-    setFirstTry(true)
     setXp(0)
-    setPhase('listen')
+    setPhase('quiz')
   }
 
   const current = quiz[pos]
@@ -61,7 +63,7 @@ export function DialoguesPage() {
   const advance = (correct: boolean) => {
     if (!current) return
     if (correct) {
-      if (firstTry) {
+      if (!current.retry) {
         addXp(XP_LINE)
         setXp((x) => x + XP_LINE)
         logActivity('steps', 1)
@@ -72,10 +74,8 @@ export function DialoguesPage() {
         return
       }
     } else {
-      setFirstTry(false)
-      setQuiz((q) => [...q, current])
+      setQuiz((q) => [...q, { ...current, retry: true }])
     }
-    setFirstTry(true)
     setPos(pos + 1)
   }
 
@@ -130,29 +130,30 @@ export function DialoguesPage() {
 
   if (!dialogue) return null
 
-  /* ── Escuchar el diálogo ──────────────────────────────────────────────── */
-  if (phase === 'listen') {
+  /* ── FINAL: la conversación se revela (recompensa) ────────────────────── */
+  if (phase === 'done') {
     return (
       <div className="flex min-h-dvh flex-col">
         <header className="sticky top-0 z-10 border-b border-vault-800 bg-vault-950/95 px-3 py-2 backdrop-blur">
-          <div className="flex items-center gap-3">
-            <span className="font-display text-lg text-vault-500">🎭 {dialogue.title}</span>
-          </div>
+          <span className="font-display text-lg text-vault-500">🎭 {dialogue.title}</span>
         </header>
         <div className="flex flex-1 flex-col justify-center gap-3 p-4">
-          <Prompt>ESCUCHA LA CONVERSACIÓN</Prompt>
+          <Prompt>▓ CONVERSACIÓN COMPLETADA ▓</Prompt>
+          <Chip className="self-center text-xl">+{xp} XP</Chip>
+
           <Panel solid className="panel-read space-y-3 p-4">
+            <p className="font-display text-lg text-vault-300">📜 LA CONVERSACIÓN ENTERA</p>
             {dialogue.lines.map((l, i) => (
               <button
                 key={i}
                 type="button"
                 className={`block w-full rounded px-2 py-1.5 text-left hover:bg-vault-800/60 ${
-                  l.who === 'A' ? 'self-start' : 'self-end text-right'
+                  l.who === 'B' ? 'text-right' : ''
                 }`}
                 onClick={() => speakSentence(l)}
                 title="pulsa para escuchar la línea"
               >
-                <span className={`font-display text-sm text-vault-500 ${l.who === 'B' ? 'block text-right' : ''}`}>
+                <span className={`font-display text-sm text-vault-500 ${l.who === 'B' ? 'block' : ''}`}>
                   {l.who === 'A' ? '🧑‍🚀 A' : '🧑‍🔧 B'}
                 </span>
                 <span className="block font-hanzi text-xl text-vault-100">{l.hanzi}</span>
@@ -161,47 +162,17 @@ export function DialoguesPage() {
               </button>
             ))}
           </Panel>
+
+          <Btn onClick={() => dialogue.lines.forEach((l) => speakSentence(l))}>🔊 ESCUCHAR TODO SEGUIDO</Btn>
+
           <div className="flex gap-2">
-            <Btn
-              variant="amber"
-              className="flex-1"
-              onClick={() => dialogue.lines.forEach((l) => speakSentence(l))}
-            >
-              🔊 TODO
+            <Btn className="flex-1" onClick={() => start(dialogue)}>
+              OTRA VEZ ▸
             </Btn>
-            <Btn
-              className="flex-1"
-              onClick={() => {
-                sfx.tap()
-                setPhase('quiz')
-              }}
-            >
-              A LOS RETOS ▸
+            <Btn variant="amber" className="flex-1" onClick={() => setPhase('list')}>
+              MÁS DIÁLOGOS ▸
             </Btn>
           </div>
-        </div>
-      </div>
-    )
-  }
-
-  /* ── Resumen ──────────────────────────────────────────────────────────── */
-  if (phase === 'done') {
-    return (
-      <div className="pop-in flex flex-col items-center gap-4 p-4 pt-10 text-center">
-        <Prompt>▓ CONVERSACIÓN COMPLETADA ▓</Prompt>
-        <p className="font-display text-5xl text-vault-amber glow">🎭</p>
-        <Chip className="text-xl">+{xp} XP</Chip>
-        <Panel className="w-full p-3">
-          <p className="font-display text-xl text-vault-300">{dialogue.title}</p>
-          <p className="text-xs text-vault-600">{dialogue.topic} · {dialogue.lines.length} líneas dominadas</p>
-        </Panel>
-        <div className="flex w-full gap-2">
-          <Btn className="flex-1" onClick={() => start(dialogue)}>
-            OTRA VEZ ▸
-          </Btn>
-          <Btn variant="amber" className="flex-1" onClick={() => setPhase('list')}>
-            MÁS DIÁLOGOS ▸
-          </Btn>
         </div>
       </div>
     )
@@ -216,9 +187,7 @@ export function DialoguesPage() {
           <div className="flex-1">
             <Meter value={quiz.length ? pos / quiz.length : 0} />
           </div>
-          <span className="flex items-center gap-1 font-display text-xl text-vault-300">
-            <CapsIcon /> +{xp}
-          </span>
+          <span className="font-display text-xl text-vault-300">+{xp} XP</span>
         </div>
       </header>
       <div className="flex flex-1 flex-col justify-center p-4">
@@ -244,31 +213,57 @@ function hash(str: string): number {
   return Math.abs(h)
 }
 
+/** Barajado estable de una lista */
+function stableShuffle<T>(list: T[], seed: string): T[] {
+  return list
+    .map((x, i) => ({ x, k: hash(seed + i) % 997 }))
+    .sort((a, b) => a.k - b.k)
+    .map((y) => y.x)
+}
+
 function buildQuiz(d: Dialogue): LineQuiz[] {
   const out: LineQuiz[] = []
-  d.lines.forEach((l: DialogueLine, i: number) => {
-    const kindRoll = hash(d.id + i) % 3
-    if (kindRoll === 0) {
-      // ¿qué significa? — opciones: traducciones de otras líneas + la correcta
-      const others = d.lines.filter((_x: DialogueLine, j: number) => j !== i).map((x: DialogueLine) => x.es)
-      const distract = others.slice(0, 3)
-      const options = [l.es, ...distract]
-      // barajar de forma estable
-      const ordered = options.map((o: string) => ({ o, k: hash(d.id + i + o) % 97 }))
-      ordered.sort((a, b) => a.k - b.k)
-      out.push({ lineIdx: i, kind: 'meaning', options: ordered.map((x: { o: string }) => x.o) })
-    } else if (kindRoll === 1) {
-      out.push({ lineIdx: i, kind: 'order' })
-    } else {
-      // palabra que falta: el "hueco" — usa una palabra de 2+ sílabas de la línea
-      const words = l.pinyin.split(/\s+/).filter((w: string) => w.length >= 2)
-      if (words.length >= 1) {
+  d.lines.forEach((_l: DialogueLine, i: number) => {
+    const roll = hash(d.id + ':' + i) % 5
+    let kind: QuizKind
+    if (roll === 0) kind = 'meaning'
+    else if (roll === 1) kind = 'who'
+    else if (roll === 2) kind = 'order'
+    else if (roll === 3) kind = 'gap'
+    else kind = 'reply'
+    // ajustes de viabilidad
+    if (kind === 'reply' && i === 0) kind = 'meaning'
+    if (kind === 'order') {
+      const chars = [...d.lines[i].hanzi.replace(/[。，？！、]/g, '')]
+      if (chars.length < 2) kind = 'meaning'
+    }
+    if (kind === 'gap') {
+      const words = d.lines[i].pinyin.split(/\s+/).filter((w: string) => w.length >= 2)
+      if (!words.length) kind = 'meaning'
+      else {
         const wIdx = hash(d.id + 'gap' + i) % words.length
         out.push({ lineIdx: i, kind: 'gap', gapPinyin: words[wIdx] })
-      } else {
-        out.push({ lineIdx: i, kind: 'meaning', options: [l.es, ...d.lines.slice(0, 3).map((x: DialogueLine) => x.es)] })
+        return
       }
     }
+    if (kind === 'meaning') {
+      const others = d.lines
+        .filter((_x: DialogueLine, j: number) => j !== i)
+        .map((x: DialogueLine) => x.es)
+      const options = stableShuffle([d.lines[i].es, ...others.slice(0, 3)], d.id + i + 'm')
+      out.push({ lineIdx: i, kind: 'meaning', options })
+      return
+    }
+    if (kind === 'reply') {
+      // la respuesta correcta es ESTA línea; distractores: hanzi de otras líneas
+      const others = d.lines
+        .filter((_x: DialogueLine, j: number) => j !== i)
+        .map((x: DialogueLine) => x.hanzi)
+      const options = stableShuffle([d.lines[i].hanzi, ...others.slice(0, 3)], d.id + i + 'r')
+      out.push({ lineIdx: i, kind: 'reply', options })
+      return
+    }
+    out.push({ lineIdx: i, kind })
   })
   return out
 }
@@ -289,29 +284,51 @@ function DialogueQuiz({
   const [gapValue, setGapValue] = useState('')
   const [state, setState] = useState<'typing' | 'ok' | 'ko'>('typing')
 
+  /** Los retes de OÍDO reproducen la línea al montar; el resto la dejan opcional */
+  const isListening = quiz.kind === 'meaning' || quiz.kind === 'who'
+  useEffect(() => {
+    if (line && isListening) {
+      const t = setTimeout(() => speakSentence(line), 400)
+      return () => clearTimeout(t)
+    }
+  }, [line, isListening])
+
   if (!line) return null
 
-  const lineContext = (
-    <div className="w-full space-y-1 text-center">
-      <SpeakerBtn onClick={() => speakSentence(line)} label="escuchar la línea" />
-      <p className="text-xs text-vault-600">
-        {line.who === 'A' ? '🧑‍🚀 A' : '🧑‍🔧 B'} · línea {quiz.lineIdx + 1} de {dialogue.lines.length}
-      </p>
-    </div>
+  const lineBadge = (
+    <p className="text-center text-xs text-vault-600">
+      línea {quiz.lineIdx + 1} de {dialogue.lines.length}
+      {quiz.retry ? ' · reintento (sin XP)' : ''}
+    </p>
   )
 
-  /* ¿Qué significa esta línea? */
+  const optionalAudio = (
+    <SpeakerBtn onClick={() => speakSentence(line)} label="escuchar la línea" />
+  )
+
+  /** Revelado de la línea + CONTINUAR con el veredicto correcto */
+  const feedback = (correct: boolean) => (
+    <>
+      <p className="text-center">
+        <span className="font-hanzi text-xl text-vault-200">{line.hanzi}</span>
+        <Pinyin text={line.pinyin} className="block text-sm" />
+        <span className="block text-xs text-vault-500">— {line.es}</span>
+      </p>
+      <Btn className="w-full" onClick={() => onResult(correct)}>
+        CONTINUAR ▸
+      </Btn>
+    </>
+  )
+
+  /* ¿Qué oyes? — solo audio, elegir traducción */
   if (quiz.kind === 'meaning') {
     const answered = picked !== null
     const correct = picked === line.es
     return (
       <div className="flex flex-col items-center gap-4">
-        <Prompt>¿QUÉ SIGNIFICA ESTA LÍNEA?</Prompt>
-        {lineContext}
-        <Panel className="w-full p-3 text-center">
-          <span className="font-hanzi text-2xl text-vault-100">{line.hanzi}</span>
-          <Pinyin text={line.pinyin} className="block text-sm" />
-        </Panel>
+        <Prompt>¿QUÉ OYES?</Prompt>
+        <SpeakerBtn big onClick={() => speakSentence(line)} />
+        {lineBadge}
         <div className={`grid w-full gap-2 ${answered ? (correct ? 'flash-correct' : 'shake flash-wrong') : ''}`}>
           {(quiz.options ?? []).map((opt, i) => {
             const cls = answered && opt === line.es ? 'choice-correct' : picked === opt ? 'choice-wrong' : ''
@@ -332,91 +349,191 @@ function DialogueQuiz({
             )
           })}
         </div>
-        {answered && <Btn className="w-full" onClick={() => onResult(correct)}>CONTINUAR ▸</Btn>}
+        {answered && (
+          <>
+            <p className={`font-display text-xl ${correct ? 'text-vault-400 glow' : 'text-vault-red'}`}>
+              {correct ? '▓ ACCESO CONCEDIDO ▓' : '✗ ERROR DE PROTOCOLO'}
+            </p>
+            {feedback(correct)}
+          </>
+        )}
       </div>
     )
   }
 
-  /* Ordena la frase */
-  if (quiz.kind === 'order') {
-    return <OrderQuiz key={quiz.lineIdx} line={line} onResult={onResult} />
+  /* ¿Quién lo dice? — oír y elegir hablante */
+  if (quiz.kind === 'who') {
+    const answered = picked !== null
+    const correct = picked === line.who
+    return (
+      <div className="flex flex-col items-center gap-4">
+        <Prompt>¿QUIÉN LO DICE?</Prompt>
+        <SpeakerBtn big onClick={() => speakSentence(line)} />
+        {lineBadge}
+        <div className={`grid w-full grid-cols-2 gap-2 ${answered ? (correct ? 'flash-correct' : 'shake flash-wrong') : ''}`}>
+          {(['A', 'B'] as const).map((w) => {
+            const cls = answered && w === line.who ? 'choice-correct' : picked === w ? 'choice-wrong' : ''
+            return (
+              <button
+                key={w}
+                type="button"
+                disabled={answered}
+                className={`choice flex flex-col items-center rounded px-3 py-4 ${cls}`}
+                onClick={() => {
+                  setPicked(w)
+                  if (w === line.who) sfx.correct()
+                  else sfx.wrong()
+                }}
+              >
+                <span className="text-3xl">{w === 'A' ? '🧑‍🚀' : '🧑‍🔧'}</span>
+                <span className="font-display text-lg">{w}</span>
+              </button>
+            )
+          })}
+        </div>
+        {answered && (
+          <>
+            <p className={`font-display text-xl ${correct ? 'text-vault-400 glow' : 'text-vault-red'}`}>
+              {correct ? '▓ ACCESO CONCEDIDO ▓' : '✗ ERROR DE PROTOCOLO'}
+            </p>
+            {feedback(correct)}
+          </>
+        )}
+      </div>
+    )
   }
 
-  /* Palabra que falta */
-  const gapPinyin = quiz.gapPinyin ?? ''
-  const plain = gapPinyin.toLowerCase().normalize('NFD').replace(/[\u0300-\u030F]/g, '')
-  const submit = () => {
-    if (!gapValue.trim() || state !== 'typing') return
-    const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u030F]/g, '').replace(/[^a-z0-9]/g, '')
-    if (norm(gapValue) === norm(gapPinyin)) {
-      setState('ok')
-      sfx.correct()
-    } else {
-      setState('ko')
-      sfx.wrong()
-    }
+  /* Ordena la línea — fichas hanzi */
+  if (quiz.kind === 'order') {
+    return <OrderQuiz line={line} quiz={quiz} onResult={onResult} />
   }
+
+  /* ¿Qué palabra falta? — pinyin con hueco (SOLO kind gap) */
+  if (quiz.kind === 'gap') {
+    const gapPinyin = quiz.gapPinyin ?? ''
+    const plain = gapPinyin.toLowerCase().normalize('NFD').replace(/[\u0300-\u030F]/g, '')
+    const submit = () => {
+      if (!gapValue.trim() || state !== 'typing') return
+      const norm = (s: string) =>
+        s.toLowerCase().normalize('NFD').replace(/[\u0300-\u030F]/g, '').replace(/[^a-z0-9]/g, '')
+      if (norm(gapValue) === norm(gapPinyin)) {
+        setState('ok')
+        sfx.correct()
+      } else {
+        setState('ko')
+        sfx.wrong()
+      }
+    }
+    return (
+      <div className="flex flex-col items-center gap-4">
+        <Prompt>¿QUÉ PALABRA FALTA?</Prompt>
+        {optionalAudio}
+        {lineBadge}
+        <Panel className="w-full p-3 text-center">
+          <Pinyin text={line.pinyin.replace(gapPinyin, '＿＿')} className="text-xl" />
+          <span className="mt-1 block text-sm text-vault-500">{line.es}</span>
+        </Panel>
+        <form
+          className={`w-full space-y-3 ${state === 'ok' ? 'flash-correct' : state === 'ko' ? 'shake flash-wrong' : ''}`}
+          onSubmit={(e) => {
+            e.preventDefault()
+            submit()
+          }}
+        >
+          <input
+            value={gapValue}
+            onChange={(e) => setGapValue(e.target.value)}
+            disabled={state !== 'typing'}
+            className="choice choice-selected w-full rounded px-4 py-3 text-center text-2xl text-vault-100 outline-none"
+            placeholder="pinyin de la palabra…"
+            autoComplete="off"
+            spellCheck={false}
+            inputMode="text"
+          />
+          {state === 'typing' && (
+            <Btn type="submit" className="w-full" disabled={!gapValue.trim()}>
+              COMPROBAR ▸
+            </Btn>
+          )}
+        </form>
+        {state !== 'typing' && (
+          <>
+            <p className="text-center text-sm text-vault-500">
+              {state === 'ok' ? '¡exacto!' : `era: ${gapPinyin} (vale sin tonos: ${plain})`}
+            </p>
+            {feedback(state === 'ok')}
+          </>
+        )}
+      </div>
+    )
+  }
+
+  /* ¿Qué responde? — contexto + elegir respuesta en hanzi (kind reply) */
+  const answered = picked !== null
+  const correct = picked === line.hanzi
+  const prev = dialogue.lines[quiz.lineIdx - 1]
   return (
     <div className="flex flex-col items-center gap-4">
-      <Prompt>¿QUÉ PALABRA FALTA?</Prompt>
-      {lineContext}
+      <Prompt>¿QUÉ RESPONDE?</Prompt>
       <Panel className="w-full p-3 text-center">
-        <Pinyin text={line.pinyin.replace(gapPinyin, '＿＿')} className="text-xl" />
-        <span className="mt-1 block font-hanzi text-lg text-vault-500">{line.es}</span>
+        <span className="font-display text-sm text-vault-500">
+          {prev.who === 'A' ? '🧑‍🚀 A' : '🧑‍🔧 B'} dice:
+        </span>
+        <span className="mt-1 block font-hanzi text-xl text-vault-100">{prev.hanzi}</span>
+        <span className="block text-xs text-vault-500">— {prev.es}</span>
+        <button
+          type="button"
+          className="mt-2 font-display text-sm text-vault-400 underline"
+          onClick={() => speakSentence(prev)}
+        >
+          🔊 escuchar
+        </button>
       </Panel>
-      <form
-        className={`w-full space-y-3 ${state === 'ok' ? 'flash-correct' : state === 'ko' ? 'shake flash-wrong' : ''}`}
-        onSubmit={(e) => {
-          e.preventDefault()
-          submit()
-        }}
-      >
-        <input
-          value={gapValue}
-          onChange={(e) => setGapValue(e.target.value)}
-          disabled={state !== 'typing'}
-          className="choice choice-selected w-full rounded px-4 py-3 text-center text-2xl text-vault-100 outline-none"
-          placeholder="pinyin de la palabra…"
-          autoComplete="off"
-          spellCheck={false}
-          inputMode="text"
-        />
-        {state === 'typing' && (
-          <Btn type="submit" className="w-full" disabled={!gapValue.trim()}>
-            COMPROBAR ▸
-          </Btn>
-        )}
-      </form>
-      {state !== 'typing' && (
+      {lineBadge}
+      <div className={`grid w-full gap-2 ${answered ? (correct ? 'flash-correct' : 'shake flash-wrong') : ''}`}>
+        {(quiz.options ?? []).map((opt, i) => {
+          const cls = answered && opt === line.hanzi ? 'choice-correct' : picked === opt ? 'choice-wrong' : ''
+          return (
+            <button
+              key={i}
+              type="button"
+              disabled={answered}
+              className={`choice rounded px-4 py-3 text-center font-hanzi text-xl text-vault-100 ${cls}`}
+              onClick={() => {
+                setPicked(opt)
+                if (opt === line.hanzi) sfx.correct()
+                else sfx.wrong()
+              }}
+            >
+              {opt}
+            </button>
+          )
+        })}
+      </div>
+      {answered && (
         <>
-          <p className="text-center text-sm text-vault-500">
-            {state === 'ok' ? '¡exacto!' : `era: ${gapPinyin} (vale sin tonos: ${plain})`}
+          <p className={`font-display text-xl ${correct ? 'text-vault-400 glow' : 'text-vault-red'}`}>
+            {correct ? '▓ ACCESO CONCEDIDO ▓' : '✗ ERROR DE PROTOCOLO'}
           </p>
-          <Btn className="w-full" onClick={() => onResult(state === 'ok')}>
-            CONTINUAR ▸
-          </Btn>
+          {feedback(correct)}
         </>
       )}
     </div>
   )
 }
 
-/* Ordenar la línea (fichas por carácter, mismo motor que las lecciones) */
+/* Ordenar la línea (fichas por carácter) */
 function OrderQuiz({
   line,
+  quiz,
   onResult,
 }: {
   line: DialogueLine
+  quiz: LineQuiz
   onResult(correct: boolean): void
 }) {
   const chars = useMemo(() => [...line.hanzi.replace(/[。，？！、]/g, '')], [line])
-  const [order] = useState<number[]>(() => {
-    const idx = chars.map((_, i) => i)
-    // barajar estable por línea
-    const keyed = idx.map((i) => ({ i, k: hash(line.hanzi + i) % 997 }))
-    keyed.sort((a, b) => a.k - b.k)
-    return keyed.map((x) => x.i)
-  })
+  const [order] = useState<number[]>(() => stableShuffle(chars.map((_, i) => i), line.hanzi + 'o'))
   const [placed, setPlaced] = useState<number[]>([])
   const [state, setState] = useState<'typing' | 'ok' | 'ko'>('typing')
 
@@ -426,14 +543,17 @@ function OrderQuiz({
   return (
     <div className="flex flex-col items-center gap-4">
       <Prompt>ORDENA LA LÍNEA</Prompt>
-      <Panel className="w-full p-2 text-center">
-        <SpeakerBtn onClick={() => speakSentence(line)} label="escuchar la línea" />
-      </Panel>
-      <p className="text-sm text-vault-500">{line.es}</p>
+      <SpeakerBtn onClick={() => speakSentence(line)} label="escuchar la línea" />
+      <p className="text-center text-xs text-vault-600">
+        línea {quiz.lineIdx + 1} · {quiz.retry ? 'reintento (sin XP)' : ''}
+      </p>
+      <p className="text-center text-sm text-vault-500">{line.es}</p>
 
-      <div className={`meter flex min-h-14 w-full flex-wrap items-center justify-center gap-1 p-2 ${
-        state === 'ok' ? 'flash-correct' : state === 'ko' ? 'shake flash-wrong' : ''
-      }`}>
+      <div
+        className={`meter flex min-h-14 w-full flex-wrap items-center justify-center gap-1 p-2 ${
+          state === 'ok' ? 'flash-correct' : state === 'ko' ? 'shake flash-wrong' : ''
+        }`}
+      >
         {placed.length === 0 && <span className="text-sm text-vault-600">toca en orden…</span>}
         {placed.map((charIdx, pos) => (
           <button

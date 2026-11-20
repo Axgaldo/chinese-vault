@@ -332,15 +332,33 @@ service cloud.firestore {
   comprueba al arrancar, al volver a la app y cada 5 min (main.tsx). Sin servidor: no
   avisa si la app está cerrada del todo (limitación PWA sin push).
 
-- **Diálogos de la Radio 🎭 (v2.7.0)**: `lib/dialogues.ts` (catálogo `DIALOGUES` anclado a
-  sectores: `unlockedDialogues` los desbloquea al completar TODAS las lecciones del sector —
-  cero vocabulario nuevo) + `pages/DialoguesPage.tsx` (ruta `/radio/dialogues`, botón en la
-  portada de la Radio). Flujo: escuchar/leer el diálogo (líneas A/B con audio por línea) →
-  retos por línea (3 tipos rotando por hash: qué significa / ordena la línea / palabra que
-  falta con hueco ＿＿) → resumen. +5 XP por línea (primer intento). Las líneas usan el mismo
-  slug de audio `s-{pinyin}` — `npm run audio` las genera (sentenceTasks las incluye).
-  AÑADIR diálogos = editar DIALOGUES con la MISMA disciplina de pinyin (sandhi en frases,
-  sílabas neutras sin marca) y correr `npm run audio`.
+- **Diálogos de la Radio 🎭 (v2.7.0+v2.8.0)**: `lib/dialogues.ts` (catálogo `DIALOGUES` — 19
+  diálogos de 4-6 líneas anclados a sectores; DISCIPLINA: solo vocabulario de su sector o
+  anteriores) + `pages/DialoguesPage.tsx` (ruta `/radio/dialogues`). FLUJO: retos por línea
+  directamente (la conversación NO se revela hasta el final; audio por línea opcional 🔊,
+  autoplay solo en retes de oído) → al completar: transcripción completa + ESCUCHAR TODO.
+  5 tipos de reto (hash estable por línea): ¿qué oyes? (audio→traducción) · ¿quién lo dice?
+  (audio→A/B) · ordena la línea (fichas) · ¿qué palabra falta? (hueco ＿＿ en el pinyin) ·
+  ¿qué responde? (línea anterior → elegir respuesta hanzi). +5 XP/línea primer intento,
+  fallo → reencola con retry. BUGS HISTÓRICOS ya arreglados (que no vuelvan): (1) el
+  CONTINUAR de meaning/who/reply debe pasar el veredicto correcto (no `state === 'ok'`,
+  que siempre es false ahí); (2) CADA tipo de reto necesita su `if (quiz.kind === 'x')`
+  con return — el JSX de gap como fall-through renderizaba los reply como gap
+  (gapPinyin undefined → hueco imposible). Las líneas usan el slug `s-{pinyin}` —
+  `npm run audio` las genera.
+
+## Preparado para HSK 3 (próxima iteración)
+
+Checklist para añadir HSK 3 (se repite el patrón de HSK 2, todo ya probado):
+
+1. `VaultModule.hsk` → `0 | 1 | 2 | 3` (types/content.ts) + test de integridad (index.test.ts
+   acepta hsk 3).
+2. Sectores `src/content/hsk3/m21…m30.ts` (S-21 a S-30): primero un sector fundacional escrito
+   A MANO con la nota pedagógica "profesor" (estilo m11), luego subagentes con tablas
+   autoritativas de pinyin. El test "builds: alineación 1:1" valida TODAS las frases.
+3. Diálogos HSK 3: añadir a `lib/dialogues.ts` anclados a los sectores nuevos + `npm run audio`.
+4. Vocabulario HSK 3 canónico: ~600 palabras nuevas (el doble que HSK 2) — repartir en 10
+   sectores de ~40-50 palabras con 4-5 lecciones cada uno.
 
 ## Radio del Refugio 📻 y HSK 2 (v2.0.0)
 
